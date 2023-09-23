@@ -1,0 +1,37 @@
+.typography-size {
+  &-small {
+    font-size: 14px;
+  }
+
+  &-large {
+    font-size: 20px;
+  }
+}
+
+.typography-weight {
+  &-default {
+    font-weight: 400;
+  }
+
+  &-bold {
+    font-weight: 500;
+  }
+
+  &-italic {
+    font-weight: 300;
+  }
+}
+
+.typography-color {
+  &-default {
+    color: #000;
+  }
+
+  &-gray {
+    color: #1B1B1F;
+  }
+
+  &-purple {
+    color: #6750A4;
+  }
+}

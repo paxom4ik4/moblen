@@ -1,0 +1,46 @@
+.app-test-card {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  border-radius: 0 15px 15px 15px;
+  background-color: #FBF8FD;
+  transition: 0.3s;
+  padding: 8px 16px;
+  margin: 10px 0;
+
+  width: 340px;
+
+  &:hover {
+    background-color: #F2F0F4;
+    cursor: pointer;
+  }
+
+  &_subject-topic {
+    color: #6750A4;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  &_name {
+    font-size: 16px;
+    padding: 4px 0;
+  }
+
+  &_tasks {
+    font-size: 14px;
+    color: #44464F;
+  }
+
+  &_share {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px;
+
+    border-radius: 15px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  }
+}

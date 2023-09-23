@@ -1,0 +1,24 @@
+.student-cart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: 0.3s;
+  padding: 4px;
+
+  :hover {
+    cursor: grab;
+    opacity: 0.8;
+  }
+
+  font-weight: 300;
+
+  &_name {
+    margin-top: 12px;
+    padding: 0 0 4px;
+  }
+}
+
+.student-cart-dragging {
+  border-radius: 16px;
+  transition: 0.5s;
+}

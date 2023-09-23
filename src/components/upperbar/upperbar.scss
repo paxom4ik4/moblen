@@ -1,0 +1,18 @@
+.app-upper-bar {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 150px;
+  height: 55px;
+  position: absolute;
+  right: 20px;
+  top: 34px;
+  background-color: #FFFFFF;
+
+  box-shadow: 1px 1px 5px 1px #ccc;
+  border-radius: 28px;
+
+  z-index: 5;
+}

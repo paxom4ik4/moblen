@@ -1,0 +1,33 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+.app {
+  width: calc(100vw - 132px);
+  height: calc(100vh - 140px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 112px;
+  margin-top: 120px;
+
+  &_title {
+    position: absolute;
+    top: 32px;
+    left: 112px;
+    font-size: 32px;
+  }
+}
+
+.backdrop-shadow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.3);
+}

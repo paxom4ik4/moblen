@@ -1,0 +1,60 @@
+.groups {
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #E1E2EC;
+  border-radius: 16px;
+  position: relative;
+  height: 100%;
+  padding: 24px;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+
+  &_list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: scroll;
+    padding: 4px 32px 4px 4px;
+    min-width: 420px;
+
+    &-add {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #F8FDF8;
+      border-radius: 0 15px 15px 15px;
+      box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.3);
+      color: #6750A4;
+      padding: 20px;
+      width: fit-content;
+      transition: 0.3s;
+
+      &:hover {
+        cursor: pointer;
+        opacity: 0.8;
+      }
+    }
+  }
+
+  &_students {
+    width: 70%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 20px;
+    height: fit-content;
+
+    &_empty {
+      margin-top: 20px;
+      width: 100%;
+      text-align: center;
+    }
+  }
+
+  &_trash {
+    position: absolute;
+    right: 20px;
+    bottom: 32px;
+  }
+}

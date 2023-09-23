@@ -1,0 +1,23 @@
+.app-sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-bottom: 20px;
+
+  &_item {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+    border-radius: 50%;
+  }
+}
+
+.active-sidebar-item {
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 0 5px 3px rgba(0, 0, 0, 0.3);
+}

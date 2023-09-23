@@ -39,14 +39,27 @@
   }
 
   &_text-container_name {
+    width: 100%;
     padding-bottom: 12px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
 
+    &-text {
+      width: 80%;
+    }
+
     &-title {
       padding-bottom: 8px;
+    }
+
+    &-work input {
+      width: 100%;
+      padding: 2px 0;
+      outline: none;
+      font-size: 18px;
+      border: none;
     }
   }
 

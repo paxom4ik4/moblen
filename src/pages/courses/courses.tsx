@@ -1,20 +1,17 @@
 import { FC, useState } from 'react';
 import { useDrop } from "react-dnd";
+import { useNavigate } from "react-router-dom";
 
 import AddIcon from 'assets/icons/add-icon.svg'
+import CheckIcon from 'assets/icons/check-icon.svg';
 import EditIcon from 'assets/icons/edit-icon.svg';
 import AddSubjectIcon from 'assets/icons/add-subject-icon.svg';
 import CancelIcon from 'assets/icons/cancel-icon.svg';
 import LockIcon from 'assets/icons/lock-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg'
-import { useNavigate } from "react-router-dom";
 import { TestCard } from "components/test-card/test-card.tsx";
-import { GroupCard} from "components/group-card/group-card.tsx";
-import { Typography} from "common/typography/typography.tsx";
-import { TitledCheckbox} from "common/titled-checkbox/titled-checkbox.tsx";
-
+import { CoursesShare } from "./courses-share/courses-share.tsx";
 import { DraggableTypes } from "types/draggable/draggable.types.ts";
-import { mockedGroups } from "constants/mockedGroups.ts";
 
 import './courses.scss';
 
@@ -32,26 +29,54 @@ export const Courses: FC = () => {
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     })
-  }))
+  }));
 
-  const [activeTopic, setActiveTopic] = useState(mockedTopics[0].id);
-  const [activeSubject, setActiveSubject] = useState(mockedSubjects[0].id);
+  const [courseData, setCourseData] = useState({
+    topics: mockedTopics,
+    subjects: mockedSubjects,
+  });
 
+  // creating / editing subjects
+  const [addNewSubject, setAddNewSubject] = useState(false);
+  const [newSubjectName, setNewSubjectName] = useState("");
+
+  const saveNewSubjectHandler = () => {
+    if (newSubjectName.length) {
+      setCourseData({
+        ...courseData,
+        subjects: [...courseData.subjects, { id: Date.now().toString(), name: newTopicName }],
+      });
+
+      setNewSubjectName("");
+      setAddNewSubject(false);
+    }
+  };
+
+  // creating / editing topics
+  const [addNewTopic, setAddNewTopic] = useState(false);
+  const [newTopicName, setNewTopicName] = useState("");
+
+  const saveNewTopicHandler = () => {
+    if (newTopicName.length) {
+      setCourseData({
+        ...courseData,
+        topics: [...courseData.topics, { id: Date.now().toString(), name: newTopicName }],
+      });
+
+      setNewTopicName("");
+      setAddNewTopic(false);
+    }
+  };
+
+  // course state
+  const [activeTopic, setActiveTopic] = useState(courseData.topics.length ? mockedTopics[0].id : null);
+  const [activeSubject, setActiveSubject] = useState(courseData.subjects.length ? mockedSubjects[0].id : null);
+
+  // new test creating
   const [isCreatingNewTest, setIsCreatingNewTest] = useState(false);
 
+  // share
   const [testToShare, setTestToShare] = useState<string | null>(null);
-
-  const [selectedShareGroups, setSelectedShareGroups] = useState<string[]>([]);
-
-  // share configuration
-  const [deadline, setDeadline] = useState(false);
-  const [timeLimit, setTimeLimit] = useState(false);
-  const [mark, setMark] = useState(false);
-  const [retry, setRetry] = useState(false);
-  const [answers, setAnswers] = useState(false);
-
-  // calendar
-  // const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   const handleTestCreate = () => setIsCreatingNewTest(true);
 
@@ -64,60 +89,14 @@ export const Courses: FC = () => {
     </div>
   )
 
-  const shareTestContent = (
-    <div className={`${DEFAULT_CLASSNAME}_share`}>
-      <div className={`${DEFAULT_CLASSNAME}_share_title`}>
-        <div className={`${DEFAULT_CLASSNAME}_share_title-name`}>{"Отправить задание"}</div>
-        <div className={`${DEFAULT_CLASSNAME}_share_title-close`} onClick={() => setTestToShare(null)}><CancelIcon /></div>
-      </div>
-      <div className={`${DEFAULT_CLASSNAME}_share_content`}>
-        <div className={`${DEFAULT_CLASSNAME}_share_content_groups`}>
-          {mockedGroups.map(group => <GroupCard active={selectedShareGroups.includes(group.id)} selectedShareGroups={selectedShareGroups} setSelectedShareGroups={setSelectedShareGroups} key={group.id} id={group.id} name={group.name} amount={group.amount} hideControls />)}
-        </div>
-        <div className={`${DEFAULT_CLASSNAME}_share_content_config`}>
-          <div className={`${DEFAULT_CLASSNAME}_share_content_config_task`}>
-            <Typography>{'Англ - Третья тема'}</Typography>
-            <Typography color={'purple'} size={'large'}>{'ДЗ №17'}</Typography>
-            <Typography color={'gray'} size={'small'}>{'Заданий - 11'}</Typography>
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime`}>
-            <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime_calendar`}></div>
-            <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime_time`}>
-              <TitledCheckbox name={'deadline'} checked={deadline} onChange={() => setDeadline(!deadline)}>Дедлайн</TitledCheckbox>
-              <TitledCheckbox name={'mark'} checked={mark} onChange={() => setMark(!mark)}>Оценка</TitledCheckbox>
-              <TitledCheckbox name={'timeLimit'} checked={timeLimit} onChange={() => setTimeLimit(!timeLimit)}>Ограничение по времени</TitledCheckbox>
-              <TitledCheckbox name={'retry'} checked={retry} onChange={() => setRetry(!retry)}>Можно перепройти</TitledCheckbox>
-              <TitledCheckbox name={'answers'} checked={answers} onChange={() => setAnswers(!answers)}>Смотр. ответы после сдачи</TitledCheckbox>
-            </div>
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_share_content_config_confirm`}></div>
-        </div>
-      </div>
-    </div>
-  );
-
-  // const calendarContent = (
-  //   <div className={`${DEFAULT_CLASSNAME}_calendar`}>
-  //     <div className={`${DEFAULT_CLASSNAME}_calendar_title`}>
-  //       <Typography size={'large'}>Расписание</Typography>
-  //       <div className={`${DEFAULT_CLASSNAME}_calendar_close`} onClick={() => setIsCalendarOpen(false)}><CancelIcon /></div>
-  //     </div>
-  //     <div className={`${DEFAULT_CLASSNAME}_calendar_content`}>
-  //       <DateCalendar displayWeekNumber />
-  //     </div>
-  //   </div>
-  // );
+  const showBackgroundShadow = isCreatingNewTest || testToShare
 
   return (
     <div className={DEFAULT_CLASSNAME}>
-      {/*{ isCalendarOpen && calendarContent }*/}
-      {/*{ isCalendarOpen && <div className={`backdrop-shadow`}/> }*/}
+      { showBackgroundShadow && <div className={`backdrop-shadow`}/> }
 
+      { testToShare && <CoursesShare setTestToShare={setTestToShare} /> }
       { isCreatingNewTest && createNewTestContent }
-      { isCreatingNewTest && <div className={`backdrop-shadow`}/> }
-
-      { testToShare && shareTestContent }
-      { testToShare && <div className={`backdrop-shadow`}/> }
 
       <div className={`${DEFAULT_CLASSNAME}_subjects`}>
         <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
@@ -126,7 +105,17 @@ export const Courses: FC = () => {
               className={`${DEFAULT_CLASSNAME}_subjects_list-item ${subject.id === activeSubject && 'active-subject'}`}
               onClick={() => setActiveSubject(subject.id)}><input disabled={true} value={subject.name} /> {subject.id === activeSubject && <EditIcon />}</div>
           )}
-          <button className={`${DEFAULT_CLASSNAME}_subjects_add-new`}><AddSubjectIcon /></button>
+          {addNewSubject &&
+              <div className={`${DEFAULT_CLASSNAME}_subjects_list-item`}>
+                  <input
+                      onChange={(e) => setNewSubjectName(e.currentTarget.value)}
+                      value={newSubjectName}
+                      placeholder={'Новый предмет'}
+                  />
+                  <div className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`} onClick={saveNewSubjectHandler}><CheckIcon /></div>
+              </div>
+          }
+          <button className={`${DEFAULT_CLASSNAME}_subjects_add-new`} onClick={() => setAddNewSubject(true)}><AddSubjectIcon /></button>
         </div>
       </div>
       <div className={`${DEFAULT_CLASSNAME}_topics`}>
@@ -134,11 +123,21 @@ export const Courses: FC = () => {
           {mockedTopics.map(topic =>
             <div
               className={`${DEFAULT_CLASSNAME}_topics_list-item ${topic.id === activeTopic && 'active-topic'}`}
-              onClick={() => setActiveTopic(topic.id)}><input disabled={true} value={topic.name} /> {topic.id === activeTopic && <div className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}><EditIcon /></div>}</div>
+              onClick={() => setActiveTopic(topic.id)}><input disabled={true} value={topic.name} /> {topic.id === activeTopic && <div className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}><EditIcon /></div>}
+            </div>
           )}
-          <div className={`${DEFAULT_CLASSNAME}_topics_add`}> <AddIcon /></div>
+          {addNewTopic &&
+              <div className={`${DEFAULT_CLASSNAME}_topics_list-item`}>
+                  <input
+                      onChange={(e) => setNewTopicName(e.currentTarget.value)}
+                      value={newTopicName}
+                      placeholder={'Новая тема'}
+                  />
+                  <div onClick={saveNewTopicHandler} className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}><CheckIcon /></div>
+              </div>
+          }
+          <div className={`${DEFAULT_CLASSNAME}_topics_add`} onClick={() => setAddNewTopic(true)}> <AddIcon /></div>
         </div>
-        {/*<div className={`${DEFAULT_CLASSNAME}_topics_edit`} onClick={() => setIsCalendarOpen(true)}><CalendarIcon /></div>*/}
       </div>
       <div className={`${DEFAULT_CLASSNAME}_tasks`}>
         <TestCard id={'test-id'} setTestToShare={setTestToShare} />

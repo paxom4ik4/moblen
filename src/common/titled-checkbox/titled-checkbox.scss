@@ -4,7 +4,16 @@
   flex-direction: row;
   background: #FFFFFF;
   border-radius: 28px;
-  width: 50%;
+  width: 100%;
   justify-content: space-between;
   align-items: center;
+
+  input[type=checkbox] {
+    width: 16px;
+    height: 16px;
+  }
+
+  input[type=checkbox]:checked {
+    accent-color: #6750A4;
+  }
 }

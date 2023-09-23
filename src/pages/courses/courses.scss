@@ -121,11 +121,9 @@
         gap: 12px;
 
         input {
-          &:disabled {
-            background: transparent;
-            border: none;
-            outline: none;
-          }
+          background: transparent;
+          border: none;
+          outline: none;
         }
 
         &:hover {
@@ -183,7 +181,7 @@
       &-item {
         background-color: #FBF8FD;
         border-radius: 16px;
-        padding: 5px 10px;
+        padding: 16px 14px;
         color: #757780;
         font-size: 14px;
         font-weight: 500;
@@ -194,11 +192,16 @@
         gap: 12px;
         height: 30px;
 
-        &_edit {
-          width: 20px;
+        svg {
+          height: 20px;
         }
 
-        input:disabled {
+        &_edit {
+          width: 20px;
+          height: 20px;
+        }
+
+        input {
           background: transparent;
           border: none;
           outline: none;
@@ -279,109 +282,6 @@
         opacity: 0.8;
       }
     }
-  }
-
-  &_share {
-    z-index: 20;
-    position: fixed;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90vw;
-    height: 90vh;
-
-    &_content {
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
-
-      &_config {
-        padding: 12px 20px;
-        display: flex;
-        background: #E1E2EC;
-        height: 100%;
-        border-radius: 0 15px 15px 15px;
-        width: 50%;
-        flex-direction: column;
-
-        &_dateTime {
-          gap: 12px;
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          width: 100%;
-          border-radius: 0 15px 15px 15px;
-
-          &_time {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-          }
-        }
-
-        &_task {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          background: #FFFFFF;
-          border-radius: 0 15px 15px 15px;
-          padding: 16px;
-          gap: 4px;
-
-          &-topic {
-            color: #6750A4;
-          }
-
-          &-name {
-            font-size: 20px;
-          }
-
-          &-amount {
-            color: #44464F;
-            font-size: 14px;
-          }
-        }
-      }
-
-      &_groups {
-        display: flex;
-        flex-wrap: wrap;
-        width: 50%;
-        gap: 20px;
-      }
-    }
-
-    &_title {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-
-      &-close {
-        cursor: pointer;
-        transition: 0.3s;
-
-        &:hover {
-          opacity: 0.8;
-        }
-      }
-
-      &-name {
-        font-size: 24px;
-      }
-    }
-
-    .group-card {
-      min-width: auto;
-      cursor: pointer;
-    }
-
-    background: #fff;
   }
 }
 

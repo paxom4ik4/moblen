@@ -11,3 +11,8 @@
   height: 100vh;
   padding: 25px 0;
 }
+
+.disabled-link {
+  pointer-events: none;
+  opacity: 0.5;
+}

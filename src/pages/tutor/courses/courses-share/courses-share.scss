@@ -109,9 +109,11 @@
     }
 
     &_groups {
+      height: fit-content;
       display: flex;
+      grid-gap: 20px;
+      flex-direction: row;
       flex-wrap: wrap;
-      column-gap: 20px;
 
       .group-card {
         height: fit-content;

@@ -15,7 +15,7 @@ import {Student} from "../../types/student.ts";
 const DEFAULT_CLASSNAME = 'group-card';
 
 export interface GroupCardProps {
-  id: string;
+  id?: string;
   active?: boolean;
   editMode?: boolean
   name?: string;
@@ -31,7 +31,7 @@ export interface GroupCardProps {
   group?: Group;
 
   selectedShareGroups?: string[];
-  setSelectedShareGroups: Dispatch<SetStateAction<string[]>>;
+  setSelectedShareGroups?: Dispatch<SetStateAction<string[]>>;
 }
 
 export const GroupCard: FC<GroupCardProps> = props => {
@@ -81,7 +81,7 @@ export const GroupCard: FC<GroupCardProps> = props => {
 
   const onGroupCartClickHandler = () => {
     if (hideControls) {
-      setSelectedShareGroups!([id, ...selectedShareGroups!])
+      setSelectedShareGroups!([id!, ...selectedShareGroups!])
     } else {
       group && setSelectedGroup!(group)
     }

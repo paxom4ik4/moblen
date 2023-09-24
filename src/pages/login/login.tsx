@@ -1,20 +1,23 @@
 import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Formik, Form, ErrorMessage } from 'formik';
 import { Input } from "common/input/input.tsx";
 
 import CheckIcon from "assets/icons/check-icon.svg";
 import { Typography } from "common/typography/typography.tsx";
-import { LoginModes } from "constants/appTypes.ts";
+import { AppModes, LoginModes } from "constants/appTypes.ts";
 
 import './login.scss';
 
 const DEFAULT_CLASSNAME = 'login';
 
 interface LoginProps {
-  setUserData: Dispatch<SetStateAction<object>>;
+  setUserData: Dispatch<SetStateAction<{ user: AppModes.student} | { user: AppModes.tutor } | null>>;
 }
 
 export const LoginPage: FC<LoginProps> = props => {
+  const navigate = useNavigate();
+
   const { setUserData } = props;
 
   const [mode, setMode]
@@ -50,7 +53,12 @@ export const LoginPage: FC<LoginProps> = props => {
       <Input label={'Повторите новый пароль'} type="passwordRepeat" name="passwordRepeat" />
       <ErrorMessage className={`${DEFAULT_CLASSNAME}_form_error_filed`} name="passwordRepeat" component="div" />
     </>
-  )
+  );
+
+  const loginHandler = () => {
+    setUserData({ user: AppModes.student });
+    navigate('/');
+  }
 
   return (
     <div className={DEFAULT_CLASSNAME}>
@@ -77,19 +85,27 @@ export const LoginPage: FC<LoginProps> = props => {
         }}
       >
         {({ isSubmitting }) => (
-          <Form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={() => setUserData({ user: true })}>
+          <Form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={loginHandler}>
             <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>{mode === LoginModes.login ? "Вход" : "Восстановить пароль"}</Typography>
 
             {mode === LoginModes.login ? loginContent : passwordResetContent}
 
             <div className={`${DEFAULT_CLASSNAME}_footer`}>
-              {mode === LoginModes.login &&
+              {mode === LoginModes.login && <>
+                  <Typography
+                      onClick={() => navigate('/registration')}
+                      color={'purple'}
+                      className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+                      Зарегистрироваться
+                  </Typography>
+
                   <Typography
                       onClick={() => setMode(LoginModes.passwordReset)}
                       color={'purple'}
                       className={`${DEFAULT_CLASSNAME}_footer_mode`}>
                       Восстановить пароль
                   </Typography>
+              </>
               }
               <button className={`${DEFAULT_CLASSNAME}_form_submit`} type="submit" disabled={isSubmitting}>
                 <CheckIcon />

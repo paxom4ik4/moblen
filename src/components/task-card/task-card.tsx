@@ -150,14 +150,14 @@ export const TaskCard: FC<TaskCardProps> = props => {
       {isCreateMode && !!assets.length && <div className={`${DEFAULT_CLASSNAME}_files`}>
         {assets.map(asset => <div className={`${DEFAULT_CLASSNAME}_files_item`}>
           <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-          <Typography>{asset.text}</Typography>
+          <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>{asset.text}</Typography>
         </div>)}
       </div>}
 
       {!!taskAssets?.length && <div className={`${DEFAULT_CLASSNAME}_files`}>
         {assets.map(asset => <div className={`${DEFAULT_CLASSNAME}_files_item`}>
           <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-          <Typography>{asset.text}</Typography>
+          <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>{asset.text}</Typography>
         </div>)}
       </div>}
 

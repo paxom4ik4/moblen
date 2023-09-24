@@ -8,8 +8,8 @@ import AddIcon from 'assets/icons/add-icon.svg';
 
 import { TaskCard } from "components/task-card/task-card.tsx";
 import { Task } from "types/task.ts";
-import {Typography} from "../../common/typography/typography.tsx";
-import {useNavigate} from "react-router-dom";
+import { Typography } from "common/typography/typography.tsx";
+import { useNavigate } from "react-router-dom";
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 

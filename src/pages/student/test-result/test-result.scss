@@ -1,0 +1,65 @@
+.test-result {
+  width: 100%;
+  max-height: 100%;
+  position: relative;
+  top: -32px;
+
+  &_title {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    margin-bottom: 32px;
+
+    &_maxScore p {
+      color: #F77126;
+    }
+  }
+
+  &_tasks {
+    padding-right: 20px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: 85vh;
+    overflow-y: scroll;
+
+    &_item {
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+
+      &_task {
+        width: 50%;
+      }
+
+      &_analytics {
+        padding: 16px;
+        overflow-y: scroll;
+        width: 50%;
+        background-color: #FEFBFF;
+        border-radius: 15px;
+        box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  &_submit-test {
+    background-color: transparent;
+    border: none;
+    box-shadow: 0 0 2px 1px rgba(103, 80, 164, 0.3);
+    padding: 4px 6px;
+    border-radius: 8px;
+    margin-top: 20px;
+    width: fit-content;
+    align-self: flex-end;
+    margin-right: 20px;
+    transition: 0.3s;
+
+    &:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+  }
+}

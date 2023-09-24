@@ -1,0 +1,55 @@
+.student-test-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0 15px 15px 15px;
+  background: #FFFFFF;
+
+  &_status {
+    border-top: 1px solid black;
+    text-align: center;
+    padding: 12px;
+    transition: 0.3s;
+
+    &:hover {
+      cursor: pointer;
+      background-color: rgba(234, 234, 234, 0.5);
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+      opacity: 0.8;
+    }
+  }
+
+  &:nth-child(1n) .student-test-card_color {
+    background-color: #F77126;
+  }
+
+  &:nth-child(2n) .student-test-card_color {
+    background-color: #DD4848;
+  }
+
+  &:nth-child(3n) .student-test-card_color {
+    background-color: #EFC222;
+  }
+
+  &:nth-child(4n) .student-test-card_color {
+    background-color: #92E20E;
+  }
+
+  &_color {
+    width: 90px;
+    height: 80px;
+    border-radius: 0 15px 0 0;
+  }
+
+  &_content {
+    display: flex;
+    flex-direction: row;
+
+    &_info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 24px 8px 16px;
+    }
+  }
+}

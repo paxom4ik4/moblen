@@ -5,8 +5,8 @@ import { GroupCard } from "components/group-card/group-card.tsx";
 import { StudentCard } from "components/student-card/student-card.tsx";
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import AddIcon from 'assets/icons/add-icon.svg';
-import {Group} from "../../types/group.ts";
-import {Typography} from "../../common/typography/typography.tsx";
+import {Group} from "types/group.ts";
+import {Typography} from "common/typography/typography.tsx";
 
 const DEFAULT_CLASSNAME = 'groups';
 
@@ -31,7 +31,7 @@ export const Groups: FC<GroupsProps> = props => {
       <div className={`${DEFAULT_CLASSNAME}_list`}>
         {!groups?.length && <div>Создайте новую группу</div>}
 
-        {groups?.map(group => <GroupCard groups={groups} active={selectedGroup === group} group={group} setSelectedGroup={setSelectedGroup} editMode={false} name={group.name} amount={group.amount} iconUrl={group.iconUrl} url={group.referralLink} />)}
+        {groups?.map(group => <GroupCard id={group.id} groups={groups} active={selectedGroup === group} group={group} setSelectedGroup={setSelectedGroup} editMode={false} name={group.name} amount={group.amount} iconUrl={group.iconUrl} url={group.referralLink} />)}
 
         {isNewGroupCreating && <GroupCard setIsNewGroupCreating={setIsNewGroupCreating} groups={groups} isNewGroupCreating={isNewGroupCreating} setGroups={setGroups} editMode={true}/>}
         <div className={`${DEFAULT_CLASSNAME}_list-add`} onClick={() => createNewGroupHandler()}><AddIcon /></div>

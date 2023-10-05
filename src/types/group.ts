@@ -1,4 +1,4 @@
-import {Student} from "./student.ts";
+import { Student } from './student.ts';
 
 export interface Group {
   group_uuid: string;

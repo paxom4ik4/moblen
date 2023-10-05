@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from 'react';
-import { Typography } from "../typography/typography.tsx";
+import { Typography } from '../typography/typography.tsx';
 
 import './titled-checkbox.scss';
 
@@ -11,12 +11,15 @@ export interface TitledCheckboxProps extends PropsWithChildren {
   name?: string;
 }
 
-export const TitledCheckbox: FC<TitledCheckboxProps> = props => {
+export const TitledCheckbox: FC<TitledCheckboxProps> = (props) => {
   const { children, name, ...otherProps } = props;
 
   return (
     <div className={DEFAULT_CLASSNAME}>
-      <label htmlFor={name}><Typography>{children}</Typography></label> <input id={name} type={"checkbox"} {...otherProps} />
+      <label htmlFor={name}>
+        <Typography>{children}</Typography>
+      </label>{' '}
+      <input id={name} type={'checkbox'} {...otherProps} />
     </div>
-  )
-}
+  );
+};

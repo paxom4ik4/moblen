@@ -16,10 +16,10 @@ export interface TaskWithAnswer extends Task {
 }
 
 export const mockedTask = {
-  taskText: "Решите пример: 2 + 2",
-  format: "standard",
+  taskText: 'Решите пример: 2 + 2',
+  format: 'standard',
   criteria: 'Нельзя ползьзоваться калькулятором',
   maxScore: '10',
-  answer: "Ответ Студента",
+  answer: 'Ответ Студента',
   assets: [],
-}
+};

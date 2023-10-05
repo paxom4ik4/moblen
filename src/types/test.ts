@@ -1,4 +1,4 @@
-import { TaskWithAnswer } from "./task.ts";
+import { TaskWithAnswer } from './task.ts';
 
 export interface Test {
   id: string;
@@ -6,5 +6,5 @@ export interface Test {
   subject: string;
   topic: string;
   status: 'pending' | 'done';
-  tasks: TaskWithAnswer[],
+  tasks: TaskWithAnswer[];
 }

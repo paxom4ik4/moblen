@@ -2,8 +2,8 @@ import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
-import { Typography } from "common/typography/typography.tsx";
-import { Asset, TaskWithAnswer } from "types/task.ts";
+import { Typography } from 'common/typography/typography.tsx';
+import { Asset, TaskWithAnswer } from 'types/task.ts';
 
 import './task-pass-card.scss';
 
@@ -22,7 +22,7 @@ interface TaskPassCardProps {
   tasksWithStudentAnswers?: TaskWithAnswer[];
 }
 
-export const TaskPassCard: FC<TaskPassCardProps> = props => {
+export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
   const {
     answer,
     mode = 'pass',
@@ -32,10 +32,10 @@ export const TaskPassCard: FC<TaskPassCardProps> = props => {
     taskAssets,
     criteria,
     tasksWithStudentAnswers,
-    setTasksWithStudentAnswers
+    setTasksWithStudentAnswers,
   } = props;
 
-  const [studentAnswer, setStudentAnswer] = useState("");
+  const [studentAnswer, setStudentAnswer] = useState('');
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
 
   useEffect(() => {
@@ -43,9 +43,13 @@ export const TaskPassCard: FC<TaskPassCardProps> = props => {
       const targetTask = tasksWithStudentAnswers![index];
       targetTask.answer = studentAnswer;
 
-      setTasksWithStudentAnswers!([...tasksWithStudentAnswers!.slice(0, index), targetTask, ...tasksWithStudentAnswers!.slice(index + 1)])
+      setTasksWithStudentAnswers!([
+        ...tasksWithStudentAnswers!.slice(0, index),
+        targetTask,
+        ...tasksWithStudentAnswers!.slice(index + 1),
+      ]);
     }
-  }, [studentAnswer, mode]);
+  }, [studentAnswer, mode, setTasksWithStudentAnswers, tasksWithStudentAnswers, index]);
 
   return (
     <>
@@ -54,14 +58,23 @@ export const TaskPassCard: FC<TaskPassCardProps> = props => {
           <div className={`${DEFAULT_CLASSNAME}_task`}>
             <div className={`${DEFAULT_CLASSNAME}_task-container`}>
               <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>Задание {index + 1}</div>
-              <div className={`${DEFAULT_CLASSNAME}_task-container_content`}><Typography>{text}</Typography></div>
+              <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+                <Typography>{text}</Typography>
+              </div>
             </div>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_criteria`}>
             <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
               <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Ответ</div>
               <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                {mode === 'pass' && <textarea rows={5} placeholder={"Запишите ответ..."} value={studentAnswer} onChange={(e) => setStudentAnswer(e.currentTarget.value)} />}
+                {mode === 'pass' && (
+                  <textarea
+                    rows={5}
+                    placeholder={'Запишите ответ...'}
+                    value={studentAnswer}
+                    onChange={(e) => setStudentAnswer(e.currentTarget.value)}
+                  />
+                )}
                 {mode === 'view' && <Typography>{answer}</Typography>}
               </div>
             </div>
@@ -75,24 +88,38 @@ export const TaskPassCard: FC<TaskPassCardProps> = props => {
             </div>
           </div>
 
-          <div className={`${DEFAULT_CLASSNAME}_task_criteria`} onClick={() => setIsCriteriaOpened(!isCriteriaOpened)}>
+          <div
+            className={`${DEFAULT_CLASSNAME}_task_criteria`}
+            onClick={() => setIsCriteriaOpened(!isCriteriaOpened)}>
             <Typography className={`${DEFAULT_CLASSNAME}_task_criteria_open`} size={'small'}>
-              Критерии <div className={`${DEFAULT_CLASSNAME}_task_criteria_open-icon ${isCriteriaOpened && 'rotated'}`}><ArrowDown /></div>
+              Критерии{' '}
+              <div
+                className={`${DEFAULT_CLASSNAME}_task_criteria_open-icon ${
+                  isCriteriaOpened && 'rotated'
+                }`}>
+                <ArrowDown />
+              </div>
             </Typography>
           </div>
         </div>
 
-        {!!taskAssets?.length && <div className={`${DEFAULT_CLASSNAME}_files`}>
-          {taskAssets.map(asset => <div className={`${DEFAULT_CLASSNAME}_files_item`}>
-            <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-            <Typography>{asset.text}</Typography>
-          </div>)}
-        </div>}
+        {!!taskAssets?.length && (
+          <div className={`${DEFAULT_CLASSNAME}_files`}>
+            {taskAssets.map((asset) => (
+              <div className={`${DEFAULT_CLASSNAME}_files_item`}>
+                <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
+                <Typography>{asset.text}</Typography>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
-      {isCriteriaOpened && <div className={`${DEFAULT_CLASSNAME}_criteria-container`}>
+      {isCriteriaOpened && (
+        <div className={`${DEFAULT_CLASSNAME}_criteria-container`}>
           <Typography>{criteria}</Typography>
-      </div>}
+        </div>
+      )}
     </>
-  )
-}
+  );
+};

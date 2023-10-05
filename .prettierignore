@@ -1,0 +1,7 @@
+**/.idea/
+**/.vscode/
+**/.env
+**/build
+**/package.json
+**/yarn.lock
+**/yarn-error.log

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   border-radius: 0 15px 15px 15px;
-  background: #FFFFFF;
+  background: #ffffff;
 
   &_status {
     border-top: 1px solid black;
@@ -20,19 +20,19 @@
   }
 
   &:nth-child(1n) .student-test-card_color {
-    background-color: #F77126;
+    background-color: #f77126;
   }
 
   &:nth-child(2n) .student-test-card_color {
-    background-color: #DD4848;
+    background-color: #dd4848;
   }
 
   &:nth-child(3n) .student-test-card_color {
-    background-color: #EFC222;
+    background-color: #efc222;
   }
 
   &:nth-child(4n) .student-test-card_color {
-    background-color: #92E20E;
+    background-color: #92e20e;
   }
 
   &_color {

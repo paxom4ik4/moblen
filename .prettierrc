@@ -1,0 +1,26 @@
+{
+  "semi": true,
+  "tabWidth": 2,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "printWidth": 100,
+  "bracketSpacing": true,
+  "bracketSameLine": true,
+  "arrowParens": "always",
+  "endOfLine": "auto",
+  "importOrderSortSpecifiers": true,
+  "importOrderSeparation": true,
+  "importOrder": [
+    "^react$",
+    "<THIRD_PARTY_MODULES>",
+    "^pages/(.+)$",
+    "^store|selectors|services|slices/(.+)$",
+    "^containers|components/(.+)$",
+    "^constants|types/(.+)$",
+    "^assets/(.+)$",
+    "^utils/(.+)$",
+    "^antd/lib/(.+)$",
+    "^[../]",
+    "^[./]"
+  ]
+}

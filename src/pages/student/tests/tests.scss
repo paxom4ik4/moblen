@@ -1,10 +1,10 @@
 .tests {
   width: 100%;
   box-sizing: border-box;
-  background-color: #E1E2EC;
+  background-color: #e1e2ec;
   border-radius: 0 16px 16px 16px;
   position: relative;
-  border-top: 16px solid #C5C6D0;
+  border-top: 16px solid #c5c6d0;
   height: 100%;
 
   &_tutors {
@@ -33,11 +33,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #E1E2EC;
+        background-color: #e1e2ec;
         padding: 10px;
         border-radius: 50%;
-        color: #575E71;
-        border: 2px solid #E1E2EC;
+        color: #575e71;
+        border: 2px solid #e1e2ec;
       }
     }
   }
@@ -45,7 +45,7 @@
   &_subjects {
     display: flex;
     flex-direction: row;
-    background-color: #FFF;
+    background-color: #fff;
     border-radius: 16px;
     position: absolute;
     top: -59px;
@@ -59,7 +59,7 @@
       &-item {
         position: relative;
         top: 5px;
-        background-color: #C5C6D0;
+        background-color: #c5c6d0;
         border-radius: 10px 10px 0 0;
         padding: 10px 16px 10px;
         transition: top 0.3s ease 0s;
@@ -90,7 +90,7 @@
       align-items: center;
 
       &-item {
-        background-color: #FBF8FD;
+        background-color: #fbf8fd;
         border-radius: 16px;
         padding: 16px 14px;
         color: #757780;
@@ -130,19 +130,19 @@
 }
 
 .student-active-topic {
-  color: #6750A4;
+  color: #6750a4;
   transition: 0.3s;
   font-weight: 500;
 }
 
 .active-subject-title {
-  color: #6750A4;
+  color: #6750a4;
   transition: 0.3s;
   font-weight: 500;
 }
 
 .active-subject {
-  background-color: #E1E2EC;
+  background-color: #e1e2ec;
   position: relative;
   top: 24px;
   transition: background-color 0.4s;
@@ -150,12 +150,12 @@
 
 .active-tutor-item {
   .tests_tutors_item_image {
-    color: #6750A4;
-    border-color: #6750A4;
-    background-color: #D9E2FF;
+    color: #6750a4;
+    border-color: #6750a4;
+    background-color: #d9e2ff;
   }
 
   .tests_tutors_item_name {
-    color: #6750A4;
+    color: #6750a4;
   }
 }

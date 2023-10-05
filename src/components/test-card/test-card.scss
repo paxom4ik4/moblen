@@ -6,7 +6,7 @@
 
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
   border-radius: 0 15px 15px 15px;
-  background-color: #FBF8FD;
+  background-color: #fbf8fd;
   transition: 0.3s;
   padding: 8px 16px;
   margin: 10px 0;
@@ -14,12 +14,12 @@
   width: 340px;
 
   &:hover {
-    background-color: #F2F0F4;
+    background-color: #f2f0f4;
     cursor: pointer;
   }
 
   &_subject-topic {
-    color: #6750A4;
+    color: #6750a4;
     font-size: 12px;
     font-weight: 500;
   }
@@ -31,7 +31,7 @@
 
   &_tasks {
     font-size: 14px;
-    color: #44464F;
+    color: #44464f;
   }
 
   &_share {

@@ -5,7 +5,7 @@ import './typography.scss';
 import cl from 'classnames';
 
 export interface TypographyProps extends PropsWithChildren {
-  size?: 'default' | 'small'  | 'large';
+  size?: 'default' | 'small' | 'large';
   color?: 'default' | 'gray' | 'purple';
   weight?: 'default' | 'bold' | 'italic';
   className?: string;
@@ -13,9 +13,25 @@ export interface TypographyProps extends PropsWithChildren {
 }
 
 export const Typography: FC<TypographyProps> = (props) => {
-  const { onClick, size = 'default', weight = 'default', color = 'default', className, children } = props;
+  const {
+    onClick,
+    size = 'default',
+    weight = 'default',
+    color = 'default',
+    className,
+    children,
+  } = props;
 
   return (
-    <p onClick={onClick} className={cl(className, `typography-size-${size}`, `typography-weight-${weight}`, `typography-color-${color}`)}>{children}</p>
-  )
-}
+    <p
+      onClick={onClick}
+      className={cl(
+        className,
+        `typography-size-${size}`,
+        `typography-weight-${weight}`,
+        `typography-color-${color}`,
+      )}>
+      {children}
+    </p>
+  );
+};

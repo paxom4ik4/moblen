@@ -1,5 +1,5 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AppModes } from "constants/appTypes.ts";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { AppModes } from 'constants/appTypes.ts';
 
 export interface AppModeState {
   appMode: AppModes.tutor | AppModes.student | null;
@@ -16,7 +16,7 @@ export const appModeSlice = createSlice({
     setAppMode: (state, action: PayloadAction<AppModes.tutor | AppModes.student | null>) => {
       state.appMode = action.payload;
     },
-  }
+  },
 });
 
 export const { setAppMode } = appModeSlice.actions;

@@ -1,4 +1,4 @@
-import { ReactElement } from "react";
+import { ReactElement } from 'react';
 
 import SettingsIcon from 'assets/icons/settings-icon.svg';
 import StatisticsIcon from 'assets/icons/statistics-icon.svg';
@@ -53,4 +53,4 @@ export const studentSidebarMenuConfig: SidebarMenuItem[] = [
     icon: <ChatIcon />,
     disabled: true,
   },
-]
+];

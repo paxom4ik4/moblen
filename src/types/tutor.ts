@@ -9,11 +9,11 @@ export interface Tutor {
 }
 
 export interface TutorRegister {
-  tutor_name: string,
-  tutor_surname: string,
-  phone_number: string,
-  email: string,
-  has_access: boolean,
-  password_hash: string,
-  salt: string,
+  tutor_name: string;
+  tutor_surname: string;
+  phone_number: string;
+  email: string;
+  has_access: boolean;
+  password_hash: string;
+  salt: string;
 }

@@ -1,6 +1,6 @@
-import { Tutor } from "types/tutor.ts";
-import { UserData } from "../../constants/appTypes.ts";
-import {Student} from "../../types/student.ts";
+import { Tutor } from 'types/tutor.ts';
+import { UserData } from '../../constants/appTypes.ts';
+import { Student } from '../../types/student.ts';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -13,8 +13,8 @@ export const remapTutorData: UserData = (tutorData: Tutor) => {
     email: tutorData?.email ?? null,
     photo: tutorData?.tutor_photo ?? null,
     has_access: tutorData?.has_access,
-  }
-}
+  };
+};
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -26,5 +26,5 @@ export const remapStudentData: UserData = (studentData: Student) => {
     phone_number: studentData?.phone_number ?? null,
     email: studentData?.email ?? null,
     photo: studentData?.student_photo ?? null,
-  }
-}
+  };
+};

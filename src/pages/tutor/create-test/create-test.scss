@@ -14,7 +14,7 @@
     height: 100%;
     font-size: 16px;
     font-weight: 400;
-    color: #1B1B1F;
+    color: #1b1b1f;
 
     &:focus {
       outline: 1px solid rgba(0, 0, 0, 0.5);
@@ -75,14 +75,14 @@
     height: calc(100% + 80px);
 
     &_addItem {
-      background-color: #E1E2EC;
+      background-color: #e1e2ec;
       display: flex;
       justify-content: center;
       align-items: center;
       width: 72px;
       min-height: 72px;
       border-radius: 0 15px 15px 15px;
-      color: #6750A4;
+      color: #6750a4;
       box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
       transition: 0.3s;
 
@@ -105,7 +105,7 @@
         align-items: center;
         width: 44px;
         height: 44px;
-        background-color: #FFFFFF;
+        background-color: #ffffff;
         border-radius: 12px;
         box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
         transition: 0.3s;
@@ -117,7 +117,7 @@
       }
 
       font-size: 14px;
-      color: #6750A4;
+      color: #6750a4;
 
       &_maxScore {
         margin-top: 4px;
@@ -134,5 +134,3 @@
     right: 20px;
   }
 }
-
-

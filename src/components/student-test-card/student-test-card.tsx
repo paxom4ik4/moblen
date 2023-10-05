@@ -1,9 +1,9 @@
 import { FC } from 'react';
 
-import { Typography } from "common/typography/typography.tsx";
+import { Typography } from 'common/typography/typography.tsx';
 
 import './student-test-card.scss';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from 'react-router-dom';
 
 const DEFAULT_CLASSNAME = 'student-test-card';
 
@@ -19,10 +19,10 @@ interface StudentTestCardProps {
   onClick?: () => void;
 }
 
-export const StudentTestCard: FC<StudentTestCardProps> = props => {
+export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
   const navigate = useNavigate();
 
-  const { id, subject, topic, name, tasksAmount, deadline, passTime = new Date(), status} = props;
+  const { id, subject, topic, name, tasksAmount, deadline, passTime = new Date(), status } = props;
 
   const handleTestClick = () => {
     if (status === 'done') {
@@ -30,29 +30,37 @@ export const StudentTestCard: FC<StudentTestCardProps> = props => {
     } else {
       navigate(`/assignments/${id}`);
     }
-  }
+  };
 
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={`${DEFAULT_CLASSNAME}_content`}>
         <div className={`${DEFAULT_CLASSNAME}_content_info`}>
           <div className={`${DEFAULT_CLASSNAME}_content_info_subject`}>
-            <Typography color={'purple'}>{subject} - {topic}</Typography>
+            <Typography color={'purple'}>
+              {subject} - {topic}
+            </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_content_info_name`}>
             <Typography size={'large'}>{name}</Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_content_info_tasks`}>
-            <Typography color={"gray"} size={'small'}>{'Заданий'} - {tasksAmount}</Typography>
+            <Typography color={'gray'} size={'small'}>
+              {'Заданий'} - {tasksAmount}
+            </Typography>
           </div>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_color`}></div>
       </div>
       <div className={`${DEFAULT_CLASSNAME}_status`} onClick={handleTestClick}>
         {status === 'pending' && <Typography>Сдать тест</Typography>}
-        {status === 'pending' && !!deadline && <Typography>Дедлайн {deadline.toString()}</Typography>}
-        {status === 'done' && passTime && <Typography>Сдано {passTime.toLocaleDateString()}</Typography>}
+        {status === 'pending' && !!deadline && (
+          <Typography>Дедлайн {deadline.toString()}</Typography>
+        )}
+        {status === 'done' && passTime && (
+          <Typography>Сдано {passTime.toLocaleDateString()}</Typography>
+        )}
       </div>
     </div>
-  )
-}
+  );
+};

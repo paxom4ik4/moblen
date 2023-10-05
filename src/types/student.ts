@@ -1,6 +1,8 @@
 export interface Student {
-  name: string;
-  surname: string;
-  id: string;
-  groupId: string;
+  student_name: string;
+  student_surname: string;
+  student_uuid: string;
+  student_photo?: string;
+  phone_number?: string;
+  email?: string;
 }

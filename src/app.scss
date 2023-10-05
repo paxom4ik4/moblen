@@ -3,6 +3,22 @@
   padding: 0;
   box-sizing: border-box;
   font-family: 'Roboto', sans-serif;
+
+  ::-webkit-scrollbar {
+    background: transparent;
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #fff;
+    border-radius: 12px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #C8CAFF;
+    border-radius: 12px;
+
+  };
 }
 
 .app {

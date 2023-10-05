@@ -33,7 +33,7 @@ export const TestCard: FC<TestCardProps> = (props) => {
         <div className={`${DEFAULT_CLASSNAME}_name`}>{name}</div>
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>Заданий - {tasks}</div>
       </div>
-      <div className={`${DEFAULT_CLASSNAME}_share`} onClick={() => setTestToShare('mocked-test-id')}>
+      <div className={`${DEFAULT_CLASSNAME}_share`} onClick={() => setTestToShare(id)}>
         <ShareIcon />
       </div>
     </div>

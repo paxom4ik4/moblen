@@ -1,10 +1,11 @@
 import {Student} from "./student.ts";
 
 export interface Group {
-  id: string;
-  name: string;
+  group_uuid: string;
+  group_name: string;
   iconUrl: File;
   amount: number;
-  referralLink: string;
+  url: string;
+  owner_uuid: string;
   students?: Student[];
 }

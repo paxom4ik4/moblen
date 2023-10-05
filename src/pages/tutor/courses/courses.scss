@@ -14,11 +14,16 @@
   position: relative;
   border-top: 16px solid #C5C6D0;
   height: 100%;
+  padding: 16px;
 
   &_delete {
     position: absolute;
     right: 20px;
     bottom: 20px;
+
+    svg {
+      transition: 0.5s;
+    }
   }
 
   &_new-test_modal {
@@ -79,6 +84,7 @@
     border-radius: 16px;
     position: absolute;
     top: -61px;
+    left: 0;
 
     &_add-new {
       border: none;
@@ -111,7 +117,7 @@
 
       &-item {
         position: relative;
-        top: 5px;
+        top: 7px;
         background-color: #C5C6D0;
         border-radius: 10px 10px 0 0;
         padding: 10px 16px 10px;
@@ -124,6 +130,7 @@
           background: transparent;
           border: none;
           outline: none;
+          width: 100%;
         }
 
         &:hover {
@@ -286,7 +293,6 @@
 }
 
 .active-topic {
-  color: #6750A4;
   border: 1px solid #757780;
   transition: 0.3s;
   box-shadow: 0 4px 3px 2px rgba(0, 0, 0, 0.3);
@@ -297,9 +303,11 @@
   position: relative;
   top: 24px;
   transition: background-color 0.4s;
+}
 
-  input {
-    font-weight: 500;
-    color: #6750A4;
+.courses-delete-drop {
+  svg {
+    width: 64px;
+    height: 64px;
   }
 }

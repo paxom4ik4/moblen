@@ -16,6 +16,6 @@ export const Typography: FC<TypographyProps> = (props) => {
   const { onClick, size = 'default', weight = 'default', color = 'default', className, children } = props;
 
   return (
-    <p onClick={onClick} className={cl(className, 'typography', `typography-size-${size}`, `typography-weight-${weight}`, `typography-color-${color}`)}>{children}</p>
+    <p onClick={onClick} className={cl(className, `typography-size-${size}`, `typography-weight-${weight}`, `typography-color-${color}`)}>{children}</p>
   )
 }

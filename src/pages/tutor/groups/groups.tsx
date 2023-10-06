@@ -19,10 +19,17 @@ import { deleteFromGroup } from 'services/student/student.ts';
 
 const DEFAULT_CLASSNAME = 'groups';
 
-export const Groups: FC = () => {
+interface GroupsProps {
+  viewMode?: boolean;
+}
+
+export const Groups: FC<GroupsProps> = (props) => {
+  const { viewMode = false } = props;
+
   const queryClient = useQueryClient();
 
   const { userData } = useSelector((state: RootState) => state.userData);
+  const { selectedStudent } = useSelector((state: RootState) => state.results);
   const [isNewGroupCreating, setIsNewGroupCreating] = useState(false);
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -74,6 +81,7 @@ export const Groups: FC = () => {
 
         {groups?.map((group) => (
           <GroupCard
+            hideControls={viewMode}
             key={group.group_uuid}
             onClick={() => setSelectedGroup(group)}
             id={group.group_uuid}
@@ -93,9 +101,11 @@ export const Groups: FC = () => {
             isNewGroupCreating={isNewGroupCreating}
           />
         )}
-        <div className={`${DEFAULT_CLASSNAME}_list-add`} onClick={() => createNewGroupHandler()}>
-          <AddIcon />
-        </div>
+        {!viewMode && (
+          <div className={`${DEFAULT_CLASSNAME}_list-add`} onClick={() => createNewGroupHandler()}>
+            <AddIcon />
+          </div>
+        )}
       </div>
       <div className={`${DEFAULT_CLASSNAME}_students`}>
         {!selectedGroup && (
@@ -116,6 +126,8 @@ export const Groups: FC = () => {
           selectedGroupData &&
           selectedGroupData?.students?.map((student: Student) => (
             <StudentCard
+              active={student.student_uuid === selectedStudent}
+              resultsViewMode={viewMode}
               groupId={selectedGroup.group_uuid}
               id={student.student_uuid}
               key={student.student_uuid}
@@ -123,11 +135,13 @@ export const Groups: FC = () => {
               surname={student.student_surname}
             />
           ))}
-        <div
-          className={`${DEFAULT_CLASSNAME}_trash ${isOver && `${DEFAULT_CLASSNAME}_trash_drop`}`}
-          ref={drop}>
-          <TrashIcon />
-        </div>
+        {!viewMode && (
+          <div
+            className={`${DEFAULT_CLASSNAME}_trash ${isOver && `${DEFAULT_CLASSNAME}_trash_drop`}`}
+            ref={drop}>
+            <TrashIcon />
+          </div>
+        )}
       </div>
     </div>
   );

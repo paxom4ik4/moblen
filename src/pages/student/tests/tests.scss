@@ -49,6 +49,7 @@
     border-radius: 16px;
     position: absolute;
     top: -59px;
+    transition: 0.3s;
 
     &_list {
       display: flex;
@@ -83,6 +84,7 @@
     border-bottom: 1px solid #757780;
 
     &_list {
+      transition: 0.3s;
       display: flex;
       flex-direction: row;
       column-gap: 20px;
@@ -90,6 +92,7 @@
       align-items: center;
 
       &-item {
+        transition: 0.3s;
         background-color: #fbf8fd;
         border-radius: 16px;
         padding: 16px 14px;
@@ -122,6 +125,7 @@
     row-gap: 20px;
     padding: 0 24px;
     flex-wrap: wrap;
+    transition: 0.3s;
   }
 }
 

@@ -1,0 +1,23 @@
+.results {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  height: 100%;
+
+  &_groups {
+    width: 100%;
+
+  }
+
+  &_tests {
+    width: 50%;
+  }
+}
+
+.results-show-results {
+  .results_groups {
+    transition: width 0.4s ease-out;
+    width: 50%;
+  }
+}

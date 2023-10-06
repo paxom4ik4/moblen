@@ -1,6 +1,6 @@
 import { createContext, FC, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
-import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -21,57 +21,17 @@ import { TestResult } from './pages/student/test-result/test-result.tsx';
 import { AppModes } from './constants/appTypes.ts';
 
 import { Test } from './types/test.ts';
-import { mockedTask } from './types/task.ts';
 
 import './app.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
+import { Results } from './pages/tutor/results/results.tsx';
+import { mockedTests, routeConfig, studentRouteConfig } from './utils/app.utils.ts';
 
-const routeConfig = [
-  {
-    title: 'Группы',
-    path: '/groups',
-  },
-  {
-    title: '',
-    path: '/assignments/create-test',
-  },
-  {
-    title: 'Курсы',
-    path: '/assignments',
-  },
-];
-
-const studentRouteConfig = [
-  {
-    title: 'Задания',
-    path: '/assignments',
-  },
-];
-
-const mockedTests: Test[] = [
-  {
-    id: 'student-test-1',
-    name: 'ДЗ #1',
-    subject: 'Англ',
-    topic: 'Первая тема',
-    status: 'pending',
-    tasks: [mockedTask, mockedTask, mockedTask],
-  },
-  {
-    id: 'student-test-2',
-    name: 'ДЗ #2',
-    subject: 'Англ',
-    topic: 'Первая тема',
-    status: 'done',
-    tasks: [mockedTask, mockedTask, mockedTask, mockedTask, mockedTask],
-  },
-];
-
+// MOCKED WHILE BE READY
 interface IAppContent {
   tests: Test[];
 }
-
 export const AppContext = createContext<IAppContent>({
   tests: [],
 });
@@ -90,13 +50,9 @@ const App: FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (!userData && !location.pathname.includes('/registration')) {
-      navigate('/login-page');
-    }
+    const shouldRedirectToLoginPage = !userData && !location.pathname.includes('/registration');
 
-    // if (userData) {
-    //   dispatch(setAppMode(userData));
-    // }
+    shouldRedirectToLoginPage && navigate('/login-page');
   }, [userData, navigate, location.pathname, dispatch]);
 
   useEffect(() => {
@@ -107,6 +63,7 @@ const App: FC = () => {
 
   const tutorRoutes = (
     <>
+      <Route path={'/results'} element={<Results />} />
       <Route path={'/groups'} element={<Groups />} />
       <Route path={'/assignments/create-test'} element={<CreateTest />} />
       <Route path={'/assignments'} element={<Courses />} />
@@ -126,13 +83,17 @@ const App: FC = () => {
       <Sidebar />
       <UpperBar />
       <div className={`${DEFAULT_CLASSNAME}_title`}>{currentTitle}</div>
-      <Routes>{appMode === AppModes.tutor ? tutorRoutes : studentRoutes}</Routes>
+      <Routes>
+        <Route path="*" element={<Navigate to="/" replace />} />
+        {appMode === AppModes.tutor ? tutorRoutes : studentRoutes}
+      </Routes>
     </div>
   );
 
   const loginContent = (
     <Routes>
       <Route path={'/registration'} element={<RegistrationPage />} />
+      <Route path={'/registration/ref/:groupId'} element={<RegistrationPage />} />
       <Route path={'/login-page'} element={<LoginPage />} />
     </Routes>
   );

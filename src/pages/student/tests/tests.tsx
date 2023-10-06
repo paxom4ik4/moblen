@@ -30,7 +30,13 @@ const mockedTutors = [
   { name: 'Преподаватель 2', id: 'tutor-2' },
 ];
 
-export const Tests: FC = () => {
+interface TestsProps {
+  resultsView?: boolean;
+}
+
+export const Tests: FC<TestsProps> = (props) => {
+  const { resultsView = false } = props;
+
   const { tests } = useContext(AppContext);
 
   const [courseData] = useState(mockedSubjects);
@@ -47,25 +53,27 @@ export const Tests: FC = () => {
 
   return (
     <>
-      <div className={`${DEFAULT_CLASSNAME}_tutors`}>
-        {mockedTutors.map((tutor) => (
-          <div
-            onClick={() => setActiveTutor(tutor)}
-            className={`${DEFAULT_CLASSNAME}_tutors_item ${
-              activeTutor === tutor ? 'active-tutor-item' : ''
-            }`}>
-            <div className={`${DEFAULT_CLASSNAME}_tutors_item_image`}>
-              <TutorIcon />
+      {!resultsView && (
+        <div className={`${DEFAULT_CLASSNAME}_tutors`}>
+          {mockedTutors.map((tutor) => (
+            <div
+              onClick={() => setActiveTutor(tutor)}
+              className={`${DEFAULT_CLASSNAME}_tutors_item ${
+                activeTutor === tutor ? 'active-tutor-item' : ''
+              }`}>
+              <div className={`${DEFAULT_CLASSNAME}_tutors_item_image`}>
+                <TutorIcon />
+              </div>
+              <Typography
+                size={'small'}
+                color={'gray'}
+                className={`${DEFAULT_CLASSNAME}_tutors_item_name`}>
+                {tutor.name}
+              </Typography>
             </div>
-            <Typography
-              size={'small'}
-              color={'gray'}
-              className={`${DEFAULT_CLASSNAME}_tutors_item_name`}>
-              {tutor.name}
-            </Typography>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
       <div className={DEFAULT_CLASSNAME}>
         <div className={`${DEFAULT_CLASSNAME}_subjects`}>
           <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>

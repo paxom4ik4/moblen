@@ -11,9 +11,10 @@ import {
   createNewStudentWithRef,
   createNewTutor,
 } from 'services/registration/registration.ts';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const DEFAULT_CLASSNAME = 'registration';
+const GROUP_REF_LINK = 'https://moblen.ru/ref/';
 
 interface RegistrationValues {
   name: string;
@@ -25,6 +26,7 @@ interface RegistrationValues {
 
 export const RegistrationPage: FC = () => {
   const navigate = useNavigate();
+  const params = useParams();
 
   const [isTutorRegister, setIsTutorRegister] = useState<boolean>(true);
   const changeModeHandler = () => setIsTutorRegister(!isTutorRegister);
@@ -38,8 +40,12 @@ export const RegistrationPage: FC = () => {
   };
 
   const handleStudentRegister = async (values: RegistrationValues) => {
-    if (values.referralLink?.length) {
-      const res = await createNewStudentWithRef(values);
+    if (location.pathname.includes('ref')) {
+      const { groupId } = params;
+
+      const referralLink = `${GROUP_REF_LINK}${groupId}`;
+
+      const res = await createNewStudentWithRef({ ...values, referralLink });
       if (res.status === 'SUCCESSFULLY_ADDED') {
         navigate('/login-page');
       }
@@ -58,7 +64,6 @@ export const RegistrationPage: FC = () => {
       login: '',
       password: '',
       passwordRepeat: '',
-      referralLink: '',
     },
     onSubmit: (values) =>
       isTutorRegister ? handleTutorRegister(values) : handleStudentRegister(values),
@@ -122,17 +127,6 @@ export const RegistrationPage: FC = () => {
         <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
           {registerFrom.errors.passwordRepeat}
         </div>
-        {!isTutorRegister && (
-          <Input
-            onBlur={registerFrom.handleBlur}
-            onChange={registerFrom.handleChange}
-            value={registerFrom.values.referralLink}
-            label={'Реферальная ссылка'}
-            type="referralLink"
-            name="referralLink"
-          />
-        )}
-
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <Typography
             onClick={changeModeHandler}

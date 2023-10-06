@@ -19,9 +19,8 @@ export const sidebarMenuConfig: SidebarMenuItem[] = [
     disabled: true,
   },
   {
-    path: '/statistics',
+    path: '/results',
     icon: <StatisticsIcon />,
-    disabled: true,
   },
   {
     path: '/assignments',
@@ -40,7 +39,7 @@ export const studentSidebarMenuConfig: SidebarMenuItem[] = [
     disabled: true,
   },
   {
-    path: '/statistics',
+    path: '/results',
     icon: <StatisticsIcon />,
     disabled: true,
   },

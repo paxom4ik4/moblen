@@ -167,7 +167,9 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
               </div>
             )}
             {!isEditMode && (
-              <div className={`${DEFAULT_CLASSNAME}_buttons-referral`}>
+              <div
+                className={`${DEFAULT_CLASSNAME}_buttons-referral`}
+                onClick={() => navigator.clipboard.writeText(url)}>
                 <LinkIcon />
                 <div className={`${DEFAULT_CLASSNAME}_buttons-referral-link`}>{url}</div>
               </div>

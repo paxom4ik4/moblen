@@ -42,6 +42,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   const [taskText, setTaskText] = useState<string>(text);
   const [taskCriteria, setTaskCriteria] = useState<string>(criteria);
+  const [taskFormat, setTaskFormat] = useState<string>(criteria);
   const [taskMaxScore, setTaskMaxScore] = useState<string>(maxScore);
 
   // assets
@@ -49,6 +50,8 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const [addNewAsset, setAddNewAsset] = useState<boolean>(false);
   const [newAssetImage, setNewAssetImage] = useState(null);
   const [newAssetText, setNewAssetText] = useState('');
+
+  // const createTaskMutation = useMutation();
 
   const saveNewTaskHandler = () => {
     if (taskText.length && taskCriteria.length && taskMaxScore.length && taskMaxScore !== '0') {
@@ -175,9 +178,18 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               )}
               {!isCreateMode && <Typography>{maxScore}</Typography>}
             </div>
-            <select disabled={!isCreateMode} value={format} title={'Формат'}>
-              <option>Формат задания</option>
-            </select>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
+              {isCreateMode && (
+                <input
+                  placeholder={'Формат задания'}
+                  value={taskFormat}
+                  type={'text'}
+                  onChange={(e) => setTaskFormat(e.currentTarget.value)}
+                />
+              )}
+              {!isCreateMode && <Typography>{format}</Typography>}
+            </div>
           </div>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_criteria`}>

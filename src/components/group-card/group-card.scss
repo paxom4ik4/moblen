@@ -123,6 +123,11 @@
       gap: 12px;
       transition: 0.3s;
 
+      svg {
+        width: 80px;
+        height: 80px;
+      }
+
       &:hover {
         cursor: pointer;
         opacity: 0.8;

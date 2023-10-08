@@ -8,24 +8,25 @@ import { DraggableTypes } from '../../types/draggable/draggable.types.ts';
 
 export interface TestCardProps {
   id: string;
-  subject?: string;
-  topic?: string;
-  name?: string;
+  subject: string;
+  topic: string;
+  name: string;
   tasks?: number;
-  setTestToShare: Dispatch<SetStateAction<string | null>>;
+  setTestToShare: Dispatch<
+    SetStateAction<{
+      list_uuid: string;
+      topic: string;
+      course: string;
+      name: string;
+    } | null>
+  >;
+  onClick?: () => void;
 }
 
 const DEFAULT_CLASSNAME = 'app-test-card';
 
 export const TestCard: FC<TestCardProps> = (props) => {
-  const {
-    setTestToShare,
-    subject = 'Англ',
-    name = 'ДЗ №12',
-    tasks = 10,
-    topic = 'Третья',
-    id,
-  } = props;
+  const { onClick, setTestToShare, subject, name, tasks = 0, topic, id } = props;
 
   const [{ isDragging }, drag] = useDrag({
     type: DraggableTypes.TEST_CARD,
@@ -34,15 +35,28 @@ export const TestCard: FC<TestCardProps> = (props) => {
   });
 
   return (
-    <div className={`${DEFAULT_CLASSNAME} ${isDragging && 'app-test-card-dragging'}}`} ref={drag}>
+    <div
+      onClick={onClick}
+      className={`${DEFAULT_CLASSNAME} ${isDragging && 'app-test-card-dragging'}}`}
+      ref={drag}>
       <div className={`${DEFAULT_CLASSNAME}_content`}>
         <div className={`${DEFAULT_CLASSNAME}_subject-topic`}>
-          {subject} - {topic} тема
+          {subject} - {topic}
         </div>
         <div className={`${DEFAULT_CLASSNAME}_name`}>{name}</div>
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>Заданий - {tasks}</div>
       </div>
-      <div className={`${DEFAULT_CLASSNAME}_share`} onClick={() => setTestToShare(id)}>
+      <div
+        className={`${DEFAULT_CLASSNAME}_share`}
+        onClick={(e) => {
+          e.stopPropagation();
+          setTestToShare({
+            list_uuid: id,
+            topic,
+            course: subject,
+            name,
+          });
+        }}>
         <ShareIcon />
       </div>
     </div>

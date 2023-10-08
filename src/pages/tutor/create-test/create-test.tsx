@@ -10,6 +10,9 @@ import { TaskCard } from 'components/task-card/task-card.tsx';
 import { Task } from 'types/task.ts';
 import { Typography } from 'common/typography/typography.tsx';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'store/store.ts';
+import { clearCreateTask } from '../../../store/create-task/create-task.slice.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -19,11 +22,16 @@ interface CreateTestProps {
 
 export const CreateTest: FC<CreateTestProps> = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { taskListId, taskListName, courseName, topicName } = useSelector(
+    (store: RootState) => store.createTask,
+  );
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [maxScore, setMaxScore] = useState(0);
   const [testText, setTestText] = useState('');
-  const [testTitle, setTestTitle] = useState('');
+  const [testTitle, setTestTitle] = useState(taskListName ?? '');
 
   useEffect(() => {
     setMaxScore(tasks.reduce((score, task) => score + Number(task.maxScore), 0));
@@ -32,9 +40,11 @@ export const CreateTest: FC<CreateTestProps> = () => {
   const [isNewTask, setIsNewTask] = useState(false);
 
   const addNewTaskHandler = () => setIsNewTask(true);
-  const saveTestHandler = () => {
-    // save logic
 
+  const saveTestHandler = () => {
+    console.log(taskListId);
+
+    dispatch(clearCreateTask());
     navigate('/assignments');
   };
 
@@ -45,7 +55,7 @@ export const CreateTest: FC<CreateTestProps> = () => {
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
             <div className={`${DEFAULT_CLASSNAME}_text-container_name-title`}>
               <Typography color={'purple'} weight={'bold'}>
-                Англ - Третья тема
+                {courseName} - {topicName}
               </Typography>
             </div>
             <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>

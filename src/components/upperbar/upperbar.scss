@@ -59,6 +59,7 @@
       padding: 8px;
 
       button {
+        width: 100%;
         border: none;
         padding: 6px;
         display: flex;
@@ -68,11 +69,10 @@
         border-radius: 8px;
         background: transparent;
         box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.5);
-
-        cursor: pointer;
         transition: 0.3s;
 
         &:hover {
+          opacity: 0.8;
           cursor: pointer;
         }
       }

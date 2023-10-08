@@ -2,7 +2,6 @@ import { FC, useState } from 'react';
 
 import ProfileIcon from 'assets/icons/profile-icon.svg';
 import NotificationIcon from 'assets/icons/notifications-icon.svg';
-import EditIcon from 'assets/icons/edit-icon.svg';
 
 import './upperbar.scss';
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,13 +46,11 @@ export const UpperBar: FC = () => {
             <Typography color={'gray'}>{email}</Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
-            <button>
-              <EditIcon />
-            </button>
             <button
               onClick={() => {
                 dispatch(setUser(null));
                 dispatch(setAppMode(null));
+                sessionStorage.removeItem('userData');
               }}>
               <Typography color={'gray'} weight={'bold'}>
                 {'Выход'}

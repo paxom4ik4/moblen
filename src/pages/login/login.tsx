@@ -14,6 +14,8 @@ import { useDispatch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { remapStudentData, remapTutorData } from './utils.ts';
+import { Student } from '../../types/student.ts';
+import { Tutor } from '../../types/tutor.ts';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -35,6 +37,10 @@ export const LoginPage: FC = () => {
   //   </>
   // );
 
+  const handleDataStoring = (userData: Student | Tutor) => {
+    sessionStorage.setItem('userData', JSON.stringify(userData));
+  };
+
   const loginHandler = async (values: { login: string; password: string }) => {
     try {
       const res = await loginUser(values);
@@ -47,6 +53,8 @@ export const LoginPage: FC = () => {
 
           dispatch(setUser(tutorData));
           dispatch(setAppMode(role));
+
+          handleDataStoring({ ...tutorData, role });
         } else {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -54,6 +62,8 @@ export const LoginPage: FC = () => {
 
           dispatch(setUser(studentData));
           dispatch(setAppMode(role));
+
+          handleDataStoring({ ...studentData, role });
         }
 
         navigate('/');

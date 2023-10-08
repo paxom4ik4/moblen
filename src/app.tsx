@@ -27,6 +27,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
 import { Results } from './pages/tutor/results/results.tsx';
 import { mockedTests, routeConfig, studentRouteConfig } from './utils/app.utils.ts';
+import { setUser } from './store/user-data/user-data.slice.ts';
+import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 
 // MOCKED WHILE BE READY
 interface IAppContent {
@@ -50,6 +52,17 @@ const App: FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    const storedUserData = sessionStorage.getItem('userData');
+
+    if (storedUserData) {
+      const userData = JSON.parse(storedUserData);
+
+      dispatch(setUser(userData));
+      dispatch(setAppMode(userData.role));
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
     const shouldRedirectToLoginPage = !userData && !location.pathname.includes('/registration');
 
     shouldRedirectToLoginPage && navigate('/login-page');
@@ -65,7 +78,7 @@ const App: FC = () => {
     <>
       <Route path={'/results'} element={<Results />} />
       <Route path={'/groups'} element={<Groups />} />
-      <Route path={'/assignments/create-test'} element={<CreateTest />} />
+      <Route path={'/assignments/create-test/:id'} element={<CreateTest />} />
       <Route path={'/assignments'} element={<Courses />} />
     </>
   );

@@ -2,7 +2,6 @@ import { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import CancelIcon from 'assets/icons/cancel-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
-import { mockedGroups } from 'constants/mockedGroups.ts';
 import { GroupCard } from 'components/group-card/group-card.tsx';
 import { Typography } from 'common/typography/typography.tsx';
 import { TitledCheckbox } from 'common/titled-checkbox/titled-checkbox.tsx';
@@ -11,15 +10,36 @@ import { DatePicker, TimePicker } from '@mui/x-date-pickers';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 import './courses-share.scss';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../../store/store.ts';
+import { useQuery } from 'react-query';
+import { getTutorGroups } from '../../../../services/tutor';
 
 const DEFAULT_CLASSNAME = 'courses-share';
 
 interface CoursesShareProps {
-  setTestToShare: Dispatch<SetStateAction<string | null>>;
+  setTestToShare: Dispatch<
+    SetStateAction<{
+      list_uuid: string;
+      topic: string;
+      course: string;
+      name: string;
+    } | null>
+  >;
+  testToShare: {
+    list_uuid: string;
+    topic: string;
+    course: string;
+    name: string;
+  };
 }
 
 export const CoursesShare: FC<CoursesShareProps> = (props) => {
-  const { setTestToShare } = props;
+  const { userData } = useSelector((state: RootState) => state.userData);
+
+  const { data: groups } = useQuery('groups', () => getTutorGroups(userData!.uuid));
+
+  const { setTestToShare, testToShare } = props;
 
   const [deadline, setDeadline] = useState(false);
   const [timeLimit, setTimeLimit] = useState(false);
@@ -53,27 +73,28 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
       </div>
       <div className={`${DEFAULT_CLASSNAME}_share_content`}>
         <div className={`${DEFAULT_CLASSNAME}_share_content_groups`}>
-          {mockedGroups.map((group) => (
-            <GroupCard
-              active={selectedShareGroups.includes(group.id)}
-              selectedShareGroups={selectedShareGroups}
-              setSelectedShareGroups={setSelectedShareGroups}
-              key={group.id}
-              id={group.id}
-              name={group.name}
-              amount={group.amount}
-              hideControls
-            />
-          ))}
+          {!!groups?.length &&
+            groups!.map((group) => (
+              <GroupCard
+                active={selectedShareGroups.includes(group.group_uuid)}
+                selectedShareGroups={selectedShareGroups}
+                setSelectedShareGroups={setSelectedShareGroups}
+                key={group.group_uuid}
+                id={group.group_uuid}
+                name={group.group_name}
+                amount={group.students?.length}
+                hideControls
+              />
+            ))}
         </div>
         <div className={`${DEFAULT_CLASSNAME}_share_content_config`}>
           <div className={`${DEFAULT_CLASSNAME}_share_content_config_task`}>
-            <Typography>{'Англ - Третья тема'}</Typography>
+            <Typography>{testToShare.course + ' - ' + testToShare.topic}</Typography>
             <Typography color={'purple'} size={'large'}>
-              {'ДЗ №17'}
+              {testToShare.name}
             </Typography>
             <Typography color={'gray'} size={'small'}>
-              {'Заданий - 11'}
+              {'Заданий - 0'}
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime`}>

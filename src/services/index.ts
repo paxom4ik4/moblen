@@ -1,5 +1,4 @@
 import axios from 'axios';
+import { BASE_URL as baseURL } from '../constants/api.ts';
 
-export default axios.create({
-  baseURL: 'https://moblen.ru/api/v1',
-});
+export default axios.create({ baseURL });

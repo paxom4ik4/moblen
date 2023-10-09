@@ -16,11 +16,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 const DEFAULT_CLASSNAME = 'registration';
 const GROUP_REF_LINK = 'https://moblen.ru/ref/';
 
-interface RegistrationValues {
+export interface RegistrationValues {
   name: string;
   surname: string;
   login: string;
   password: string;
+  passwordRepeat: string;
   referralLink?: string;
 }
 

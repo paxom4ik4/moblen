@@ -1,5 +1,6 @@
 import { Test } from '../types/test.ts';
 import { mockedTask } from '../types/task.ts';
+import { AppModes } from '../constants/appTypes.ts';
 
 export const routeConfig = [
   {
@@ -63,3 +64,17 @@ export const mockedTests: Test[] = [
     tasks: [mockedTask, mockedTask, mockedTask, mockedTask, mockedTask],
   },
 ];
+
+export const getStoredAppMode = (): AppModes | null => {
+  const storedAppMode = sessionStorage.getItem('appMode');
+
+  if (!storedAppMode) {
+    return null;
+  }
+
+  if (storedAppMode === AppModes.tutor) {
+    return AppModes.tutor;
+  }
+
+  return AppModes.student;
+};

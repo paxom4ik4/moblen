@@ -26,7 +26,12 @@ import './app.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
 import { Results } from './pages/tutor/results/results.tsx';
-import { mockedTests, routeConfig, studentRouteConfig } from './utils/app.utils.ts';
+import {
+  getStoredAppMode,
+  mockedTests,
+  routeConfig,
+  studentRouteConfig,
+} from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 
@@ -58,7 +63,7 @@ const App: FC = () => {
       const userData = JSON.parse(storedUserData);
 
       dispatch(setUser(userData));
-      dispatch(setAppMode(userData.role));
+      dispatch(setAppMode(getStoredAppMode()));
     }
   }, [dispatch]);
 

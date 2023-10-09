@@ -6,7 +6,7 @@ import { Input } from 'common/input/input.tsx';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import VKIcon from 'assets/icons/vk-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
-import { LoginModes } from 'constants/appTypes.ts';
+import { LoginModes, UserData } from 'constants/appTypes.ts';
 
 import './login.scss';
 import { loginUser } from 'services/login/login.ts';
@@ -14,10 +14,14 @@ import { useDispatch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { remapStudentData, remapTutorData } from './utils.ts';
-import { Student } from '../../types/student.ts';
-import { Tutor } from '../../types/tutor.ts';
 
 const DEFAULT_CLASSNAME = 'login';
+
+interface LoginErrors {
+  login: string;
+  password: string;
+  passwordRepeat: string;
+}
 
 export const LoginPage: FC = () => {
   const dispatch = useDispatch();
@@ -37,8 +41,9 @@ export const LoginPage: FC = () => {
   //   </>
   // );
 
-  const handleDataStoring = (userData: Student | Tutor) => {
+  const handleDataStoring = (userData: UserData, role: string) => {
     sessionStorage.setItem('userData', JSON.stringify(userData));
+    sessionStorage.setItem('appMode', JSON.stringify(role));
   };
 
   const loginHandler = async (values: { login: string; password: string }) => {
@@ -47,23 +52,19 @@ export const LoginPage: FC = () => {
       const { status, role, user } = res;
       if (status === 'AUTHORIZED') {
         if (role === 'tutor') {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           const tutorData = remapTutorData(user);
 
           dispatch(setUser(tutorData));
           dispatch(setAppMode(role));
 
-          handleDataStoring({ ...tutorData, role });
+          handleDataStoring(tutorData, role);
         } else {
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           const studentData = remapStudentData(user);
 
           dispatch(setUser(studentData));
           dispatch(setAppMode(role));
 
-          handleDataStoring({ ...studentData, role });
+          handleDataStoring(studentData, role);
         }
 
         navigate('/');
@@ -82,16 +83,12 @@ export const LoginPage: FC = () => {
       mode === LoginModes.login && loginHandler(values);
     },
     validate: (values) => {
-      const errors = {};
+      const errors: Partial<LoginErrors> = {};
 
       if (!values.login) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         errors.login = 'Обязательное поле';
       }
       if (!values.password) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
         errors.password = 'Обязательное поле';
       }
 

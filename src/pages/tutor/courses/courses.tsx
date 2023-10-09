@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { createCourse, createTopic, getTopics, getTutorsCourses } from 'services/courses';
 import { createTaskList, deleteTaskList, getTaskList } from '../../../services/tasks';
-import { setTaskToCreate } from '../../../store/create-task/create-task.slice.ts';
+import { setTaskToCreate } from 'store/create-task/create-task.slice.ts';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -73,8 +73,10 @@ export const Courses: FC = () => {
     },
   );
 
-  const handleDeleteTest = (id: string) => {
-    deleteTaskListMutation.mutate({ list_uuid: id, topic_uuid: activeTopic! });
+  const handleDeleteTest = async (id: string) => {
+    if (activeTopic) {
+      await deleteTaskListMutation.mutate({ list_uuid: id, topic_uuid: activeTopic! });
+    }
   };
 
   const [{ isOver }, drop] = useDrop(() => ({
@@ -260,11 +262,6 @@ export const Courses: FC = () => {
                   <Typography color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
                     {topic.topic_name}
                   </Typography>
-                  {/*{topic.topic_uuid === activeTopic && (*/}
-                  {/*  <div className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}>*/}
-                  {/*    <EditIcon />*/}
-                  {/*  </div>*/}
-                  {/*)}*/}
                 </div>
               ))}
             {addNewTopic && (

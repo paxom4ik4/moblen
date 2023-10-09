@@ -1,10 +1,7 @@
 import { Tutor } from 'types/tutor.ts';
-import { UserData } from '../../constants/appTypes.ts';
-import { Student } from '../../types/student.ts';
+import { Student } from 'types/student.ts';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export const remapTutorData: UserData = (tutorData: Tutor) => {
+export const remapTutorData = (tutorData: Tutor) => {
   return {
     uuid: tutorData.tutor_uuid,
     name: tutorData.tutor_name,
@@ -16,9 +13,7 @@ export const remapTutorData: UserData = (tutorData: Tutor) => {
   };
 };
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-export const remapStudentData: UserData = (studentData: Student) => {
+export const remapStudentData = (studentData: Student) => {
   return {
     uuid: studentData.student_uuid,
     name: studentData.student_name,

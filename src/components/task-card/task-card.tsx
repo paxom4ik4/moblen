@@ -48,7 +48,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   // assets
   const [assets, setAssets] = useState<Asset[]>(taskAssets ?? []);
   const [addNewAsset, setAddNewAsset] = useState<boolean>(false);
-  const [newAssetImage, setNewAssetImage] = useState(null);
+  const [newAssetImage, setNewAssetImage] = useState<File | null>(null);
   const [newAssetText, setNewAssetText] = useState('');
 
   // const createTaskMutation = useMutation();
@@ -116,9 +116,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               <input
                 type={'file'}
                 onChange={(e) =>
-                  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                  // @ts-ignore
-                  setNewAssetImage(e.currentTarget.files[0])
+                  setNewAssetImage(e.currentTarget.files![0])
                 }
               />
               {!newAssetImage && (

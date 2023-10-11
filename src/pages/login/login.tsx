@@ -43,7 +43,7 @@ export const LoginPage: FC = () => {
 
   const handleDataStoring = (userData: UserData, role: string) => {
     sessionStorage.setItem('userData', JSON.stringify(userData));
-    sessionStorage.setItem('appMode', JSON.stringify(role));
+    sessionStorage.setItem('appMode', role);
   };
 
   const loginHandler = async (values: { login: string; password: string }) => {
@@ -108,6 +108,7 @@ export const LoginPage: FC = () => {
         </Typography>
 
         <Input
+          autoComplete={'false'}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           value={form.values.login}
@@ -117,6 +118,7 @@ export const LoginPage: FC = () => {
         />
         <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{form.errors.login}</div>
         <Input
+          autoComplete={'false'}
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           value={form.values.password}
@@ -130,11 +132,11 @@ export const LoginPage: FC = () => {
           <div className={`${DEFAULT_CLASSNAME}_footer_options`}>
             {mode === LoginModes.login && (
               <>
-                <Typography
-                  onClick={() => navigate('/registration')}
-                  color={'purple'}
-                  className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-                  Зарегистрироваться
+                <Typography className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+                  Нет аккаунта?{' '}
+                  <span onClick={() => navigate('/registration')} color={'purple'}>
+                    Зарегистрироваться
+                  </span>
                 </Typography>
 
                 <Typography

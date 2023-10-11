@@ -7,12 +7,14 @@ import CheckIcon from 'assets/icons/check-icon.svg';
 import AddIcon from 'assets/icons/add-icon.svg';
 
 import { TaskCard } from 'components/task-card/task-card.tsx';
-import { Task } from 'types/task.ts';
 import { Typography } from 'common/typography/typography.tsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
-import { clearCreateTask } from '../../../store/create-task/create-task.slice.ts';
+import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
+import { useQuery } from 'react-query';
+import { getTasks } from 'services/tasks';
+import { Task } from '../../../types/task.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -24,26 +26,33 @@ export const CreateTest: FC<CreateTestProps> = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const { id: paramsTaskListId } = useParams();
+
   const { taskListId, taskListName, courseName, topicName } = useSelector(
     (store: RootState) => store.createTask,
   );
 
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const { data: tasksData, isLoading } = useQuery('tasks', () =>
+    getTasks(taskListId || paramsTaskListId!),
+  );
+
   const [maxScore, setMaxScore] = useState(0);
   const [testText, setTestText] = useState('');
   const [testTitle, setTestTitle] = useState(taskListName ?? '');
 
   useEffect(() => {
-    setMaxScore(tasks.reduce((score, task) => score + Number(task.maxScore), 0));
-  }, [tasks]);
+    if (tasksData) {
+      setMaxScore(
+        tasksData.tasks.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
+      );
+    }
+  }, [tasksData]);
 
   const [isNewTask, setIsNewTask] = useState(false);
 
   const addNewTaskHandler = () => setIsNewTask(true);
 
   const saveTestHandler = () => {
-    console.log(taskListId);
-
     dispatch(clearCreateTask());
     navigate('/assignments');
   };
@@ -92,30 +101,32 @@ export const CreateTest: FC<CreateTestProps> = () => {
             <CheckIcon />
           </div>
         </div>
-        {tasks?.map((task, index) => (
-          <TaskCard
-            tasks={tasks}
-            setTasks={setTasks}
-            taskAssets={task.assets}
-            text={task.taskText}
-            criteria={task.criteria}
-            maxScore={task.maxScore}
-            format={task.format}
-            index={index + 1}
-          />
-        ))}
+        {isLoading && <Typography>Загрузка заданий...</Typography>}
+
+        {tasksData?.tasks &&
+          tasksData.tasks.length &&
+          tasksData.tasks?.map((task: Task, index: number) => (
+            <TaskCard
+              taskId={task.task_uuid}
+              taskListId={taskListId!}
+              taskAssets={task.task_image}
+              text={task.task_condition}
+              criteria={task.criteria}
+              maxScore={task.max_ball}
+              format={task.format}
+              index={index + 1}
+            />
+          ))}
 
         {isNewTask && (
           <TaskCard
+            taskListId={taskListId!}
             isCreateMode
             setIsCreatingMode={setIsNewTask}
-            tasks={tasks}
-            setTasks={setTasks}
             text={''}
             criteria={''}
-            maxScore={''}
+            maxScore={null}
             format={'standard'}
-            index={3}
           />
         )}
         <div

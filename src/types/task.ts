@@ -2,13 +2,14 @@ export interface Asset {
   image: File;
   text: string;
 }
-
 export interface Task {
-  taskText: string;
-  format: string;
   criteria: string;
-  maxScore: string;
-  assets?: Asset[];
+  format: string;
+  max_ball: number;
+  task_answer?: string;
+  task_condition: string;
+  task_image: null;
+  task_uuid: string;
 }
 
 export interface TaskWithAnswer extends Task {
@@ -16,10 +17,13 @@ export interface TaskWithAnswer extends Task {
 }
 
 export const mockedTask = {
-  taskText: 'Решите пример: 2 + 2',
-  format: 'standard',
+  task_condition: 'Решите пример: 2 + 2',
+  format: 'Текстовый формат',
   criteria: 'Нельзя ползьзоваться калькулятором',
-  maxScore: '10',
-  answer: 'Ответ Студента',
-  assets: [],
+  max_ball: 10,
+  assets: null,
+  task_answer: '',
+  answer: 'task',
+  task_image: null,
+  task_uuid: '123',
 };

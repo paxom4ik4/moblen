@@ -14,7 +14,7 @@ interface TaskPassCardProps {
   mode?: 'view' | 'pass';
   text: string;
   criteria: string;
-  maxScore: string;
+  maxScore: number;
   format?: string;
   index: number;
   taskAssets?: Asset[];

@@ -16,6 +16,7 @@ import './group-card.scss';
 import { createTutorGroup } from 'services/tutor';
 import { addNewStudent, deleteGroup } from 'services/groups';
 import { deleteFromGroup } from '../../services/student/student.ts';
+import { Notification } from '../../common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'group-card';
 
@@ -66,6 +67,8 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
   const [newGroupImage, setNewGroupImage] = useState<File | null>(null);
 
   const [isEditMode, setIsEditMode] = useState(editMode ?? false);
+
+  const [copiedToClipboard, setCopiedTopClipboard] = useState(false);
 
   const createGroupMutation = useMutation({
     mutationFn: createTutorGroup,
@@ -169,8 +172,18 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
             {!isEditMode && (
               <div
                 className={`${DEFAULT_CLASSNAME}_buttons-referral`}
-                onClick={() => navigator.clipboard.writeText(url)}>
+                onClick={() => {
+                  setCopiedTopClipboard(true);
+                  navigator.clipboard.writeText(url);
+                }}>
                 <LinkIcon />
+                <Notification
+                  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                  autoHideDuration={3000}
+                  message={'Реферальная ссылка скопирована'}
+                  open={copiedToClipboard}
+                  onClose={() => setCopiedTopClipboard(!copiedToClipboard)}
+                />
                 <div className={`${DEFAULT_CLASSNAME}_buttons-referral-link`}>{url}</div>
               </div>
             )}

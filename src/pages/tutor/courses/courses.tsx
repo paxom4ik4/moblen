@@ -12,14 +12,16 @@ import { TestCard } from 'components/test-card/test-card.tsx';
 import { CoursesShare } from './courses-share/courses-share.tsx';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
 
-import './courses.scss';
 import { Typography } from 'common/typography/typography.tsx';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { createCourse, createTopic, getTopics, getTutorsCourses } from 'services/courses';
-import { createTaskList, deleteTaskList, getTaskList } from '../../../services/tasks';
+import { createTaskList, deleteTaskList, getTaskList } from 'services/tasks';
 import { setTaskToCreate } from 'store/create-task/create-task.slice.ts';
+import { setActiveCourse, setActiveTopic } from 'store/courses/courses.slice.ts';
+
+import './courses.scss';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -31,9 +33,7 @@ export const Courses: FC = () => {
   const navigate = useNavigate();
 
   const { userData } = useSelector((state: RootState) => state.userData);
-
-  const [activeCourse, setActiveCourse] = useState<null | string>(null);
-  const [activeTopic, setActiveTopic] = useState<null | string>(null);
+  const { activeCourse, activeTopic } = useSelector((state: RootState) => state.courses);
 
   const { data: courses, isLoading } = useQuery('courses', () => getTutorsCourses(userData!.uuid));
 
@@ -45,7 +45,7 @@ export const Courses: FC = () => {
   );
 
   const { data: topics, isLoading: isTopicsLoading } = useQuery(['topics', activeCourse], () =>
-    getTopics(activeCourse ?? null),
+    getTopics(activeCourse!),
   );
 
   const createNewTopicMutation = useMutation(
@@ -215,8 +215,8 @@ export const Courses: FC = () => {
             courses.map((course) => (
               <div
                 onClick={() => {
-                  setActiveCourse(course.course_uuid);
-                  setActiveTopic(null);
+                  dispatch(setActiveCourse(course.course_uuid));
+                  dispatch(setActiveTopic(null));
                 }}
                 className={`${DEFAULT_CLASSNAME}_subjects_list-item ${
                   course.course_uuid === activeCourse && 'active-subject'
@@ -258,7 +258,7 @@ export const Courses: FC = () => {
                   className={`${DEFAULT_CLASSNAME}_topics_list-item ${
                     topic.topic_uuid === activeTopic && 'active-topic'
                   }`}
-                  onClick={() => setActiveTopic(topic.topic_uuid)}>
+                  onClick={() => dispatch(setActiveTopic(topic.topic_uuid))}>
                   <Typography color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
                     {topic.topic_name}
                   </Typography>

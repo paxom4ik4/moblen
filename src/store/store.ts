@@ -5,6 +5,7 @@ import userDataReduced from './user-data/user-data.slice.ts';
 import tutorGroupsReducer from './tutor-groups/tutor-groups.slice.ts';
 import resultsSliceReducer from './results/results.slice.ts';
 import createTaskSliceReducer from './create-task/create-task.slice.ts';
+import coursesSliceReducer from './courses/courses.slice.ts';
 
 const reducer = combineReducers({
   appMode: appModeReducer,
@@ -12,6 +13,7 @@ const reducer = combineReducers({
   tutorGroups: tutorGroupsReducer,
   results: resultsSliceReducer,
   createTask: createTaskSliceReducer,
+  courses: coursesSliceReducer,
 });
 
 export const store = configureStore({

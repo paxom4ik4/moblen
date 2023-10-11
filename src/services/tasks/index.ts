@@ -33,13 +33,33 @@ const tasklistAPI = {
 };
 
 const tasksAPI = {
-  getTask: (taskListId: string) => {
-    return API.get(`${TASK_URL}/get-by-tsklist/${taskListId}`).then((res) => res.data);
+  getTasks: (taskListId: string) => {
+    return API.get(`${TASK_URL}/by-tasklist/${taskListId}`).then((res) => res.data);
   },
-  createTask: ({ list_uuid }: { list_uuid: string }) => {
-    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}`);
+  createTask: ({
+    list_uuid,
+    task_condition,
+    criteria,
+    max_ball,
+    format,
+  }: {
+    list_uuid: string;
+    task_condition: string;
+    criteria: string;
+    format: string;
+    max_ball: number;
+  }) => {
+    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}`, {
+      task_condition,
+      criteria,
+      max_ball,
+      format,
+    }).then((res) => res.data);
+  },
+  deleteTask: ({ taskListId, taskId }: { taskListId: string; taskId: string }) => {
+    return API.delete(`${TASK_URL}/by-tasklist/${taskListId}/${taskId}`).then((res) => res.data);
   },
 };
 
 export const { getTaskList, deleteTaskList, createTaskList, editTaskList } = tasklistAPI;
-export const { getTask, createTask } = tasksAPI;
+export const { getTasks, createTask, deleteTask } = tasksAPI;

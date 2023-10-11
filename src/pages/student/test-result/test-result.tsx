@@ -19,7 +19,7 @@ export const TestResult = () => {
 
   const { name, subject, topic, tasks } = testData!;
   const maxScore = tasks.reduce(
-    (score: number, task: { maxScore: string }) => score + Number(task.maxScore),
+    (score: number, task: TaskWithAnswer) => score + Number(task.max_ball),
     0,
   );
 
@@ -47,9 +47,9 @@ export const TestResult = () => {
                 <TaskPassCard
                   answer={task.answer}
                   mode={'view'}
-                  text={task.taskText}
+                  text={task.task_condition}
                   criteria={task.criteria}
-                  maxScore={task.maxScore}
+                  maxScore={task.max_ball}
                   format={task.format}
                   index={index}
                 />

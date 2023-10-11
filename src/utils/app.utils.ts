@@ -72,7 +72,7 @@ export const getStoredAppMode = (): AppModes | null => {
     return null;
   }
 
-  if (storedAppMode === AppModes.tutor) {
+  if (storedAppMode === AppModes[AppModes.tutor]) {
     return AppModes.tutor;
   }
 

@@ -1,10 +1,13 @@
-import { Dispatch, FC, SetStateAction } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import ShareIcon from 'assets/icons/share-icon.svg';
+import ConfirmIcon from 'assets/icons/check-icon.svg';
 
 import './test-card.scss';
 import { useDrag } from 'react-dnd';
 import { DraggableTypes } from '../../types/draggable/draggable.types.ts';
+import { useMutation, useQueryClient } from 'react-query';
+import { createTaskList } from '../../services/tasks';
 
 export interface TestCardProps {
   id: string;
@@ -21,6 +24,13 @@ export interface TestCardProps {
     } | null>
   >;
   onClick?: () => void;
+}
+
+export interface TestCardCreateProps {
+  subject: string;
+  topic: string;
+  activeTopic: string;
+  setIsTaskListCreating: Dispatch<SetStateAction<boolean>>;
 }
 
 const DEFAULT_CLASSNAME = 'app-test-card';
@@ -58,6 +68,50 @@ export const TestCard: FC<TestCardProps> = (props) => {
           });
         }}>
         <ShareIcon />
+      </div>
+    </div>
+  );
+};
+
+export const TestCardCreate: FC<TestCardCreateProps> = (props) => {
+  const { subject, topic, activeTopic, setIsTaskListCreating } = props;
+
+  const queryClient = useQueryClient();
+
+  const [newTaskListName, setNewTaskListName] = useState('');
+
+  const createNewTaskListMutation = useMutation(
+    (data: { list_name: string; topic_uuid: string }) => createTaskList(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('taskList'),
+    },
+  );
+
+  const handleNewTaskListCreate = async () => {
+    await createNewTaskListMutation.mutate({
+      topic_uuid: activeTopic,
+      list_name: newTaskListName,
+    });
+
+    setIsTaskListCreating(false);
+    setNewTaskListName('');
+  };
+
+  return (
+    <div className={DEFAULT_CLASSNAME}>
+      <div className={`${DEFAULT_CLASSNAME}_content`}>
+        <div className={`${DEFAULT_CLASSNAME}_subject-topic`}>
+          {subject} - {topic}
+        </div>
+        <input
+          type={'text'}
+          value={newTaskListName}
+          onChange={(e) => setNewTaskListName(e.currentTarget.value)}
+          placeholder={'Введите название теста...'}
+        />
+      </div>
+      <div className={`${DEFAULT_CLASSNAME}_share`} onClick={handleNewTaskListCreate}>
+        <ConfirmIcon />
       </div>
     </div>
   );

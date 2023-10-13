@@ -29,12 +29,17 @@
 
     &_title {
       position: absolute;
-      top: 72px;
-      left: 12px;
+      top: 63px;
+      left: 1px;
+      width: calc(100% - 8px);
+      border-top-left-radius: 16px;
+      border-top-right-radius: 16px;
+      padding: 8px 12px;
+      background: #ffffff;
     }
 
     &_main {
-      padding: 36px 12px 12px !important;
+      padding: 36px 12px 12px;
     }
   }
 
@@ -52,6 +57,15 @@
 
     &-title {
       padding-bottom: 8px;
+    }
+
+    &-cut {
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        opacity: 0.8;
+      }
     }
 
     &-work input {

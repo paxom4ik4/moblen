@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useRef, useState } from 'react';
 
 import './create-test.scss';
 
@@ -36,9 +36,10 @@ export const CreateTest: FC<CreateTestProps> = () => {
     getTasks(taskListId || paramsTaskListId!),
   );
 
+  const textContainerRef = useRef<HTMLTextAreaElement>(null);
+
   const [maxScore, setMaxScore] = useState(0);
   const [testText, setTestText] = useState('');
-  const [testTitle, setTestTitle] = useState(taskListName ?? '');
 
   useEffect(() => {
     if (tasksData) {
@@ -49,12 +50,22 @@ export const CreateTest: FC<CreateTestProps> = () => {
   }, [tasksData]);
 
   const [isNewTask, setIsNewTask] = useState(false);
+  const [newTaskText, setNewTaskText] = useState('');
 
   const addNewTaskHandler = () => setIsNewTask(true);
 
   const saveTestHandler = () => {
     dispatch(clearCreateTask());
     navigate('/assignments');
+  };
+
+  const handleCreateTaskFromText = () => {
+    const cursorStart = textContainerRef.current!.selectionStart;
+    const cursorEnd = textContainerRef.current!.selectionEnd;
+
+    setIsNewTask(true);
+
+    setNewTaskText(testText.substring(cursorStart, cursorEnd));
   };
 
   return (
@@ -68,15 +79,12 @@ export const CreateTest: FC<CreateTestProps> = () => {
               </Typography>
             </div>
             <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>
-              <input
-                placeholder={'Введите имя теста'}
-                type={'text'}
-                value={testTitle}
-                onChange={(e) => setTestTitle(e.currentTarget.value)}
-              />
+              <Typography size={'large'}>{taskListName}</Typography>
             </div>
           </div>
-          <div className={`${DEFAULT_CLASSNAME}_text-container_name-cut`}>
+          <div
+            className={`${DEFAULT_CLASSNAME}_text-container_name-cut`}
+            onClick={handleCreateTaskFromText}>
             <CutIcon />
           </div>
         </div>
@@ -84,6 +92,7 @@ export const CreateTest: FC<CreateTestProps> = () => {
           Текст заданий
         </Typography>
         <textarea
+          ref={textContainerRef}
           className={`${DEFAULT_CLASSNAME}_text-container_main`}
           onSelectCapture={(e) => console.log(e)}
           value={testText}
@@ -103,8 +112,7 @@ export const CreateTest: FC<CreateTestProps> = () => {
         </div>
         {isLoading && <Typography>Загрузка заданий...</Typography>}
 
-        {tasksData?.tasks &&
-          tasksData.tasks.length &&
+        {!!tasksData?.tasks?.length &&
           tasksData.tasks?.map((task: Task, index: number) => (
             <TaskCard
               taskId={task.task_uuid}
@@ -123,7 +131,7 @@ export const CreateTest: FC<CreateTestProps> = () => {
             taskListId={taskListId!}
             isCreateMode
             setIsCreatingMode={setIsNewTask}
-            text={''}
+            text={newTaskText ?? ''}
             criteria={''}
             maxScore={null}
             format={'standard'}

@@ -8,7 +8,7 @@ import AddSubjectIcon from 'assets/icons/add-subject-icon.svg';
 import CancelIcon from 'assets/icons/cancel-icon.svg';
 import LockIcon from 'assets/icons/lock-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg';
-import { TestCard } from 'components/test-card/test-card.tsx';
+import { TestCard, TestCardCreate } from 'components/test-card/test-card.tsx';
 import { CoursesShare } from './courses-share/courses-share.tsx';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
 
@@ -17,7 +17,7 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { createCourse, createTopic, getTopics, getTutorsCourses } from 'services/courses';
-import { createTaskList, deleteTaskList, getTaskList } from 'services/tasks';
+import { deleteTaskList, getTaskList } from 'services/tasks';
 import { setTaskToCreate } from 'store/create-task/create-task.slice.ts';
 import { setActiveCourse, setActiveTopic } from 'store/courses/courses.slice.ts';
 
@@ -57,13 +57,6 @@ export const Courses: FC = () => {
 
   const { data: taskList, isLoading: isTaskListLoading } = useQuery(['taskList', activeTopic], () =>
     getTaskList(activeTopic ?? null),
-  );
-
-  const createNewTaskListMutation = useMutation(
-    (data: { list_name: string; topic_uuid: string }) => createTaskList(data),
-    {
-      onSuccess: () => queryClient.invalidateQueries('taskList'),
-    },
   );
 
   const deleteTaskListMutation = useMutation(
@@ -119,17 +112,6 @@ export const Courses: FC = () => {
     list_name: string;
   } | null>(null);
   const [isTaskListCreating, setIsTaskListCreating] = useState(false);
-  const [newTaskListName, setNewTaskListName] = useState('');
-
-  const handleNewTaskListCreate = async () => {
-    await createNewTaskListMutation.mutate({
-      topic_uuid: activeTopic!,
-      list_name: newTaskListName,
-    });
-
-    setIsTaskListCreating(false);
-    setNewTaskListName('');
-  };
 
   // share
   const [testToShare, setTestToShare] = useState<{
@@ -139,7 +121,17 @@ export const Courses: FC = () => {
     name: string;
   } | null>(null);
 
-  const handleTaskListCreate = () => setIsTaskListCreating(true);
+  const activeCourseName =
+    (!!courses?.length &&
+      activeCourse &&
+      courses.find((item) => item.course_uuid === activeCourse)!.course_name) ||
+    '';
+
+  const activeTopicName =
+    (!!topics?.length &&
+      activeTopic &&
+      topics.find((item) => item.topic_uuid === activeTopic)!.topic_name) ||
+    '';
 
   const createNewTestContent = (
     <div className={`${DEFAULT_CLASSNAME}_new-test_modal`}>
@@ -151,42 +143,24 @@ export const Courses: FC = () => {
 
       <button
         onClick={() => {
-          dispatch(
-            setTaskToCreate({
-              courseName: courses!.find((item) => item.course_uuid === activeCourse)!.course_name,
-              topicName: topics!.find((item) => item.topic_uuid === activeTopic)!.topic_name,
-              taskListId: isCreatingNewTest!.list_uuid,
-              taskListName: isCreatingNewTest!.list_name,
-            }),
-          );
-          navigate(`/assignments/create-test/${isCreatingNewTest?.list_uuid}`);
-          setIsCreatingNewTest(null);
+          if (isCreatingNewTest?.list_uuid && isCreatingNewTest?.list_name) {
+            dispatch(
+              setTaskToCreate({
+                courseName: activeCourseName,
+                topicName: activeTopicName,
+                taskListId: isCreatingNewTest.list_uuid,
+                taskListName: isCreatingNewTest!.list_name,
+              }),
+            );
+            navigate(`/assignments/create-test/${isCreatingNewTest.list_uuid}`);
+            setIsCreatingNewTest(null);
+          }
         }}>
         Внести готовые задания
       </button>
       <button disabled={true} onClick={() => navigate('/assignments/generate-test')}>
         Сгенерировать задания <LockIcon />
       </button>
-    </div>
-  );
-
-  const createTaskListContent = (
-    <div className={`${DEFAULT_CLASSNAME}_new-test_modal`}>
-      <div
-        className={`${DEFAULT_CLASSNAME}_new-test_modal_cancel`}
-        onClick={() => setIsTaskListCreating(false)}>
-        <CancelIcon />
-      </div>
-
-      <div className={`${DEFAULT_CLASSNAME}_new-taskList_modal_content`}>
-        <input
-          placeholder={'Введите название теста'}
-          type={'text'}
-          value={newTaskListName}
-          onChange={(e) => setNewTaskListName(e.currentTarget.value)}
-        />
-        <button onClick={handleNewTaskListCreate}>{'Создать'}</button>
-      </div>
     </div>
   );
 
@@ -206,8 +180,6 @@ export const Courses: FC = () => {
 
       {testToShare && <CoursesShare testToShare={testToShare} setTestToShare={setTestToShare} />}
       {!!isCreatingNewTest && createNewTestContent}
-
-      {isTaskListCreating && createTaskListContent}
 
       <div className={`${DEFAULT_CLASSNAME}_subjects`}>
         <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
@@ -298,13 +270,24 @@ export const Courses: FC = () => {
               }
               id={test.list_uuid}
               name={test.list_name}
-              subject={courses!.find((item) => item.course_uuid === activeCourse)!.course_name}
-              topic={topics!.find((item) => item.topic_uuid === activeTopic)!.topic_name}
+              subject={activeCourseName}
+              topic={activeTopicName}
+              tasks={test.task_count}
               setTestToShare={setTestToShare}
             />
           ))}
+        {isTaskListCreating && (
+          <TestCardCreate
+            setIsTaskListCreating={setIsTaskListCreating}
+            activeTopic={activeTopic!}
+            subject={activeCourseName}
+            topic={activeTopicName}
+          />
+        )}
         {activeTopic && (
-          <button onClick={handleTaskListCreate} className={`${DEFAULT_CLASSNAME}_tasks_add`}>
+          <button
+            onClick={() => setIsTaskListCreating(true)}
+            className={`${DEFAULT_CLASSNAME}_tasks_add`}>
             <AddIcon />
           </button>
         )}

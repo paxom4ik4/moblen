@@ -16,7 +16,14 @@ const tasklistAPI = {
   },
   getTaskList: (
     topic_uuid: string | null,
-  ): Promise<{ list_uuid: string; topic_uuid: string; list_name: string }[]> | null => {
+  ): Promise<
+    {
+      task_count: number;
+      list_uuid: string;
+      topic_uuid: string;
+      list_name: string;
+    }[]
+  > | null => {
     try {
       return API.get(`${TASK_LIST_URL}/by-topic/${topic_uuid}`).then((res) => res.data);
     } catch (error) {

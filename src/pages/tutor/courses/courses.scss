@@ -16,6 +16,25 @@
   height: 100%;
   padding: 16px;
 
+  &_calendar-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #ffffff;
+    padding: 5px;
+    border-radius: 12px;
+    box-shadow: 0 0 3px 2px rgba(0, 0, 0, 0.3);
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+    align-self: center;
+    margin-left: auto;
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
   &_delete {
     position: absolute;
     right: 20px;
@@ -203,6 +222,7 @@
     }
 
     &_list {
+      width: 100%;
       display: flex;
       flex-direction: row;
       column-gap: 20px;
@@ -293,9 +313,10 @@
     height: 90vh;
 
     &_content {
+      margin-top: 16px;
       height: 90%;
       border-radius: 15px;
-      box-shadow: 0 0 3px 2px rgba(27, 27, 31, 0.3);
+      box-shadow: 0 0 2px 1px rgba(27, 27, 31, 0.3);
     }
 
     &_title {
@@ -334,4 +355,37 @@
     width: 64px;
     height: 64px;
   }
+}
+
+// MUI CALENDAR OVERRIDE
+
+.MuiDateCalendar-root {
+  width: 100% !important;
+  min-height: 440px !important;
+}
+
+.MuiDayCalendar-header {
+  margin: 0 100px;
+  justify-content: space-between !important;
+
+  div {
+    height: fit-content !important;
+  }
+}
+
+.MuiDayCalendar-weekContainer {
+  margin: 60px 100px !important;
+  justify-content: space-between !important;
+}
+
+.MuiDayCalendar-monthContainer {
+  height: fit-content !important;
+}
+
+.MuiPickersSlideTransition-root {
+  min-height: 560px !important;
+}
+
+.MuiButtonBase-root {
+  font-size: 20px !important;
 }

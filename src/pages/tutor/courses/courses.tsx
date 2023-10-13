@@ -8,6 +8,7 @@ import AddSubjectIcon from 'assets/icons/add-subject-icon.svg';
 import CancelIcon from 'assets/icons/cancel-icon.svg';
 import LockIcon from 'assets/icons/lock-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg';
+import CalendarIcon from 'assets/icons/calendar-icon.svg';
 import { TestCard, TestCardCreate } from 'components/test-card/test-card.tsx';
 import { CoursesShare } from './courses-share/courses-share.tsx';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
@@ -22,6 +23,7 @@ import { setTaskToCreate } from 'store/create-task/create-task.slice.ts';
 import { setActiveCourse, setActiveTopic } from 'store/courses/courses.slice.ts';
 
 import './courses.scss';
+import { DateCalendar } from '@mui/x-date-pickers';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -133,6 +135,8 @@ export const Courses: FC = () => {
       topics.find((item) => item.topic_uuid === activeTopic)!.topic_name) ||
     '';
 
+  const [calendarOpened, setCalendarOpened] = useState<boolean>(false);
+
   const createNewTestContent = (
     <div className={`${DEFAULT_CLASSNAME}_new-test_modal`}>
       <div
@@ -164,7 +168,23 @@ export const Courses: FC = () => {
     </div>
   );
 
-  const showBackgroundShadow = isCreatingNewTest || testToShare;
+  const calendarContent = (
+    <div className={`${DEFAULT_CLASSNAME}_calendar`}>
+      <div className={`${DEFAULT_CLASSNAME}_calendar_title`}>
+        <Typography size={'large'}>Расписание</Typography>
+        <div
+          className={`${DEFAULT_CLASSNAME}_calendar_close`}
+          onClick={() => setCalendarOpened(false)}>
+          <CancelIcon />
+        </div>
+      </div>
+      <div className={`${DEFAULT_CLASSNAME}_calendar_content`}>
+        <DateCalendar />
+      </div>
+    </div>
+  );
+
+  const showBackgroundShadow = isCreatingNewTest || testToShare || calendarOpened;
 
   if (isLoading) {
     return (
@@ -180,6 +200,7 @@ export const Courses: FC = () => {
 
       {testToShare && <CoursesShare testToShare={testToShare} setTestToShare={setTestToShare} />}
       {!!isCreatingNewTest && createNewTestContent}
+      {calendarOpened && calendarContent}
 
       <div className={`${DEFAULT_CLASSNAME}_subjects`}>
         <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
@@ -254,6 +275,11 @@ export const Courses: FC = () => {
               {' '}
               <AddIcon />
             </div>
+            <button
+              className={`${DEFAULT_CLASSNAME}_calendar-btn`}
+              onClick={() => setCalendarOpened(true)}>
+              <CalendarIcon />
+            </button>
           </div>
         )}
       </div>

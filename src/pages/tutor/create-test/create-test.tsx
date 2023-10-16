@@ -14,15 +14,11 @@ import { RootState } from 'store/store.ts';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useQuery } from 'react-query';
 import { getTasks } from 'services/tasks';
-import { Task } from '../../../types/task.ts';
+import { Task } from 'types/task.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
-interface CreateTestProps {
-  tasks?: Task[];
-}
-
-export const CreateTest: FC<CreateTestProps> = () => {
+export const CreateTest: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -94,7 +90,6 @@ export const CreateTest: FC<CreateTestProps> = () => {
         <textarea
           ref={textContainerRef}
           className={`${DEFAULT_CLASSNAME}_text-container_main`}
-          onSelectCapture={(e) => console.log(e)}
           value={testText}
           onChange={(e) => setTestText(e.currentTarget.value)}></textarea>
       </div>

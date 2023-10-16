@@ -126,7 +126,7 @@ export const Groups: FC<GroupsProps> = (props) => {
           selectedGroupData &&
           selectedGroupData?.students?.map((student: Student) => (
             <StudentCard
-              active={student.student_uuid === selectedStudent}
+              active={viewMode && student.student_uuid === selectedStudent}
               resultsViewMode={viewMode}
               groupId={selectedGroup.group_uuid}
               id={student.student_uuid}

@@ -19,10 +19,7 @@ export const PassTest: FC = () => {
   const testData = tests.find((test) => test.id === id);
 
   const { name, subject, topic, tasks } = testData!;
-  const maxScore = tasks.reduce(
-    (score: number, task: { maxScore: string }) => score + Number(task.maxScore),
-    0,
-  );
+  const maxScore = tasks.reduce((score: number, task) => score + Number(task.max_ball), 0);
 
   const initialTasks = useMemo(
     () =>
@@ -64,9 +61,9 @@ export const PassTest: FC = () => {
           <TaskPassCard
             tasksWithStudentAnswers={tasksWithStudentAnswers}
             setTasksWithStudentAnswers={setTasksWithStudentAnswers}
-            text={task.taskText}
+            text={task.task_condition}
             criteria={task.criteria}
-            maxScore={task.maxScore}
+            maxScore={task.max_ball}
             format={task.format}
             index={index}
           />

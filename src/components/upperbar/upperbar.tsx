@@ -9,7 +9,8 @@ import { setUser } from 'store/user-data/user-data.slice.ts';
 import StudentIcon from 'assets/icons/student-icon.svg';
 import { RootState } from 'store/store.ts';
 import { Typography } from 'common/typography/typography.tsx';
-import { setAppMode } from '../../store/app-mode/app-mode.slice.ts';
+import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
+import { logoutUser } from 'services/login/login.ts';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
@@ -20,6 +21,13 @@ export const UpperBar: FC = () => {
   const { name, surname, email, photo } = userData!;
 
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
+
+  const logoutHandler = async () => {
+    dispatch(setUser(null));
+    dispatch(setAppMode(null));
+    sessionStorage.removeItem('userData');
+    await logoutUser();
+  };
 
   return (
     <div className={DEFAULT_CLASSNAME}>
@@ -46,12 +54,7 @@ export const UpperBar: FC = () => {
             <Typography color={'gray'}>{email}</Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
-            <button
-              onClick={() => {
-                dispatch(setUser(null));
-                dispatch(setAppMode(null));
-                sessionStorage.removeItem('userData');
-              }}>
+            <button onClick={logoutHandler}>
               <Typography color={'gray'} weight={'bold'}>
                 {'Выход'}
               </Typography>

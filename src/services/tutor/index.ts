@@ -9,7 +9,11 @@ const tutorAPI = {
     return await API.get(`${TUTOR_API_URL}/${tutorId}/`);
   },
   getTutorGroups: (tutorId: string): Promise<Group[]> => {
-    return API.get(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`).then((res) => res.data);
+    return API.get(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`, {
+      withCredentials: true,
+      xsrfHeaderName: 'csrftoken',
+      xsrfCookieName: 'csrftoken',
+    }).then((res) => res.data);
   },
   createTutorGroup: ({ tutorId, groupName }: { tutorId: string; groupName: string }) => {
     return API.post(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`, { group_name: groupName }).then(

@@ -5,7 +5,9 @@ const LOGOUT_URL = '/users/logout/';
 
 const loginAPI = {
   loginUser: ({ login, password }: { login: string; password: string }) => {
-    return API.post(`${LOGIN_URL}`, { login, password }).then((res) => res.data);
+    return API.post(`${LOGIN_URL}`, { login, password }, { withCredentials: false }).then(
+      (res) => res.data,
+    );
   },
   logoutUser: () => {
     return API.post(`${LOGOUT_URL}`).then((res) => res.data);

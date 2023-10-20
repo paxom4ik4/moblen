@@ -10,7 +10,7 @@ import { Group } from 'types/group.ts';
 import { Typography } from 'common/typography/typography.tsx';
 import { RootState } from 'store/store.ts';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { getTutorGroups } from 'services/tutor';
+import { getTutorGroups, getTutorInfo } from 'services/tutor';
 import { getGroup } from 'services/groups';
 import { Student } from 'types/student.ts';
 import { useDrop } from 'react-dnd';
@@ -35,6 +35,13 @@ export const Groups: FC<GroupsProps> = (props) => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
   const { data: groups, isLoading } = useQuery('groups', () => getTutorGroups(userData!.uuid));
+
+  const { data: tutorData, isLoading: isTutorDataLoading } = useQuery('tutorData', () =>
+    getTutorInfo(userData!.uuid),
+  );
+
+  console.log(isTutorDataLoading);
+  console.log(tutorData);
 
   const { data: selectedGroupData, isLoading: isGroupLoading } = useQuery(
     ['groupData', selectedGroup],

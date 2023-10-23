@@ -10,10 +10,11 @@ import { LoginModes, UserData } from 'constants/appTypes.ts';
 
 import './login.scss';
 import { loginUser } from 'services/login/login.ts';
-import { useDispatch } from 'react-redux';
+import { useDispatch, batch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { remapStudentData, remapTutorData } from './utils.ts';
+import { LoginRoutes, StudentRoutes, TutorRoutes } from '../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -42,8 +43,8 @@ export const LoginPage: FC = () => {
   // );
 
   const handleDataStoring = (userData: UserData, role: string) => {
-    sessionStorage.setItem('userData', JSON.stringify(userData));
-    sessionStorage.setItem('appMode', role);
+    localStorage.setItem('userData', JSON.stringify(userData));
+    localStorage.setItem('appMode', role);
   };
 
   const loginHandler = async (values: { login: string; password: string }) => {
@@ -54,20 +55,26 @@ export const LoginPage: FC = () => {
         if (role === 'tutor') {
           const tutorData = remapTutorData(user);
 
-          dispatch(setUser(tutorData));
-          dispatch(setAppMode(role));
+          navigate(TutorRoutes.ASSIGNMENTS);
+
+          batch(() => {
+            dispatch(setUser(tutorData));
+            dispatch(setAppMode(role));
+          });
 
           handleDataStoring(tutorData, role);
         } else {
           const studentData = remapStudentData(user);
 
-          dispatch(setUser(studentData));
-          dispatch(setAppMode(role));
+          navigate(StudentRoutes.ASSIGNMENTS);
+
+          batch(() => {
+            dispatch(setUser(studentData));
+            dispatch(setAppMode(role));
+          });
 
           handleDataStoring(studentData, role);
         }
-
-        navigate('/');
       }
     } catch (error) {
       form.resetForm({
@@ -134,7 +141,7 @@ export const LoginPage: FC = () => {
               <>
                 <Typography className={`${DEFAULT_CLASSNAME}_footer_mode`}>
                   Нет аккаунта?{' '}
-                  <span onClick={() => navigate('/registration')} color={'purple'}>
+                  <span onClick={() => navigate(LoginRoutes.REGISTRATION)} color={'purple'}>
                     Зарегистрироваться
                   </span>
                 </Typography>

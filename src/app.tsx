@@ -23,7 +23,7 @@ import { AppModes } from './constants/appTypes.ts';
 import { Test } from './types/test.ts';
 
 import './app.scss';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
 import { Results } from './pages/tutor/results/results.tsx';
 import {
@@ -34,6 +34,8 @@ import {
 } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
+import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
+import { checkAuthorize } from './services/login/login.ts';
 
 // MOCKED WHILE BE READY
 interface IAppContent {
@@ -57,21 +59,33 @@ const App: FC = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    const storedUserData = sessionStorage.getItem('userData');
+    const storedUserData = localStorage.getItem('userData');
 
     if (storedUserData) {
       const userData = JSON.parse(storedUserData);
 
-      dispatch(setUser(userData));
-      dispatch(setAppMode(getStoredAppMode()));
+      batch(() => {
+        dispatch(setUser(userData));
+        dispatch(setAppMode(getStoredAppMode()));
+      });
     }
-  }, [dispatch]);
 
-  useEffect(() => {
-    const shouldRedirectToLoginPage = !userData && !location.pathname.includes('/registration');
+    (async () => {
+      try {
+        await checkAuthorize();
+      } catch (error) {
+        navigate('/login-page');
 
-    shouldRedirectToLoginPage && navigate('/login-page');
-  }, [userData, navigate, location.pathname, dispatch]);
+        sessionStorage.removeItem('userData');
+        sessionStorage.removeItem('appMode');
+
+        batch(() => {
+          dispatch(setUser(null));
+          dispatch(setAppMode(null));
+        });
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     const config = appMode === AppModes.tutor ? routeConfig : studentRouteConfig;
@@ -81,18 +95,18 @@ const App: FC = () => {
 
   const tutorRoutes = (
     <>
-      <Route path={'/results'} element={<Results />} />
-      <Route path={'/groups'} element={<Groups />} />
-      <Route path={'/assignments/create-test/:id'} element={<CreateTest />} />
-      <Route path={'/assignments'} element={<Courses />} />
+      <Route path={TutorRoutes.RESULTS} element={<Results />} />
+      <Route path={TutorRoutes.GROUPS} element={<Groups />} />
+      <Route path={TutorRoutes.CREATE_TEST} element={<CreateTest />} />
+      <Route path={TutorRoutes.ASSIGNMENTS} element={<Courses />} />
     </>
   );
 
   const studentRoutes = (
     <>
-      <Route path={'/assignments'} element={<Tests />} />
-      <Route path={'/assignments/:id'} element={<PassTest />} />
-      <Route path={'/assignments/result/:id'} element={<TestResult />} />
+      <Route path={StudentRoutes.ASSIGNMENTS} element={<Tests />} />
+      <Route path={StudentRoutes.PASS_TEST} element={<PassTest />} />
+      <Route path={StudentRoutes.TEST_RESULT} element={<TestResult />} />
     </>
   );
 
@@ -102,7 +116,7 @@ const App: FC = () => {
       <UpperBar />
       <div className={`${DEFAULT_CLASSNAME}_title`}>{currentTitle}</div>
       <Routes>
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/assignments" replace />} />
         {appMode === AppModes.tutor ? tutorRoutes : studentRoutes}
       </Routes>
     </div>
@@ -110,9 +124,9 @@ const App: FC = () => {
 
   const loginContent = (
     <Routes>
-      <Route path={'/registration'} element={<RegistrationPage />} />
-      <Route path={'/registration/ref/:groupId'} element={<RegistrationPage />} />
-      <Route path={'/login-page'} element={<LoginPage />} />
+      <Route path={LoginRoutes.LOGIN} element={<LoginPage />} />
+      <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />
+      <Route path={LoginRoutes.REGISTRATION_WITH_REF} element={<RegistrationPage />} />
     </Routes>
   );
 

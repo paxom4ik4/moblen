@@ -11,11 +11,14 @@ import { RootState } from 'store/store.ts';
 import { Typography } from 'common/typography/typography.tsx';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { logoutUser } from 'services/login/login.ts';
+import { useNavigate } from 'react-router-dom';
+import { LoginRoutes } from '../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
 export const UpperBar: FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { userData } = useSelector((state: RootState) => state.userData);
   const { name, surname, email, photo } = userData!;
@@ -25,7 +28,9 @@ export const UpperBar: FC = () => {
   const logoutHandler = async () => {
     dispatch(setUser(null));
     dispatch(setAppMode(null));
-    sessionStorage.removeItem('userData');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('appMode');
+    navigate(LoginRoutes.LOGIN);
     await logoutUser();
   };
 

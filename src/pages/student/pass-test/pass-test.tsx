@@ -8,6 +8,7 @@ import { Task, TaskWithAnswer } from 'types/task.ts';
 import CheckIcon from 'assets/icons/check-icon.svg';
 
 import './pass-test.scss';
+import { StudentRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'pass-test';
 
@@ -37,7 +38,7 @@ export const PassTest: FC = () => {
     // send answers to BE and change the status of task to done
     console.log(tasksWithStudentAnswers);
 
-    navigate('/assignments');
+    navigate(StudentRoutes.ASSIGNMENTS);
   };
 
   return (

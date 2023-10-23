@@ -66,7 +66,7 @@ export const mockedTests: Test[] = [
 ];
 
 export const getStoredAppMode = (): AppModes | null => {
-  const storedAppMode = sessionStorage.getItem('appMode');
+  const storedAppMode = localStorage.getItem('appMode');
 
   if (!storedAppMode) {
     return null;

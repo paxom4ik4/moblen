@@ -12,6 +12,7 @@ import {
   createNewTutor,
 } from 'services/registration/registration.ts';
 import { useNavigate, useParams } from 'react-router-dom';
+import { LoginRoutes } from '../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'registration';
 const GROUP_REF_LINK = 'https://moblen.ru/ref/';
@@ -36,7 +37,7 @@ export const RegistrationPage: FC = () => {
     const res = await createNewTutor(values);
 
     if ('tutor_uuid' in res) {
-      navigate('/login-page');
+      navigate(LoginRoutes.LOGIN);
     }
   };
 
@@ -48,12 +49,12 @@ export const RegistrationPage: FC = () => {
 
       const res = await createNewStudentWithRef({ ...values, referralLink });
       if (res.status === 'SUCCESSFULLY_ADDED') {
-        navigate('/login-page');
+        navigate(LoginRoutes.LOGIN);
       }
     } else {
       const res = await createNewStudent(values);
       if ('student_uuid' in res) {
-        navigate('/login-page');
+        navigate(LoginRoutes.LOGIN);
       }
     }
   };

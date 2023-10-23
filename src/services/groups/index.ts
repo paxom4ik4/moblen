@@ -17,6 +17,11 @@ const groupsAPI = {
   getGroupLink: (groupId: string) => {
     return API.get(`${GROUPS_API_URL}/${groupId}/reflink/`).then((res) => res.data);
   },
+  refreshGroupLink: (groupId: string) => {
+    return API.patch(`${GROUPS_API_URL}/${groupId}/reflink/`, { group_uuid: groupId }).then(
+      (res) => res.data,
+    );
+  },
   addNewStudent: ({ groupId, studentId }: { groupId: string; studentId: string }) => {
     return API.post(`${GROUPS_API_URL}/${groupId}/new-student/`, { student_uuid: studentId }).then(
       (res) => res.data,
@@ -24,4 +29,11 @@ const groupsAPI = {
   },
 };
 
-export const { getGroup, editGroupName, deleteGroup, getGroupLink, addNewStudent } = groupsAPI;
+export const {
+  getGroup,
+  editGroupName,
+  deleteGroup,
+  getGroupLink,
+  addNewStudent,
+  refreshGroupLink,
+} = groupsAPI;

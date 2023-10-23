@@ -15,6 +15,7 @@ import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useQuery } from 'react-query';
 import { getTasks } from 'services/tasks';
 import { Task } from 'types/task.ts';
+import { TutorRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -52,7 +53,7 @@ export const CreateTest: FC = () => {
 
   const saveTestHandler = () => {
     dispatch(clearCreateTask());
-    navigate('/assignments');
+    navigate(TutorRoutes.ASSIGNMENTS);
   };
 
   const handleCreateTaskFromText = () => {

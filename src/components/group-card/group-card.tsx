@@ -14,7 +14,7 @@ import { RootState } from 'store/store.ts';
 import './group-card.scss';
 
 import { createTutorGroup } from 'services/tutor';
-import { addNewStudent, deleteGroup } from 'services/groups';
+import { addNewStudent, deleteGroup, refreshGroupLink } from 'services/groups';
 import { deleteFromGroup } from '../../services/student/student.ts';
 import { Notification } from '../../common/notification/notification.tsx';
 
@@ -107,10 +107,16 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
     },
   );
 
+  const refreshGroupLinkMutation = useMutation((groupId: string) => refreshGroupLink(groupId), {
+    onSuccess: () => queryClient.invalidateQueries('groups'),
+  });
+
   const handleStudentCardDrop = async (studentId: string, groupId: string) => {
     await deleteStudentFromGroupMutation.mutate({ studentId, groupId });
     await addToGroupMutation.mutate({ groupId: id!, studentId });
   };
+
+  const handlerRefreshRefLink = async () => await refreshGroupLinkMutation.mutate(id!);
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: DraggableTypes.STUDENT_CARD,
@@ -203,7 +209,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
                 </button>
               )}
               {!isEditMode && (
-                <button>
+                <button onClick={handlerRefreshRefLink}>
                   <RefreshIcon />
                 </button>
               )}

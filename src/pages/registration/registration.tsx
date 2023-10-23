@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { Input } from 'common/input/input.tsx';
 import CheckIcon from 'assets/icons/check-icon.svg';
@@ -40,6 +40,10 @@ export const RegistrationPage: FC = () => {
       navigate(LoginRoutes.LOGIN);
     }
   };
+
+  useEffect(() => {
+    params.groupId && setIsTutorRegister(false);
+  }, [params.groupId]);
 
   const handleStudentRegister = async (values: RegistrationValues) => {
     if (location.pathname.includes('ref')) {

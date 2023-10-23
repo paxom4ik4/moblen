@@ -74,7 +74,7 @@ const App: FC = () => {
       try {
         await checkAuthorize();
       } catch (error) {
-        navigate('/login-page');
+        !location.pathname.includes('registration') && navigate('/login-page');
 
         sessionStorage.removeItem('userData');
         sessionStorage.removeItem('appMode');

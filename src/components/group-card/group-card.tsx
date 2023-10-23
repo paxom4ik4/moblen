@@ -14,7 +14,7 @@ import { RootState } from 'store/store.ts';
 import './group-card.scss';
 
 import { createTutorGroup } from 'services/tutor';
-import { addNewStudent, deleteGroup, refreshGroupLink } from 'services/groups';
+import { addNewStudent, deleteGroup, editGroupName, refreshGroupLink } from 'services/groups';
 import { deleteFromGroup } from '../../services/student/student.ts';
 import { Notification } from '../../common/notification/notification.tsx';
 
@@ -40,6 +40,8 @@ export interface GroupCardProps {
 
   onClick?: () => void;
 }
+
+const QUERY_KEY = 'groups';
 
 export const GroupCard: FC<GroupCardProps> = (props) => {
   const {
@@ -72,12 +74,17 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
 
   const createGroupMutation = useMutation({
     mutationFn: createTutorGroup,
-    onSuccess: () => queryClient.invalidateQueries('groups'),
+    onSuccess: () => queryClient.invalidateQueries(QUERY_KEY),
   });
 
   const deleteGroupMutation = useMutation({
     mutationFn: deleteGroup,
-    onSuccess: () => queryClient.invalidateQueries('groups'),
+    onSuccess: () => queryClient.invalidateQueries(QUERY_KEY),
+  });
+
+  const editGroupNameMutation = useMutation({
+    mutationFn: editGroupName,
+    onSuccess: () => queryClient.invalidateQueries(QUERY_KEY),
   });
 
   const saveGroupHandler = () => {
@@ -86,6 +93,11 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
       setIsEditMode(false);
 
       createGroupMutation.mutate({ groupName: newGroupName, tutorId: userData!.uuid });
+    } else {
+      if (id && newGroupName.length) {
+        editGroupNameMutation.mutate({ groupId: id!, groupName: newGroupName });
+        setIsEditMode(false);
+      }
     }
   };
 

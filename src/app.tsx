@@ -73,6 +73,10 @@ const App: FC = () => {
     (async () => {
       try {
         await checkAuthorize();
+
+        if (!storedUserData) {
+          !location.pathname.includes('registration') && navigate('/login-page');
+        }
       } catch (error) {
         !location.pathname.includes('registration') && navigate('/login-page');
 

@@ -33,8 +33,15 @@ const topicsAPI = {
   },
   getTopics: (
     courseId: string | null,
-  ): Promise<{ topic_uuid: string; course_uuid: string; topic_name: string }[]> => {
-    return API.get(`${TOPICS_API_URL}/by-courses/${courseId}`).then((res) => res.data);
+  ): Promise<{ topic_uuid: string; course_uuid: string; topic_name: string }[]> | null => {
+    if (!courseId) return null;
+
+    try {
+      return API.get(`${TOPICS_API_URL}/by-courses/${courseId}`).then((res) => res.data);
+    } catch (error) {
+      console.log('Error fetching Topics');
+      return null;
+    }
   },
   editTopicName: ({ courseId, topicName }: { courseId: string; topicName: string }) => {
     return API.patch(`${TOPICS_API_URL}/by-tutor/${courseId}`, {

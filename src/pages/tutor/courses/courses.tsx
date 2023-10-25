@@ -47,7 +47,11 @@ export const Courses: FC = () => {
   );
 
   const { data: topics, isLoading: isTopicsLoading } = useQuery(['topics', activeCourse], () =>
-    getTopics(activeCourse!),
+    getTopics(activeCourse ?? null),
+  );
+
+  const { data: taskList, isLoading: isTaskListLoading } = useQuery(['taskList', activeTopic], () =>
+    getTaskList(activeTopic ?? null),
   );
 
   const createNewTopicMutation = useMutation(
@@ -55,10 +59,6 @@ export const Courses: FC = () => {
     {
       onSuccess: () => queryClient.invalidateQueries('topics'),
     },
-  );
-
-  const { data: taskList, isLoading: isTaskListLoading } = useQuery(['taskList', activeTopic], () =>
-    getTaskList(activeTopic ?? null),
   );
 
   const deleteTaskListMutation = useMutation(

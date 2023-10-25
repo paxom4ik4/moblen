@@ -13,6 +13,7 @@ export enum StudentRoutes {
 
 export enum LoginRoutes {
   LOGIN = '/login-page',
+  LOGIN_WITH_REF = '/login-page/ref/:groupId',
   REGISTRATION = '/registration',
   REGISTRATION_WITH_REF = '/registration/ref/:groupId',
 }

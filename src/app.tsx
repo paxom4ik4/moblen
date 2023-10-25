@@ -129,6 +129,7 @@ const App: FC = () => {
   const loginContent = (
     <Routes>
       <Route path={LoginRoutes.LOGIN} element={<LoginPage />} />
+      <Route path={LoginRoutes.LOGIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />
       <Route path={LoginRoutes.REGISTRATION_WITH_REF} element={<RegistrationPage />} />
     </Routes>

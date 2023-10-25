@@ -1,5 +1,5 @@
 import { FC, MouseEvent, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { Input } from 'common/input/input.tsx';
 
@@ -15,6 +15,7 @@ import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { remapStudentData, remapTutorData } from './utils.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from '../../constants/routes.ts';
+import { GROUP_REF_LINK } from '../../constants/api.ts';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -28,8 +29,9 @@ export const LoginPage: FC = () => {
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+  const params = useParams();
 
-  const [mode, setMode] = useState<LoginModes.login | LoginModes.passwordReset>(LoginModes.login);
+  const [mode] = useState<LoginModes.login | LoginModes.passwordReset>(LoginModes.login);
 
   // const passwordResetContent = (
   //   <>
@@ -49,7 +51,11 @@ export const LoginPage: FC = () => {
 
   const loginHandler = async (values: { login: string; password: string }) => {
     try {
-      const res = await loginUser(values);
+      const loginValues = params?.groupId
+        ? { ...values, referral_link: `${GROUP_REF_LINK}${params.groupId}` }
+        : values;
+
+      const res = await loginUser(loginValues);
       const { status, role, user } = res;
       if (status === 'AUTHORIZED') {
         if (role === 'tutor') {
@@ -146,12 +152,12 @@ export const LoginPage: FC = () => {
                   </span>
                 </Typography>
 
-                <Typography
-                  onClick={() => setMode(LoginModes.passwordReset)}
-                  color={'purple'}
-                  className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-                  Восстановить пароль
-                </Typography>
+                {/*<Typography*/}
+                {/*  onClick={() => setMode(LoginModes.passwordReset)}*/}
+                {/*  color={'purple'}*/}
+                {/*  className={`${DEFAULT_CLASSNAME}_footer_mode`}>*/}
+                {/*  Восстановить пароль*/}
+                {/*</Typography>*/}
               </>
             )}
           </div>

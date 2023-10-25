@@ -12,10 +12,10 @@ import {
   createNewTutor,
 } from 'services/registration/registration.ts';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LoginRoutes } from '../../constants/routes.ts';
+import { LoginRoutes } from 'constants/routes.ts';
+import { GROUP_REF_LINK } from 'constants/api.ts';
 
 const DEFAULT_CLASSNAME = 'registration';
-const GROUP_REF_LINK = 'https://moblen.ru/ref/';
 
 export interface RegistrationValues {
   name: string;
@@ -40,6 +40,9 @@ export const RegistrationPage: FC = () => {
       navigate(LoginRoutes.LOGIN);
     }
   };
+
+  const handleLoginStudentWithRef = () =>
+    navigate(params.groupId ? `${LoginRoutes.LOGIN}/ref/${params.groupId}` : LoginRoutes.LOGIN);
 
   useEffect(() => {
     params.groupId && setIsTutorRegister(false);
@@ -134,12 +137,23 @@ export const RegistrationPage: FC = () => {
           {registerFrom.errors.passwordRepeat}
         </div>
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
-          <Typography
-            onClick={changeModeHandler}
-            color={'purple'}
-            className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-            Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'}
-          </Typography>
+          <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
+            {!isTutorRegister && (
+              <Typography
+                onClick={handleLoginStudentWithRef}
+                color={'purple'}
+                weight={'bold'}
+                className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+                <Typography color={'default'}>Есть аккаунт?</Typography> Войти
+              </Typography>
+            )}
+            <Typography
+              onClick={changeModeHandler}
+              color={'purple'}
+              className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+              Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'}
+            </Typography>
+          </div>
           <button className={`${DEFAULT_CLASSNAME}_form_submit`} type={'submit'}>
             <CheckIcon />
           </button>

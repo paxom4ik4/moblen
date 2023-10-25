@@ -24,6 +24,8 @@ const tasklistAPI = {
       list_name: string;
     }[]
   > | null => {
+    if (!topic_uuid) return null;
+
     try {
       return API.get(`${TASK_LIST_URL}/by-topic/${topic_uuid}`).then((res) => res.data);
     } catch (error) {

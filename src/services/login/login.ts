@@ -5,8 +5,16 @@ const LOGOUT_URL = '/users/logout/';
 const CHECK_AUTHORIZE = '/users/check-authorize/';
 
 const loginAPI = {
-  loginUser: ({ login, password }: { login: string; password: string }) => {
-    return API.post(LOGIN_URL, { login, password }, { withCredentials: false }).then(
+  loginUser: ({
+    login,
+    password,
+    referral_link,
+  }: {
+    login: string;
+    password: string;
+    referral_link?: string;
+  }) => {
+    return API.post(LOGIN_URL, { login, password, referral_link }, { withCredentials: false }).then(
       (res) => res.data,
     );
   },

@@ -1,3 +1,4 @@
+import { FC, memo } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { TaskWithAnswer } from 'types/task.ts';
@@ -10,7 +11,7 @@ import { mockedTests } from 'utils/app.utils.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
-export const TestResult = () => {
+export const TestResult: FC = memo(() => {
   const { id } = useParams();
 
   const testData = mockedTests.find((test) => test.id === id);
@@ -63,4 +64,4 @@ export const TestResult = () => {
       </div>
     </div>
   );
-};
+});

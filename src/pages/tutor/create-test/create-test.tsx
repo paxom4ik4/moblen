@@ -1,4 +1,4 @@
-import { FC, useEffect, useRef, useState } from 'react';
+import { FC, useEffect, useRef, useState, memo } from 'react';
 
 import './create-test.scss';
 
@@ -19,7 +19,7 @@ import { TutorRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
-export const CreateTest: FC = () => {
+export const CreateTest: FC = memo(() => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -141,4 +141,4 @@ export const CreateTest: FC = () => {
       </div>
     </div>
   );
-};
+});

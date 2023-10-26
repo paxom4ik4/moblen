@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, memo } from 'react';
 
 import './results.scss';
 import { Groups } from '../groups/groups.tsx';
@@ -9,7 +9,7 @@ import { clearSelectedStudent } from 'store/results/results.slice.ts';
 
 const DEFAULT_CLASSNAME = 'results';
 
-export const Results: FC = () => {
+export const Results: FC = memo(() => {
   const { selectedStudent } = useSelector((state: RootState) => state.results);
 
   const dispatch = useDispatch();
@@ -32,4 +32,4 @@ export const Results: FC = () => {
       )}
     </div>
   );
-};
+});

@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react';
+import { FC, useEffect, memo } from 'react';
 
 import TutorIcon from 'assets/icons/tutor-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
@@ -20,7 +20,7 @@ interface TestsProps {
   resultsView?: boolean;
 }
 
-export const Tests: FC<TestsProps> = (props) => {
+export const Tests: FC<TestsProps> = memo((props) => {
   const dispatch = useDispatch();
   const { activeTutor, activeTopic, activeCourse } = useSelector(
     (state: RootState) => state.student,
@@ -154,4 +154,4 @@ export const Tests: FC<TestsProps> = (props) => {
       </div>
     </>
   );
-};
+});

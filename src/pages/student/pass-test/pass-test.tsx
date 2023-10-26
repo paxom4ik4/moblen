@@ -1,4 +1,4 @@
-import { FC, useMemo, useState } from 'react';
+import { FC, useMemo, useState, memo } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { Typography } from 'common/typography/typography.tsx';
@@ -13,7 +13,7 @@ import './pass-test.scss';
 
 const DEFAULT_CLASSNAME = 'pass-test';
 
-export const PassTest: FC = () => {
+export const PassTest: FC = memo(() => {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -75,4 +75,4 @@ export const PassTest: FC = () => {
       </div>
     </div>
   );
-};
+});

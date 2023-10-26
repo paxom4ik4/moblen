@@ -1,4 +1,4 @@
-import { FC, useState, MouseEvent, useEffect } from 'react';
+import { FC, useState, MouseEvent, useEffect, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,7 +34,7 @@ import { DateCalendar } from '@mui/x-date-pickers';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
-export const Courses: FC = () => {
+export const Courses: FC = memo(() => {
   const queryClient = useQueryClient();
 
   const dispatch = useDispatch();
@@ -396,4 +396,4 @@ export const Courses: FC = () => {
       </div>
     </div>
   );
-};
+});

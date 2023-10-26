@@ -1,122 +1,156 @@
-import { FC, useContext, useState } from 'react';
+import { FC, useEffect } from 'react';
 
 import TutorIcon from 'assets/icons/tutor-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
 import { StudentTestCard } from 'components/student-test-card/student-test-card.tsx';
-import { AppContext } from 'app.tsx';
 
 import './tests.scss';
+import { useQuery } from 'react-query';
+import { getStudentInfo } from 'services/student/student.ts';
+import { useDispatch, useSelector } from 'react-redux';
+import { Tutor } from 'types/tutor.ts';
+import { getTopics, getTutorsCourses } from 'services/courses';
+import { RootState } from 'store/store.ts';
+import { setActiveCourse, setActiveTopic, setActiveTutor } from 'store/student/student.slice.ts';
+import { mockedTests } from 'utils/app.utils.ts';
 
 const DEFAULT_CLASSNAME = 'tests';
-
-const mockedSubjects = [
-  {
-    id: 'subject-1',
-    name: 'История ОГЭ',
-    topics: [
-      { id: 'topic-1', name: 'Первая тема', tests: [] },
-      { id: 'topic-2', name: 'Вторая тема', tests: [] },
-    ],
-  },
-  {
-    id: 'subject-2',
-    name: 'Обществознание ЕГЭ',
-    topics: [{ id: 'topic-1', name: 'Первая тема', tests: [] }],
-  },
-];
-
-const mockedTutors = [
-  { name: 'Преподаватель 1', id: 'tutor-1' },
-  { name: 'Преподаватель 2', id: 'tutor-2' },
-];
 
 interface TestsProps {
   resultsView?: boolean;
 }
 
 export const Tests: FC<TestsProps> = (props) => {
+  const dispatch = useDispatch();
+  const { activeTutor, activeTopic, activeCourse } = useSelector(
+    (state: RootState) => state.student,
+  );
+
   const { resultsView = false } = props;
 
-  const { tests } = useContext(AppContext);
+  const { userData } = useSelector((state: RootState) => state.userData);
 
-  const [courseData] = useState(mockedSubjects);
+  const { data: studentData, isLoading: isStudentDataLoading } = useQuery('studentData', () =>
+    getStudentInfo(userData!.uuid),
+  );
 
-  // tasks state
-  const [activeSubject, setActiveSubject] = useState(courseData.length ? courseData[0] : null);
-  const [activeTopic, setActiveTopic] = useState<null | {
-    id: string;
-    name: string;
-    tests: object[];
-  }>(null);
+  const { data: courseData, isLoading: isCourseDataLoading } = useQuery(
+    ['courses', activeTutor],
+    () => getTutorsCourses(activeTutor ?? ''),
+  );
 
-  const [activeTutor, setActiveTutor] = useState<null | { name: string; id: string }>(null);
+  useEffect(() => {
+    if (courseData?.length) {
+      dispatch(setActiveCourse(courseData[0].course_uuid));
+    }
+  }, [courseData, dispatch]);
+
+  const { data: topics, isLoading: isTopicsLoading } = useQuery(['topics', activeCourse], () =>
+    getTopics(activeCourse ?? null),
+  );
+
+  if (isStudentDataLoading) {
+    return <Typography>Загрузка...</Typography>;
+  }
+
+  if (!studentData.tutors.length) {
+    return (
+      <Typography color={'purple'} size={'large'}>
+        У вас нет преподавателей / групп
+      </Typography>
+    );
+  }
+
+  const showTasks = activeTutor && activeCourse && activeTopic;
 
   return (
     <>
       {!resultsView && (
         <div className={`${DEFAULT_CLASSNAME}_tutors`}>
-          {mockedTutors.map((tutor) => (
-            <div
-              onClick={() => setActiveTutor(tutor)}
-              className={`${DEFAULT_CLASSNAME}_tutors_item ${
-                activeTutor === tutor ? 'active-tutor-item' : ''
-              }`}>
-              <div className={`${DEFAULT_CLASSNAME}_tutors_item_image`}>
-                <TutorIcon />
+          {!!studentData?.tutors &&
+            studentData.tutors.map((tutor: Tutor) => (
+              <div
+                onClick={() => dispatch(setActiveTutor(tutor.tutor_uuid))}
+                className={`${DEFAULT_CLASSNAME}_tutors_item ${
+                  activeTutor === tutor.tutor_uuid ? 'active-tutor-item' : ''
+                }`}>
+                <div className={`${DEFAULT_CLASSNAME}_tutors_item_image`}>
+                  <TutorIcon />
+                </div>
+                <Typography
+                  size={'small'}
+                  color={'gray'}
+                  className={`${DEFAULT_CLASSNAME}_tutors_item_name`}>
+                  {tutor.tutor_name}
+                </Typography>
               </div>
-              <Typography
-                size={'small'}
-                color={'gray'}
-                className={`${DEFAULT_CLASSNAME}_tutors_item_name`}>
-                {tutor.name}
-              </Typography>
-            </div>
-          ))}
+            ))}
         </div>
       )}
       <div className={DEFAULT_CLASSNAME}>
-        <div className={`${DEFAULT_CLASSNAME}_subjects`}>
-          <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
-            {courseData.map((subject) => (
-              <div
-                onClick={() => setActiveSubject(subject)}
-                className={`${DEFAULT_CLASSNAME}_subjects_list-item ${
-                  subject === activeSubject && 'active-subject'
-                }`}>
-                <Typography className={`${subject === activeSubject && 'active-subject-title'}`}>
-                  {subject.name}
-                </Typography>
+        {activeTutor ? (
+          <>
+            <div className={`${DEFAULT_CLASSNAME}_subjects`}>
+              <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
+                {isCourseDataLoading && <Typography>Загрузка...</Typography>}
+
+                {courseData?.map((course) => (
+                  <div
+                    onClick={() => dispatch(setActiveCourse(course.course_uuid))}
+                    className={`${DEFAULT_CLASSNAME}_subjects_list-item ${
+                      course.course_uuid === activeCourse && 'active-subject'
+                    }`}>
+                    <Typography
+                      className={`${
+                        course.course_uuid === activeCourse && 'active-subject-title'
+                      }`}>
+                      {course.course_name}
+                    </Typography>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className={`${DEFAULT_CLASSNAME}_topics`}>
-          <div className={`${DEFAULT_CLASSNAME}_topics_list`}>
-            {activeSubject?.topics?.map((topic) => (
-              <div
-                className={`${DEFAULT_CLASSNAME}_topics_list-item ${
-                  topic === activeTopic && 'student-active-topic-item'
-                }`}
-                onClick={() => setActiveTopic(topic)}>
-                <Typography className={`${topic === activeTopic && 'student-active-topic'}`}>
-                  {topic.name}
-                </Typography>
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_topics`}>
+              <div className={`${DEFAULT_CLASSNAME}_topics_list`}>
+                {isTopicsLoading && <Typography>Загрузка...</Typography>}
+
+                {activeCourse &&
+                  topics?.map((topic) => (
+                    <div
+                      className={`${DEFAULT_CLASSNAME}_topics_list-item ${
+                        topic.topic_uuid === activeTopic && 'student-active-topic-item'
+                      }`}
+                      onClick={() => dispatch(setActiveTopic(topic.topic_uuid))}>
+                      <Typography
+                        className={`${topic.topic_uuid === activeTopic && 'student-active-topic'}`}>
+                        {topic.topic_name}
+                      </Typography>
+                    </div>
+                  ))}
               </div>
-            ))}
-          </div>
-        </div>
-        <div className={`${DEFAULT_CLASSNAME}_tasks`}>
-          {tests.map((test) => (
-            <StudentTestCard
-              id={test.id}
-              name={test.name}
-              subject={test.subject}
-              topic={test.topic}
-              status={test.status}
-              tasksAmount={test.tasks.length}
-            />
-          ))}
-        </div>
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_tasks`}>
+              {showTasks ? (
+                mockedTests.map((test) => (
+                  <StudentTestCard
+                    id={test.id}
+                    name={test.name}
+                    subject={test.subject}
+                    topic={test.topic}
+                    status={test.status}
+                    tasksAmount={test.tasks.length}
+                  />
+                ))
+              ) : (
+                <Typography color={'purple'}>Выберите курс и тему</Typography>
+              )}
+            </div>
+          </>
+        ) : (
+          <Typography className={`${DEFAULT_CLASSNAME}_select_tutor`} color={'purple'}>
+            Выберите преподавателя чтобы просмотреть задания
+          </Typography>
+        )}
       </div>
     </>
   );

@@ -1,4 +1,4 @@
-import { createContext, FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -20,30 +20,15 @@ import { TestResult } from './pages/student/test-result/test-result.tsx';
 
 import { AppModes } from './constants/appTypes.ts';
 
-import { Test } from './types/test.ts';
-
 import './app.scss';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
 import { Results } from './pages/tutor/results/results.tsx';
-import {
-  getStoredAppMode,
-  mockedTests,
-  routeConfig,
-  studentRouteConfig,
-} from './utils/app.utils.ts';
+import { getStoredAppMode, routeConfig, studentRouteConfig } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
 import { checkAuthorize } from './services/login/login.ts';
-
-// MOCKED WHILE BE READY
-interface IAppContent {
-  tests: Test[];
-}
-export const AppContext = createContext<IAppContent>({
-  tests: [],
-});
 
 const DEFAULT_CLASSNAME = 'app';
 
@@ -138,9 +123,7 @@ const App: FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <AppContext.Provider value={{ tests: mockedTests }}>
-          {userData ? appContent : loginContent}
-        </AppContext.Provider>
+        {userData ? appContent : loginContent}
       </LocalizationProvider>
     </DndProvider>
   );

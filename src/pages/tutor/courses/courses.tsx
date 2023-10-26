@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useState, MouseEvent, useEffect } from 'react';
 import { useDrop } from 'react-dnd';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,9 +15,16 @@ import { DraggableTypes } from 'types/draggable/draggable.types.ts';
 
 import { Typography } from 'common/typography/typography.tsx';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
-import { createCourse, createTopic, getTopics, getTutorsCourses } from 'services/courses';
+import {
+  createCourse,
+  createTopic,
+  deleteCourse,
+  deleteTopic,
+  getTopics,
+  getTutorsCourses,
+} from 'services/courses';
 import { deleteTaskList, getTaskList } from 'services/tasks';
 import { setTaskToCreate } from 'store/create-task/create-task.slice.ts';
 import { setActiveCourse, setActiveTopic } from 'store/courses/courses.slice.ts';
@@ -39,6 +46,17 @@ export const Courses: FC = () => {
 
   const { data: courses, isLoading } = useQuery('courses', () => getTutorsCourses(userData!.uuid));
 
+  useEffect(() => {
+    if (courses?.length) {
+      dispatch(setActiveCourse(courses[0].course_uuid));
+    } else {
+      batch(() => {
+        dispatch(setActiveCourse(null));
+        dispatch(setActiveTopic(null));
+      });
+    }
+  }, [courses, dispatch]);
+
   const createNewCourseMutation = useMutation(
     (data: { tutorId: string; courseName: string }) => createCourse(data),
     {
@@ -49,6 +67,12 @@ export const Courses: FC = () => {
   const { data: topics, isLoading: isTopicsLoading } = useQuery(['topics', activeCourse], () =>
     getTopics(activeCourse ?? null),
   );
+
+  useEffect(() => {
+    if (topics?.length && !activeTopic) {
+      dispatch(setActiveTopic(topics[0].topic_uuid));
+    }
+  }, [activeTopic, dispatch, topics]);
 
   const { data: taskList, isLoading: isTaskListLoading } = useQuery(['taskList', activeTopic], () =>
     getTaskList(activeTopic ?? null),
@@ -65,6 +89,20 @@ export const Courses: FC = () => {
     (data: { topic_uuid: string; list_uuid: string }) => deleteTaskList(data),
     {
       onSuccess: () => queryClient.invalidateQueries('taskList'),
+    },
+  );
+
+  const deleteCourseMutation = useMutation(
+    (data: { course_uuid: string; tutorId: string }) => deleteCourse(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('courses'),
+    },
+  );
+
+  const deleteTopicMutation = useMutation(
+    (data: { course_uuid: string; topic_uuid: string }) => deleteTopic(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('topics'),
     },
   );
 
@@ -104,6 +142,27 @@ export const Courses: FC = () => {
     }
   };
 
+  const deleteCourseHandler = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    if (activeCourse) {
+      await deleteCourseMutation.mutate({ course_uuid: activeCourse, tutorId: userData!.uuid });
+      setActiveCourse(null);
+      setActiveTopic(null);
+    }
+  };
+
+  const deleteTopicHandler = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+
+    if (activeCourse && activeTopic) {
+      await deleteTopicMutation.mutate({ course_uuid: activeCourse, topic_uuid: activeTopic });
+
+      setActiveCourse(null);
+      setActiveTopic(null);
+    }
+  };
+
   // creating / editing topics
   const [addNewTopic, setAddNewTopic] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
@@ -126,13 +185,13 @@ export const Courses: FC = () => {
   const activeCourseName =
     (!!courses?.length &&
       activeCourse &&
-      courses.find((item) => item.course_uuid === activeCourse)!.course_name) ||
+      courses.find((item) => item.course_uuid === activeCourse)?.course_name) ||
     '';
 
   const activeTopicName =
     (!!topics?.length &&
       activeTopic &&
-      topics.find((item) => item.topic_uuid === activeTopic)!.topic_name) ||
+      topics.find((item) => item.topic_uuid === activeTopic)?.topic_name) ||
     '';
 
   const [calendarOpened, setCalendarOpened] = useState<boolean>(false);
@@ -217,7 +276,13 @@ export const Courses: FC = () => {
                 <Typography color={course.course_uuid === activeCourse ? 'purple' : 'default'}>
                   {course.course_name}
                 </Typography>
-                {/*{course.course_uuid === activeCourse && <EditIcon />}*/}
+                {course.course_uuid === activeCourse && (
+                  <button
+                    onClick={deleteCourseHandler}
+                    className={`${DEFAULT_CLASSNAME}_list-item_delete`}>
+                    <TrashIcon />
+                  </button>
+                )}
               </div>
             ))}
           {addNewCourse && (
@@ -255,6 +320,13 @@ export const Courses: FC = () => {
                   <Typography color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
                     {topic.topic_name}
                   </Typography>
+                  {topic.topic_uuid === activeTopic && (
+                    <button
+                      onClick={deleteTopicHandler}
+                      className={`${DEFAULT_CLASSNAME}_list-item_delete`}>
+                      <TrashIcon />
+                    </button>
+                  )}
                 </div>
               ))}
             {addNewTopic && (

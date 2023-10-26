@@ -1,23 +1,23 @@
-import { FC, useContext, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { AppContext } from 'app.tsx';
 import { Typography } from 'common/typography/typography.tsx';
 import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
 import { Task, TaskWithAnswer } from 'types/task.ts';
 import CheckIcon from 'assets/icons/check-icon.svg';
 
+import { StudentRoutes } from 'constants/routes.ts';
+import { mockedTests } from 'utils/app.utils.ts';
+
 import './pass-test.scss';
-import { StudentRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'pass-test';
 
 export const PassTest: FC = () => {
   const navigate = useNavigate();
 
-  const { tests } = useContext(AppContext);
   const { id } = useParams();
-  const testData = tests.find((test) => test.id === id);
+  const testData = mockedTests.find((test) => test.id === id);
 
   const { name, subject, topic, tasks } = testData!;
   const maxScore = tasks.reduce((score: number, task) => score + Number(task.max_ball), 0);

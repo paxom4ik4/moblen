@@ -12,11 +12,20 @@ const coursesAPI = {
       owner_uuid: tutorId,
     }).then((res) => res.data);
   },
-  getTutorsCourses: (tutorId: string): Promise<{ course_uuid: string; course_name: string }[]> => {
+  getTutorsCourses: (
+    tutorId: string | undefined,
+  ): Promise<{ course_uuid: string; course_name: string }[]> | [] => {
+    if (!tutorId) return [];
+
     return API.get(`${COURSES_API_URL}/by-tutor/${tutorId}/`).then((res) => res.data);
   },
   updateCourseName: ({ tutorId, courseName }: { tutorId: string; courseName: string }) => {
     return API.patch(`${COURSES_API_URL}/by-tutor/${tutorId}/`, { course_name: courseName }).then(
+      (res) => res.data,
+    );
+  },
+  deleteCourse: ({ tutorId, course_uuid }: { tutorId: string; course_uuid: string }) => {
+    return API.delete(`${COURSES_API_URL}/by-tutor/${tutorId}/${course_uuid}`).then(
       (res) => res.data,
     );
   },
@@ -49,10 +58,12 @@ const topicsAPI = {
       course_uuid: courseId,
     }).then((res) => res.data);
   },
-  deleteTopics: (courseId: string) => {
-    return API.delete(`${TOPICS_API_URL}/by-tutor/${courseId}`).then((res) => res.data);
+  deleteTopic: ({ course_uuid, topic_uuid }: { course_uuid: string; topic_uuid: string }) => {
+    return API.delete(`${TOPICS_API_URL}/by-course/${course_uuid}/${topic_uuid}`).then(
+      (res) => res.data,
+    );
   },
 };
 
-export const { createCourse, getTutorsCourses, updateCourseName } = coursesAPI;
-export const { createTopic, getTopics, editTopicName, deleteTopics } = topicsAPI;
+export const { createCourse, getTutorsCourses, updateCourseName, deleteCourse } = coursesAPI;
+export const { createTopic, getTopics, editTopicName, deleteTopic } = topicsAPI;

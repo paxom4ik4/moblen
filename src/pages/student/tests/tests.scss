@@ -7,6 +7,10 @@
   border-top: 16px solid #c5c6d0;
   height: 100%;
 
+  &_select_tutor {
+    padding: 16px;
+  }
+
   &_tutors {
     display: flex;
     flex-direction: column;

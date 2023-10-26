@@ -16,6 +16,29 @@
   height: 100%;
   padding: 16px;
 
+  &_list-item_delete {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    outline: none;
+    border: none;
+    transition: 0.3s;
+
+    svg {
+      color: #6750a4;
+      height: 19px;
+      width: 20px;
+    }
+
+    &:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+  }
+
   &_calendar-btn {
     display: flex;
     justify-content: center;
@@ -243,9 +266,6 @@
         gap: 12px;
         height: 30px;
 
-        svg {
-          height: 20px;
-        }
 
         &_edit {
           width: 20px;

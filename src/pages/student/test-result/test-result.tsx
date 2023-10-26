@@ -1,21 +1,19 @@
-import { useContext } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { TaskWithAnswer } from 'types/task.ts';
 
-import { AppContext } from 'app.tsx';
 import { Typography } from 'common/typography/typography.tsx';
 import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
 
 import './test-result.scss';
+import { mockedTests } from 'utils/app.utils.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
 export const TestResult = () => {
-  const { tests } = useContext(AppContext);
   const { id } = useParams();
 
-  const testData = tests.find((test) => test.id === id);
+  const testData = mockedTests.find((test) => test.id === id);
 
   const { name, subject, topic, tasks } = testData!;
   const maxScore = tasks.reduce(

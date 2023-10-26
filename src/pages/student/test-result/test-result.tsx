@@ -11,7 +11,7 @@ import { mockedTests } from 'utils/app.utils.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
-export const TestResult: FC = memo(() => {
+const TestResult: FC = memo(() => {
   const { id } = useParams();
 
   const testData = mockedTests.find((test) => test.id === id);
@@ -65,3 +65,5 @@ export const TestResult: FC = memo(() => {
     </div>
   );
 });
+
+export default TestResult;

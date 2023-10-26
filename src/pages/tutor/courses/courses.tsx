@@ -34,7 +34,7 @@ import { DateCalendar } from '@mui/x-date-pickers';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
-export const Courses: FC = memo(() => {
+const Courses: FC = memo(() => {
   const queryClient = useQueryClient();
 
   const dispatch = useDispatch();
@@ -44,7 +44,11 @@ export const Courses: FC = memo(() => {
   const { userData } = useSelector((state: RootState) => state.userData);
   const { activeCourse, activeTopic } = useSelector((state: RootState) => state.courses);
 
-  const { data: courses, isLoading } = useQuery('courses', () => getTutorsCourses(userData!.uuid));
+  const {
+    data: courses,
+    isLoading,
+    isLoadingError,
+  } = useQuery('courses', () => getTutorsCourses(userData!.uuid));
 
   useEffect(() => {
     if (courses?.length) {
@@ -253,6 +257,14 @@ export const Courses: FC = memo(() => {
     );
   }
 
+  if (isLoadingError) {
+    return (
+      <div className={DEFAULT_CLASSNAME}>
+        <Typography>Произошла ошибка во время загрузки... Попробуйте позже</Typography>
+      </div>
+    );
+  }
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       {showBackgroundShadow && <div className={`backdrop-shadow`} />}
@@ -397,3 +409,5 @@ export const Courses: FC = memo(() => {
     </div>
   );
 });
+
+export default Courses;

@@ -23,7 +23,7 @@ interface GroupsProps {
   viewMode?: boolean;
 }
 
-export const Groups: FC<GroupsProps> = memo((props) => {
+const Groups: FC<GroupsProps> = memo((props) => {
   const { viewMode = false } = props;
 
   const queryClient = useQueryClient();
@@ -146,3 +146,5 @@ export const Groups: FC<GroupsProps> = memo((props) => {
     </div>
   );
 });
+
+export default Groups;

@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useEffect, useState, lazy, Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -8,31 +8,33 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 
 import Sidebar from 'components/sidebar/sidebar.tsx';
 import { UpperBar } from 'components/upperbar/upperbar.tsx';
-
-import { Courses } from 'pages/tutor/courses/courses.tsx';
-import { CreateTest } from 'pages/tutor/create-test/create-test.tsx';
-import { Groups } from 'pages/tutor/groups/groups.tsx';
 import { RegistrationPage } from 'pages/registration/registration.tsx';
 import { LoginPage } from 'pages/login/login.tsx';
-import { Tests } from './pages/student/tests/tests.tsx';
-import { PassTest } from './pages/student/pass-test/pass-test.tsx';
-import { TestResult } from './pages/student/test-result/test-result.tsx';
 
 import { AppModes } from './constants/appTypes.ts';
 
 import './app.scss';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
-import { Results } from './pages/tutor/results/results.tsx';
 import { getStoredAppMode, routeConfig, studentRouteConfig } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
 import { checkAuthorize } from './services/login/login.ts';
+import { Typography } from './common/typography/typography.tsx';
 
 const DEFAULT_CLASSNAME = 'app';
 
 const App: FC = () => {
+  // components lazy import
+  const Courses = lazy(() => import('pages/tutor/courses/courses.tsx'));
+  const CreateTest = lazy(() => import('pages/tutor/create-test/create-test.tsx'));
+  const Groups = lazy(() => import('pages/tutor/groups/groups.tsx'));
+  const Tests = lazy(() => import('./pages/student/tests/tests.tsx'));
+  const PassTest = lazy(() => import('./pages/student/pass-test/pass-test.tsx'));
+  const TestResult = lazy(() => import('./pages/student/test-result/test-result.tsx'));
+  const Results = lazy(() => import('./pages/tutor/results/results.tsx'));
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -120,10 +122,18 @@ const App: FC = () => {
     </Routes>
   );
 
+  const fallbackScreen = (
+    <div className={'fallback'}>
+      <Typography color={'purple'} weight={'bold'}>
+        Загрузка...
+      </Typography>
+    </div>
+  );
+
   return (
     <DndProvider backend={HTML5Backend}>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        {userData ? appContent : loginContent}
+        <Suspense fallback={fallbackScreen}>{userData ? appContent : loginContent}</Suspense>
       </LocalizationProvider>
     </DndProvider>
   );

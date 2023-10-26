@@ -13,7 +13,7 @@ import './pass-test.scss';
 
 const DEFAULT_CLASSNAME = 'pass-test';
 
-export const PassTest: FC = memo(() => {
+const PassTest: FC = memo(() => {
   const navigate = useNavigate();
 
   const { id } = useParams();
@@ -76,3 +76,5 @@ export const PassTest: FC = memo(() => {
     </div>
   );
 });
+
+export default PassTest;

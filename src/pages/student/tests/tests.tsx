@@ -20,7 +20,7 @@ interface TestsProps {
   resultsView?: boolean;
 }
 
-export const Tests: FC<TestsProps> = memo((props) => {
+const Tests: FC<TestsProps> = memo((props) => {
   const dispatch = useDispatch();
   const { activeTutor, activeTopic, activeCourse } = useSelector(
     (state: RootState) => state.student,
@@ -30,9 +30,11 @@ export const Tests: FC<TestsProps> = memo((props) => {
 
   const { userData } = useSelector((state: RootState) => state.userData);
 
-  const { data: studentData, isLoading: isStudentDataLoading } = useQuery('studentData', () =>
-    getStudentInfo(userData!.uuid),
-  );
+  const {
+    data: studentData,
+    isLoading: isStudentDataLoading,
+    isLoadingError,
+  } = useQuery('studentData', () => getStudentInfo(userData!.uuid));
 
   const { data: courseData, isLoading: isCourseDataLoading } = useQuery(
     ['courses', activeTutor],
@@ -51,6 +53,10 @@ export const Tests: FC<TestsProps> = memo((props) => {
 
   if (isStudentDataLoading) {
     return <Typography>Загрузка...</Typography>;
+  }
+
+  if (isLoadingError) {
+    return <Typography>Произошла ошибка во время загруки... Попробуйте позже</Typography>;
   }
 
   if (!studentData.tutors.length) {
@@ -155,3 +161,5 @@ export const Tests: FC<TestsProps> = memo((props) => {
     </>
   );
 });
+
+export default Tests;

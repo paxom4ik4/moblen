@@ -19,7 +19,7 @@ import { TutorRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
-export const CreateTest: FC = memo(() => {
+const CreateTest: FC = memo(() => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -142,3 +142,5 @@ export const CreateTest: FC = memo(() => {
     </div>
   );
 });
+
+export default CreateTest;

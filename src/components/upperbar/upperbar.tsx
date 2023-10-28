@@ -4,13 +4,13 @@ import ProfileIcon from 'assets/icons/profile-icon.svg';
 import NotificationIcon from 'assets/icons/notifications-icon.svg';
 
 import './upperbar.scss';
-import { useDispatch, useSelector } from 'react-redux';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import StudentIcon from 'assets/icons/student-icon.svg';
 import { RootState } from 'store/store.ts';
 import { Typography } from 'common/typography/typography.tsx';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
-import { logoutUser } from 'services/login/login.ts';
+// import { logoutUser } from 'services/login/login.ts';
 import { useNavigate } from 'react-router-dom';
 import { LoginRoutes } from '../../constants/routes.ts';
 
@@ -26,12 +26,23 @@ export const UpperBar: FC = () => {
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
 
   const logoutHandler = async () => {
-    dispatch(setUser(null));
-    dispatch(setAppMode(null));
+    // await logoutUser(localStorage.getItem('refreshToken')!);
+
+    // clearing app state
+    batch(() => {
+      dispatch(setUser(null));
+      dispatch(setAppMode(null));
+    });
+
+    // clearing localStorage
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('expiresIn');
     localStorage.removeItem('userData');
     localStorage.removeItem('appMode');
+
+    // navigate to login page
     navigate(LoginRoutes.LOGIN);
-    await logoutUser();
   };
 
   return (

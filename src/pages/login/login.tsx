@@ -56,8 +56,12 @@ export const LoginPage: FC = () => {
         : values;
 
       const res = await loginUser(loginValues);
-      const { status, role, user } = res;
+      const { status, role, user, token } = res;
       if (status === 'AUTHORIZED') {
+        localStorage.setItem('accessToken', token.access_token);
+        localStorage.setItem('refreshToken', token.refresh_token);
+        localStorage.setItem('expiresIn', token.expires_in);
+
         if (role === 'tutor') {
           const tutorData = remapTutorData(user);
 

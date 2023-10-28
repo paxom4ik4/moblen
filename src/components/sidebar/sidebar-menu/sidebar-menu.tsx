@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { useSelector } from 'react-redux';
 
 import './sidebar-menu.scss';
@@ -9,7 +9,11 @@ import { RootState } from 'store/store.ts';
 
 const DEFAULT_CLASSNAME = 'app-sidebar-menu';
 
-export const SidebarMenu: FC = () => {
+export const SidebarMenu: FC<{ setIsSidebarOpened: Dispatch<SetStateAction<boolean>> }> = (
+  props,
+) => {
+  const { setIsSidebarOpened } = props;
+
   const location = useLocation();
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
@@ -20,6 +24,7 @@ export const SidebarMenu: FC = () => {
     <div className={DEFAULT_CLASSNAME}>
       {config.map((item) => (
         <Link
+          onClick={() => window.innerWidth <= 768 && setIsSidebarOpened(false)}
           key={item.path}
           to={item.path}
           className={`${DEFAULT_CLASSNAME}_item ${

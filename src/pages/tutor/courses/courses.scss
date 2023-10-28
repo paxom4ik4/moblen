@@ -149,6 +149,7 @@
     background-color: #fff;
     border-radius: 16px;
     position: absolute;
+    width: 100%;
     top: -61px;
     left: 0;
 
@@ -158,6 +159,7 @@
       margin-left: 4px;
       margin-top: 4px;
       transition: 0.3s;
+      min-width: 120px;
 
       &:hover {
         cursor: pointer;
@@ -408,4 +410,19 @@
 
 .MuiButtonBase-root {
   font-size: 20px !important;
+}
+
+@media (max-width: 768px) {
+  .app-courses_topics_list-item {
+    font-size: 10px;
+
+    svg {
+      color: #6750a4;
+      height: 16px;
+      width: 16px;
+    }
+  }
+  .app-courses_subjects_list-item {
+    font-size: 12px;
+  }
 }

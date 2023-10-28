@@ -1,6 +1,29 @@
+@keyframes smooth {
+  0% {
+    opacity: 0;
+    left: -90px;
+  }
+  100% {
+    opacity: 1;
+    left: 0;
+  }
+}
+
+@keyframes smoothBack {
+  0% {
+    opacity: 1;
+    left: 0;
+
+  }
+  100% {
+    opacity: 0;
+    left: -90px;
+  }
+}
+
 .app-sidebar {
-  position: absolute;
-  left: 0;
+  position: fixed;
+  left: -90px;
   top: 0;
   display: flex;
   flex-direction: column;
@@ -10,6 +33,16 @@
   box-shadow: 0 1px 3px 1px rgba(0, 0, 0, 0.3);
   height: 100vh;
   padding: 25px 0;
+  animation: smoothBack 0.5s;
+  opacity: 0;
+  z-index: 1000;
+  background: #ffffff;
+}
+
+.sidebar-opened {
+  left: 0;
+  opacity: 1;
+  animation: smooth 0.5s;
 }
 
 .disabled-link {

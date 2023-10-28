@@ -3,7 +3,7 @@
   display: flex;
   gap: 16px;
   width: fit-content;
-  min-width: 406px;
+  min-width: 390px;
 
   background-color: #fbf8fd;
   border-radius: 0 16px 16px 16px;
@@ -163,4 +163,30 @@
 .active-group-card {
   transition: 0.3s;
   background-color: #d9e2ff;
+}
+
+@media (max-width: 768px) {
+  .group-card {
+    min-width: 300px;
+    max-width: 300px;
+
+    &_icon {
+      display: none;
+    }
+  }
+}
+
+@media (max-width: 525px) {
+  .group-card {
+    min-width: 100%;
+    max-width: 100%;
+
+    &_text {
+      width: 100%;
+    }
+
+    &_icon {
+      display: none;
+    }
+  }
 }

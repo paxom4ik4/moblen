@@ -1,7 +1,7 @@
 import API from '../index.ts';
 
 const LOGIN_URL = '/users/login/';
-const LOGOUT_URL = '/users/logout/';
+const LOGOUT_URL = '/users/revoke-token/';
 const CHECK_AUTHORIZE = '/users/check-authorize/';
 
 const loginAPI = {
@@ -18,8 +18,8 @@ const loginAPI = {
       (res) => res.data,
     );
   },
-  logoutUser: () => {
-    return API.post(LOGOUT_URL).then((res) => res.data);
+  logoutUser: (token: string) => {
+    return API.post(LOGOUT_URL, { token }).then((res) => res.data);
   },
   checkAuthorize: () => {
     return API.get(CHECK_AUTHORIZE).then((res) => res.data);

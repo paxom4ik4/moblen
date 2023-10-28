@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, lazy, Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -20,10 +20,14 @@ import { getStoredAppMode, routeConfig, studentRouteConfig } from './utils/app.u
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
-import { checkAuthorize } from './services/login/login.ts';
 import { Typography } from './common/typography/typography.tsx';
 
+import MenuIcon from 'assets/icons/menu-item.svg';
+import { axiosAddAuthToken } from './services/tokenHelper.ts';
+
 const DEFAULT_CLASSNAME = 'app';
+
+const MOBILE_VIEW_WIDTH = 768;
 
 const App: FC = () => {
   // components lazy import
@@ -35,7 +39,6 @@ const App: FC = () => {
   const TestResult = lazy(() => import('./pages/student/test-result/test-result.tsx'));
   const Results = lazy(() => import('./pages/tutor/results/results.tsx'));
 
-  const navigate = useNavigate();
   const location = useLocation();
 
   const [currentTitle, setCurrentTitle] = useState<string | null>('');
@@ -56,26 +59,6 @@ const App: FC = () => {
         dispatch(setAppMode(getStoredAppMode()));
       });
     }
-
-    (async () => {
-      try {
-        await checkAuthorize();
-
-        if (!storedUserData) {
-          !location.pathname.includes('registration') && navigate('/login-page');
-        }
-      } catch (error) {
-        !location.pathname.includes('registration') && navigate('/login-page');
-
-        sessionStorage.removeItem('userData');
-        sessionStorage.removeItem('appMode');
-
-        batch(() => {
-          dispatch(setUser(null));
-          dispatch(setAppMode(null));
-        });
-      }
-    })();
   }, []);
 
   useEffect(() => {
@@ -83,6 +66,26 @@ const App: FC = () => {
 
     setCurrentTitle(config.find((route) => route.path === location.pathname)?.title ?? '');
   }, [appMode, location]);
+
+  // handle sidebar
+  const [isSidebarOpened, setIsSidebarOpened] = useState(true);
+
+  useEffect(() => {
+    if (window.innerWidth <= MOBILE_VIEW_WIDTH) setIsSidebarOpened(false);
+  }, []);
+
+  const handleMenuClose = () => setIsSidebarOpened(false);
+
+  useEffect(() => {
+    if (isSidebarOpened) {
+      document.addEventListener('onmousedown', handleMenuClose);
+      return () => document.removeEventListener('onmousedown', handleMenuClose);
+    }
+  }, [isSidebarOpened]);
+
+  useEffect(() => {
+    if (userData) axiosAddAuthToken();
+  }, [userData]);
 
   const tutorRoutes = (
     <>
@@ -103,9 +106,16 @@ const App: FC = () => {
 
   const appContent = (
     <div className={DEFAULT_CLASSNAME}>
-      <Sidebar />
+      <Sidebar isSidebarOpened={isSidebarOpened} setIsSidebarOpened={setIsSidebarOpened} />
       <UpperBar />
-      <div className={`${DEFAULT_CLASSNAME}_title`}>{currentTitle}</div>
+      <div className={`${DEFAULT_CLASSNAME}_title`}>
+        <button
+          onClick={() => setIsSidebarOpened(true)}
+          className={`${DEFAULT_CLASSNAME}_title-menu`}>
+          <MenuIcon />
+        </button>
+        {currentTitle}
+      </div>
       <Routes>
         <Route path="*" element={<Navigate to="/assignments" replace />} />
         {appMode === AppModes.tutor ? tutorRoutes : studentRoutes}
@@ -115,6 +125,7 @@ const App: FC = () => {
 
   const loginContent = (
     <Routes>
+      <Route path="*" element={<Navigate to={LoginRoutes.LOGIN} replace />} />
       <Route path={LoginRoutes.LOGIN} element={<LoginPage />} />
       <Route path={LoginRoutes.LOGIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />

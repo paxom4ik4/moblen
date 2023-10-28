@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { Dispatch, FC, SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 
 import MoblenIcon from 'assets/icons/moblen-icon.svg';
@@ -9,14 +9,21 @@ import './sidebar.scss';
 
 const DEFAULT_CLASSNAME = 'app-sidebar';
 
-export const Sidebar: FC = () => {
+interface SidebarProps {
+  isSidebarOpened: boolean;
+  setIsSidebarOpened: Dispatch<SetStateAction<boolean>>;
+}
+
+export const Sidebar: FC<SidebarProps> = (props) => {
+  const { isSidebarOpened, setIsSidebarOpened } = props;
+
   return (
-    <div className={DEFAULT_CLASSNAME}>
+    <div className={`${DEFAULT_CLASSNAME} ${isSidebarOpened && 'sidebar-opened'}`}>
       <Link to={'/'}>
         <MoblenIcon />
       </Link>
 
-      <SidebarMenu />
+      <SidebarMenu setIsSidebarOpened={setIsSidebarOpened} />
     </div>
   );
 };

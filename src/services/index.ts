@@ -1,9 +1,4 @@
 import axios from 'axios';
 import { BASE_URL as baseURL } from '../constants/api.ts';
 
-export default axios.create({
-  withCredentials: true,
-  baseURL,
-  xsrfCookieName: 'csrftoken',
-  xsrfHeaderName: 'X-Csrftoken',
-});
+export default axios.create({ baseURL });

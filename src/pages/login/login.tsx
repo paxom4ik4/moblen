@@ -60,7 +60,7 @@ export const LoginPage: FC = () => {
       if (status === 'AUTHORIZED') {
         localStorage.setItem('accessToken', token.access_token);
         localStorage.setItem('refreshToken', token.refresh_token);
-        localStorage.setItem('expiresIn', token.expires_in);
+        localStorage.setItem('expiresIn', String(Date.now() + Number(`${token.expires_in}000`)));
 
         if (role === 'tutor') {
           const tutorData = remapTutorData(user);

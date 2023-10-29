@@ -2,8 +2,8 @@
   position: relative;
   display: flex;
   gap: 16px;
-  width: fit-content;
-  min-width: 390px;
+  width: 100%;
+  min-width: 170px;
 
   background-color: #fbf8fd;
   border-radius: 0 16px 16px 16px;
@@ -24,8 +24,10 @@
     font-size: 20px;
     font-weight: 500;
     background-color: #c8caff;
-    width: 114px;
-    height: 114px;
+    min-height: 100px;
+    min-width: 100px;
+    height: auto;
+    width: auto;
     border-radius: 50%;
 
     img {
@@ -39,8 +41,10 @@
       position: absolute;
       left: 16px;
       top: 16px;
-      width: 114px;
-      height: 114px;
+      min-height: 100px;
+      min-width: 100px;
+      height: auto;
+      width: auto;
       opacity: 0;
       cursor: pointer;
     }
@@ -50,10 +54,10 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    width: 65%;
+    width: 100%;
 
     &-name {
-      font-size: 20px;
+      font-size: 16px;
       border: none;
       padding: 4px;
       border-radius: 4px;
@@ -75,7 +79,6 @@
     justify-content: center;
     align-items: center;
     gap: 8px;
-    margin-top: 20px;
 
     &_delete-group {
       display: flex;
@@ -112,16 +115,17 @@
     }
 
     &-referral {
+      max-width: 100px;
       display: flex;
       flex-direction: row;
       background: #fff;
       border-radius: 12px;
-      height: 40px;
-      width: 150px;
-      padding: 8px;
+      height: 30px;
+      padding: 4px 8px;
       align-items: center;
       gap: 12px;
       transition: 0.3s;
+      font-size: 10px;
 
       svg {
         width: 80px;
@@ -144,13 +148,17 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
       background: #fff;
       border: none;
       border-radius: 12px;
       outline: none;
       transition: 0.3s;
+
+      svg {
+        width: 16px;
+      }
 
       &:hover {
         cursor: pointer;

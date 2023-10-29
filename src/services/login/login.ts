@@ -1,8 +1,8 @@
 import API from '../index.ts';
 
 const LOGIN_URL = '/users/login/';
-const LOGOUT_URL = '/users/revoke-token/';
-const CHECK_AUTHORIZE = '/users/check-authorize/';
+const LOGOUT_URL = '/users/revoke_token/';
+const REFRESH_TOKEN = '/users/refresh_token/';
 
 const loginAPI = {
   loginUser: ({
@@ -21,9 +21,9 @@ const loginAPI = {
   logoutUser: (token: string) => {
     return API.post(LOGOUT_URL, { token }).then((res) => res.data);
   },
-  checkAuthorize: () => {
-    return API.get(CHECK_AUTHORIZE).then((res) => res.data);
+  refreshToken: (refresh_token: string) => {
+    return API.post(REFRESH_TOKEN, { refresh_token }).then((res) => res.data);
   },
 };
 
-export const { loginUser, logoutUser, checkAuthorize } = loginAPI;
+export const { loginUser, logoutUser, refreshToken } = loginAPI;

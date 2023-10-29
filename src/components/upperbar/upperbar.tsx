@@ -10,9 +10,10 @@ import StudentIcon from 'assets/icons/student-icon.svg';
 import { RootState } from 'store/store.ts';
 import { Typography } from 'common/typography/typography.tsx';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
-// import { logoutUser } from 'services/login/login.ts';
 import { useNavigate } from 'react-router-dom';
-import { LoginRoutes } from '../../constants/routes.ts';
+import { LoginRoutes } from 'constants/routes.ts';
+import { logoutUser } from 'services/login/login.ts';
+import { clearLocalStorage } from 'utils/app.utils.ts';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
@@ -25,24 +26,22 @@ export const UpperBar: FC = () => {
 
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
 
-  const logoutHandler = async () => {
-    // await logoutUser(localStorage.getItem('refreshToken')!);
+  const clearAppStateHandler = () => {
+    clearLocalStorage();
 
-    // clearing app state
     batch(() => {
       dispatch(setUser(null));
       dispatch(setAppMode(null));
     });
+  };
 
-    // clearing localStorage
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('expiresIn');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('appMode');
+  const logoutHandler = async () => {
+    await logoutUser(localStorage.getItem('refreshToken')!);
+    await logoutUser(localStorage.getItem('accessToken')!);
 
-    // navigate to login page
     navigate(LoginRoutes.LOGIN);
+
+    clearAppStateHandler();
   };
 
   return (

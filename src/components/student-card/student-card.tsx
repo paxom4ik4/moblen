@@ -53,10 +53,16 @@ export const StudentCard: FC<StudentCardProps> = (props) => {
       <div className={`${DEFAULT_CLASSNAME}_icon`}>
         {imgUrl ? <img src={imgUrl} alt={'Image Student'} /> : <StudentIcon />}
       </div>
-      <Typography color={active ? 'purple' : 'default'} className={`${DEFAULT_CLASSNAME}_name`}>
+      <Typography
+        size={'small'}
+        color={active ? 'purple' : 'default'}
+        className={`${DEFAULT_CLASSNAME}_name`}>
         {name}
       </Typography>
-      <Typography color={active ? 'purple' : 'default'} className={`${DEFAULT_CLASSNAME}_surname`}>
+      <Typography
+        size={'small'}
+        color={active ? 'purple' : 'default'}
+        className={`${DEFAULT_CLASSNAME}_surname`}>
         {surname}
       </Typography>
     </div>

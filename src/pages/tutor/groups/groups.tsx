@@ -82,6 +82,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
         {groups?.map((group) => (
           <GroupCard
             hideControls={viewMode}
+            hideIcon={viewMode && !!selectedStudent}
             key={group.group_uuid}
             onClick={() => setSelectedGroup(group)}
             id={group.group_uuid}

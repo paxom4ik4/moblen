@@ -65,6 +65,14 @@ export const mockedTests: Test[] = [
   },
 ];
 
+export const clearLocalStorage = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('expiresIn');
+  localStorage.removeItem('userData');
+  localStorage.removeItem('appMode');
+};
+
 export const getStoredAppMode = (): AppModes | null => {
   const storedAppMode = localStorage.getItem('appMode');
 

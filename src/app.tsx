@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, lazy, Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -16,7 +16,12 @@ import { AppModes } from './constants/appTypes.ts';
 import './app.scss';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { RootState } from './store/store.ts';
-import { getStoredAppMode, routeConfig, studentRouteConfig } from './utils/app.utils.ts';
+import {
+  clearLocalStorage,
+  getStoredAppMode,
+  routeConfig,
+  studentRouteConfig,
+} from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
@@ -24,6 +29,7 @@ import { Typography } from './common/typography/typography.tsx';
 
 import MenuIcon from 'assets/icons/menu-item.svg';
 import { axiosAddAuthToken } from './services/tokenHelper.ts';
+import { refreshToken } from './services/login/login.ts';
 
 const DEFAULT_CLASSNAME = 'app';
 
@@ -40,15 +46,30 @@ const App: FC = () => {
   const Results = lazy(() => import('./pages/tutor/results/results.tsx'));
 
   const location = useLocation();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [currentTitle, setCurrentTitle] = useState<string | null>('');
 
   const { userData } = useSelector((state: RootState) => state.userData);
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
-  const dispatch = useDispatch();
+  const clearAppStateHandler = () => {
+    clearLocalStorage();
+
+    batch(() => {
+      dispatch(setUser(userData));
+      dispatch(setAppMode(getStoredAppMode()));
+    });
+
+    navigate(LoginRoutes.LOGIN);
+  };
 
   useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    const storedRefreshToken = localStorage.getItem('refreshToken');
+    const expiresIn = localStorage.getItem('expiresIn');
+
     const storedUserData = localStorage.getItem('userData');
 
     if (storedUserData) {
@@ -59,6 +80,17 @@ const App: FC = () => {
         dispatch(setAppMode(getStoredAppMode()));
       });
     }
+
+    (async () => {
+      if (accessToken && expiresIn && storedRefreshToken && Date.now() >= +expiresIn) {
+        try {
+          const res = await refreshToken(storedRefreshToken);
+          console.log(res);
+        } catch (error) {
+          clearAppStateHandler();
+        }
+      }
+    })();
   }, []);
 
   useEffect(() => {

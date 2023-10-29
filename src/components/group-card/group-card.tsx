@@ -34,6 +34,7 @@ export interface GroupCardProps {
   setIsNewGroupCreating?: Dispatch<SetStateAction<boolean>>;
 
   hideControls?: boolean;
+  hideIcon?: boolean;
 
   selectedShareGroups?: string[];
   setSelectedShareGroups?: Dispatch<SetStateAction<string[]>>;
@@ -50,6 +51,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
     id,
     active = false,
     hideControls = false,
+    hideIcon = false,
     setIsNewGroupCreating,
     editMode = false,
     name = '',
@@ -151,21 +153,23 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
         active && `active-${DEFAULT_CLASSNAME}`
       } ${isOver} && group-card-drop`}
       onClick={onClick ?? onGroupCartClickHandler}>
-      <div className={`${DEFAULT_CLASSNAME}_icon`}>
-        {isEditMode && (
-          <input
-            placeholder={'Название группы'}
-            onChange={(e) => setNewGroupImage(e.target.files![0])}
-            type={'file'}
-            className={`${DEFAULT_CLASSNAME}_icon-edit`}
-          />
-        )}
-        {isEditMode && newGroupImage && (
-          <img src={URL.createObjectURL(newGroupImage)} alt={'Group Icon'} />
-        )}
-        {iconUrl && <img src={URL.createObjectURL(iconUrl)} alt={'Group Icon'} />}
-        {!iconUrl && !newGroupImage && (newGroupName[0] ?? name[0])}
-      </div>
+      {!hideIcon && (
+        <div className={`${DEFAULT_CLASSNAME}_icon`}>
+          {isEditMode && (
+            <input
+              placeholder={'Название группы'}
+              onChange={(e) => setNewGroupImage(e.target.files![0])}
+              type={'file'}
+              className={`${DEFAULT_CLASSNAME}_icon-edit`}
+            />
+          )}
+          {isEditMode && newGroupImage && (
+            <img src={URL.createObjectURL(newGroupImage)} alt={'Group Icon'} />
+          )}
+          {iconUrl && <img src={URL.createObjectURL(iconUrl)} alt={'Group Icon'} />}
+          {!iconUrl && !newGroupImage && (newGroupName[0] ?? name[0])}
+        </div>
+      )}
       <div className={`${DEFAULT_CLASSNAME}_text`}>
         <input
           onChange={(e) => setNewGroupName(e.currentTarget.value)}

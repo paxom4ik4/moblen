@@ -65,6 +65,18 @@ const App: FC = () => {
     navigate(LoginRoutes.LOGIN);
   };
 
+  const refreshTokenHandler = (res: {
+    access_token: string;
+    refresh_token: string;
+    expires_in: number;
+  }) => {
+    localStorage.setItem('accessToken', res.access_token);
+    localStorage.setItem('refreshToken', res.refresh_token);
+    localStorage.setItem('expiresIn', String(Date.now() + Number(`${res.expires_in}000`)));
+
+    axiosAddAuthToken();
+  };
+
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const storedRefreshToken = localStorage.getItem('refreshToken');
@@ -85,7 +97,7 @@ const App: FC = () => {
       if (accessToken && expiresIn && storedRefreshToken && Date.now() >= +expiresIn) {
         try {
           const res = await refreshToken(storedRefreshToken);
-          console.log(res);
+          res.access_token ? refreshTokenHandler(res) : clearAppStateHandler();
         } catch (error) {
           clearAppStateHandler();
         }

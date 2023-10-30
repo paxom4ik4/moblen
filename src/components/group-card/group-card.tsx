@@ -157,6 +157,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
         <div className={`${DEFAULT_CLASSNAME}_icon`}>
           {isEditMode && (
             <input
+              disabled={true}
               placeholder={'Название группы'}
               onChange={(e) => setNewGroupImage(e.target.files![0])}
               type={'file'}

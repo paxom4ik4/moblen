@@ -16,6 +16,7 @@ import { Student } from 'types/student.ts';
 import { useDrop } from 'react-dnd';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
 import { deleteFromGroup } from 'services/student/student.ts';
+import { Tooltip } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'groups';
 
@@ -77,8 +78,6 @@ const Groups: FC<GroupsProps> = memo((props) => {
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={`${DEFAULT_CLASSNAME}_list`}>
-        {!groups?.length && <Typography color={'purple'}>Создайте новую группу</Typography>}
-
         {groups?.map((group) => (
           <GroupCard
             hideControls={viewMode}
@@ -103,9 +102,13 @@ const Groups: FC<GroupsProps> = memo((props) => {
           />
         )}
         {!viewMode && (
-          <div className={`${DEFAULT_CLASSNAME}_list-add`} onClick={() => createNewGroupHandler()}>
-            <AddIcon />
-          </div>
+          <Tooltip title="Создать новую группу">
+            <div
+              className={`${DEFAULT_CLASSNAME}_list-add`}
+              onClick={() => createNewGroupHandler()}>
+              <AddIcon />
+            </div>
+          </Tooltip>
         )}
       </div>
       <div className={`${DEFAULT_CLASSNAME}_students`}>

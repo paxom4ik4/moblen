@@ -138,15 +138,13 @@ export const RegistrationPage: FC = () => {
         </div>
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
-            {!isTutorRegister && (
-              <Typography
-                onClick={handleLoginStudentWithRef}
-                color={'purple'}
-                weight={'bold'}
-                className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-                <Typography color={'default'}>Есть аккаунт?</Typography> Войти
-              </Typography>
-            )}
+            <Typography
+              onClick={handleLoginStudentWithRef}
+              color={'purple'}
+              weight={'bold'}
+              className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+              <Typography color={'default'}>Есть аккаунт?</Typography> Войти
+            </Typography>
             <Typography
               onClick={changeModeHandler}
               color={'purple'}

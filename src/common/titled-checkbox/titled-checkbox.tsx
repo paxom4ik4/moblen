@@ -17,7 +17,7 @@ export const TitledCheckbox: FC<TitledCheckboxProps> = (props) => {
   return (
     <div className={DEFAULT_CLASSNAME}>
       <label htmlFor={name}>
-        <Typography>{children}</Typography>
+        <Typography size={'small'}>{children}</Typography>
       </label>{' '}
       <input id={name} type={'checkbox'} {...otherProps} />
     </div>

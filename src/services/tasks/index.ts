@@ -1,4 +1,5 @@
 import API from '../index.ts';
+import { ShareDataType } from '../../types/share.data.type.ts';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
@@ -33,11 +34,12 @@ const tasklistAPI = {
       return null;
     }
   },
-  editTaskList: ({ listName, topicId }: { listName: string; topicId: string }) => {
-    return API.patch(`${TASK_LIST_URL}/get-by-topic/${topicId}`, {
-      list_name: listName,
-      topic_uuid: topicId,
-    }).then((res) => res.data);
+  shareTaskList: (data: ShareDataType) => {
+    const { list_uuid, ...taskListData } = data;
+
+    return API.post(`${TASK_LIST_URL}/${list_uuid}/share/`, { ...taskListData }).then(
+      (res) => res.data,
+    );
   },
 };
 
@@ -70,5 +72,5 @@ const tasksAPI = {
   },
 };
 
-export const { getTaskList, deleteTaskList, createTaskList, editTaskList } = tasklistAPI;
+export const { getTaskList, deleteTaskList, createTaskList, shareTaskList } = tasklistAPI;
 export const { getTasks, createTask, deleteTask } = tasksAPI;

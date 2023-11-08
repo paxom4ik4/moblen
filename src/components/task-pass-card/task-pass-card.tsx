@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
@@ -23,33 +23,10 @@ interface TaskPassCardProps {
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
-  const {
-    answer,
-    mode = 'pass',
-    text,
-    maxScore,
-    index,
-    taskAssets,
-    criteria,
-    tasksWithStudentAnswers,
-    setTasksWithStudentAnswers,
-  } = props;
+  const { answer, mode = 'pass', text, maxScore, index, taskAssets, criteria } = props;
 
   const [studentAnswer, setStudentAnswer] = useState('');
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
-
-  useEffect(() => {
-    if (mode === 'pass') {
-      const targetTask = tasksWithStudentAnswers![index];
-      targetTask.answer = studentAnswer;
-
-      setTasksWithStudentAnswers!([
-        ...tasksWithStudentAnswers!.slice(0, index),
-        targetTask,
-        ...tasksWithStudentAnswers!.slice(index + 1),
-      ]);
-    }
-  }, [studentAnswer, mode, setTasksWithStudentAnswers, tasksWithStudentAnswers, index]);
 
   return (
     <>
@@ -84,7 +61,7 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
         <div className={`${DEFAULT_CLASSNAME}_task_score`}>
           <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
             <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-              <Typography weight={'bold'}>8 / {maxScore} баллов</Typography>
+              <Typography weight={'bold'}>Баллов: {maxScore}</Typography>
             </div>
           </div>
 

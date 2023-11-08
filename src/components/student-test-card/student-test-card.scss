@@ -5,6 +5,9 @@
   background: #ffffff;
 
   &_status {
+    outline: none;
+    background: transparent;
+    border: none;
     border-top: 1px solid black;
     text-align: center;
     padding: 12px;

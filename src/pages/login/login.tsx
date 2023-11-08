@@ -6,14 +6,14 @@ import { Input } from 'common/input/input.tsx';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import VKIcon from 'assets/icons/vk-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
-import { LoginModes, UserData } from 'constants/appTypes.ts';
+import { LoginModes } from 'constants/appTypes.ts';
 
 import './login.scss';
 import { loginUser } from 'services/login/login.ts';
 import { useDispatch, batch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
-import { remapStudentData, remapTutorData } from './utils.ts';
+import { handleDataStoring, remapStudentData, remapTutorData } from './utils.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from '../../constants/routes.ts';
 import { GROUP_REF_LINK } from '../../constants/api.ts';
 
@@ -43,11 +43,6 @@ export const LoginPage: FC = () => {
   //     <ErrorMessage className={`${DEFAULT_CLASSNAME}_form_error_filed`} name="passwordRepeat" component="div" />
   //   </>
   // );
-
-  const handleDataStoring = (userData: UserData, role: string) => {
-    localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('appMode', role);
-  };
 
   const loginHandler = async (values: { login: string; password: string }) => {
     try {

@@ -21,7 +21,7 @@ export interface TaskCardProps {
   criteria: string;
   maxScore: number | null;
   format: string;
-  taskAssets?: Asset[] | null;
+  taskAssets?: Asset[];
   index?: number;
 
   isCreateMode?: boolean;

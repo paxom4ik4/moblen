@@ -14,8 +14,8 @@ import { RootState } from 'store/store.ts';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useQuery } from 'react-query';
 import { getTasks } from 'services/tasks';
+import { TutorRoutes } from 'constants/routes.ts';
 import { Task } from 'types/task.ts';
-import { TutorRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -113,7 +113,6 @@ const CreateTest: FC = memo(() => {
             <TaskCard
               taskId={task.task_uuid}
               taskListId={taskListId!}
-              taskAssets={task.task_image}
               text={task.task_condition}
               criteria={task.criteria}
               maxScore={task.max_ball}

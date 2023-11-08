@@ -1,4 +1,11 @@
 import { RegistrationValues } from './registration.tsx';
+import { loginUser } from '../../services/login/login.ts';
+import { handleDataStoring, remapStudentData, remapTutorData } from '../login/utils.ts';
+import { batch } from 'react-redux';
+import { setUser } from '../../store/user-data/user-data.slice.ts';
+import { setAppMode } from '../../store/app-mode/app-mode.slice.ts';
+import { Dispatch } from 'react';
+import { Action } from '@reduxjs/toolkit';
 
 const REQUIRED = 'Обязательное поле';
 const PASSWORD_MATCH = 'Пароли несовпадают';
@@ -42,4 +49,37 @@ export const validateFn = (values: RegistrationValues) => {
   }
 
   return errors;
+};
+
+export const loginAfterRegister = async (
+  loginValues: { login: string; password: string },
+  dispatch: Dispatch<Action>,
+) => {
+  const res = await loginUser(loginValues);
+  const { status, role, user, token } = res;
+  if (status === 'AUTHORIZED') {
+    localStorage.setItem('accessToken', token.access_token);
+    localStorage.setItem('refreshToken', token.refresh_token);
+    localStorage.setItem('expiresIn', String(Date.now() + Number(`${token.expires_in}000`)));
+
+    if (role === 'tutor') {
+      const tutorData = remapTutorData(user);
+
+      batch(() => {
+        dispatch(setUser(tutorData));
+        dispatch(setAppMode(role));
+      });
+
+      handleDataStoring(tutorData, role);
+    } else {
+      const studentData = remapStudentData(user);
+
+      batch(() => {
+        dispatch(setUser(studentData));
+        dispatch(setAppMode(role));
+      });
+
+      handleDataStoring(studentData, role);
+    }
+  }
 };

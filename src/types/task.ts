@@ -27,15 +27,3 @@ export interface TaskList {
 export interface TaskWithAnswer extends Task {
   answer: string;
 }
-
-export const mockedTask = {
-  task_condition: 'Решите пример: 2 + 2',
-  format: 'Текстовый формат',
-  criteria: 'Нельзя ползьзоваться калькулятором',
-  max_ball: 10,
-  assets: null,
-  task_answer: '',
-  answer: 'task',
-  task_image: null,
-  task_uuid: '123',
-};

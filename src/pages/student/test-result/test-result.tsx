@@ -1,7 +1,7 @@
 import { FC, memo } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { TaskWithAnswer } from 'types/task.ts';
+import { Task, TaskWithAnswer } from 'types/task.ts';
 
 import { Typography } from 'common/typography/typography.tsx';
 import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
@@ -40,11 +40,11 @@ const TestResult: FC = memo(() => {
           </div>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>
-          {tasks?.map((task: TaskWithAnswer, index: number) => (
+          {tasks?.map((task: Task, index: number) => (
             <div className={`${DEFAULT_CLASSNAME}_tasks_item`}>
               <div className={`${DEFAULT_CLASSNAME}_tasks_item_task`}>
                 <TaskPassCard
-                  answer={task.answer}
+                  answer={'Test Answer'}
                   mode={'view'}
                   text={task.task_condition}
                   criteria={task.criteria}

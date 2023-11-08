@@ -17,6 +17,7 @@ import { createTutorGroup } from 'services/tutor';
 import { addNewStudent, deleteGroup, editGroupName, refreshGroupLink } from 'services/groups';
 import { deleteFromGroup } from '../../services/student/student.ts';
 import { Notification } from '../../common/notification/notification.tsx';
+import { Typography } from '../../common/typography/typography.tsx';
 
 const DEFAULT_CLASSNAME = 'group-card';
 
@@ -172,16 +173,18 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
         </div>
       )}
       <div className={`${DEFAULT_CLASSNAME}_text`}>
-        <input
-          onChange={(e) => setNewGroupName(e.currentTarget.value)}
-          disabled={!isEditMode}
-          className={`${DEFAULT_CLASSNAME}_text-name`}
-          value={isEditMode ? newGroupName : name}
-        />
+        {isEditMode && (
+          <input
+            onChange={(e) => setNewGroupName(e.currentTarget.value)}
+            className={`${DEFAULT_CLASSNAME}_text-name`}
+            value={newGroupName}
+          />
+        )}
+        {!isEditMode && <Typography size={'default'}>{name}</Typography>}
         {!isEditMode && (
-          <div className={`${DEFAULT_CLASSNAME}_text-amount`}>
+          <Typography size={'small'}>
             {amount === 0 ? 'Нет участников' : `Участников: ${amount}`}
-          </div>
+          </Typography>
         )}
         {!hideControls && (
           <div className={`${DEFAULT_CLASSNAME}_buttons`}>

@@ -8,7 +8,6 @@ import AddSubjectIcon from 'assets/icons/add-subject-icon.svg';
 import CancelIcon from 'assets/icons/cancel-icon.svg';
 import LockIcon from 'assets/icons/lock-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg';
-import CalendarIcon from 'assets/icons/calendar-icon.svg';
 import { TestCard, TestCardCreate } from 'components/test-card/test-card.tsx';
 import { CoursesShare } from './courses-share/courses-share.tsx';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
@@ -184,6 +183,7 @@ const Courses: FC = memo(() => {
     topic: string;
     course: string;
     name: string;
+    task_amount: number;
   } | null>(null);
 
   const activeCourseName =
@@ -329,7 +329,9 @@ const Courses: FC = memo(() => {
                     topic.topic_uuid === activeTopic && 'active-topic'
                   }`}
                   onClick={() => dispatch(setActiveTopic(topic.topic_uuid))}>
-                  <Typography color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
+                  <Typography
+                    size={'small'}
+                    color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
                     {topic.topic_name}
                   </Typography>
                   {topic.topic_uuid === activeTopic && (
@@ -359,11 +361,11 @@ const Courses: FC = memo(() => {
               {' '}
               <AddIcon />
             </div>
-            <button
-              className={`${DEFAULT_CLASSNAME}_calendar-btn`}
-              onClick={() => setCalendarOpened(true)}>
-              <CalendarIcon />
-            </button>
+            {/*<button*/}
+            {/*  className={`${DEFAULT_CLASSNAME}_calendar-btn`}*/}
+            {/*  onClick={() => setCalendarOpened(true)}>*/}
+            {/*  <CalendarIcon />*/}
+            {/*</button>*/}
           </div>
         )}
       </div>

@@ -6,14 +6,17 @@ import { GroupCard } from 'components/group-card/group-card.tsx';
 import { Typography } from 'common/typography/typography.tsx';
 import { TitledCheckbox } from 'common/titled-checkbox/titled-checkbox.tsx';
 
-import { DatePicker, TimePicker } from '@mui/x-date-pickers';
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { DateTimePicker } from '@mui/x-date-pickers';
 
 import './courses-share.scss';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../../../store/store.ts';
-import { useQuery } from 'react-query';
-import { getTutorGroups } from '../../../../services/tutor';
+import { RootState } from 'store/store.ts';
+import { useMutation, useQuery } from 'react-query';
+import { Button } from 'common/button/button.tsx';
+import { getTutorGroups } from 'services/tutor';
+import dayjs from 'dayjs';
+import { ShareDataType } from 'types/share.data.type.ts';
+import { shareTaskList } from 'services/tasks';
 
 const DEFAULT_CLASSNAME = 'courses-share';
 
@@ -24,6 +27,7 @@ interface CoursesShareProps {
       topic: string;
       course: string;
       name: string;
+      task_amount: number;
     } | null>
   >;
   testToShare: {
@@ -31,6 +35,7 @@ interface CoursesShareProps {
     topic: string;
     course: string;
     name: string;
+    task_amount: number;
   };
 }
 
@@ -41,24 +46,33 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
 
   const { setTestToShare, testToShare } = props;
 
-  const [deadline, setDeadline] = useState(false);
-  const [timeLimit, setTimeLimit] = useState(false);
-  const [mark, setMark] = useState(false);
-  const [retry, setRetry] = useState(false);
-  const [answers, setAnswers] = useState(false);
+  const [withDeadline, setWithDeadline] = useState(false);
+  const [withTimeLimit, setWithTimeLimit] = useState(false);
 
-  const [timeLimitValue, setTimeLimitValue] = useState('0');
-  const [assessmentMethod, setAssessmentMethod] = useState('Оценивание по ФГОС');
-  const [criteriaView, setCriteriaView] = useState('Просмотр учеником');
+  const [timeLimit, setTimeLimit] = useState(0);
+  const [deadline, setDeadline] = useState(() => dayjs(Date.now()));
+  const [appreciable, setAppreciable] = useState(false);
+  const [replay, setReplay] = useState(false);
+  const [seeAnswers, setSeeAnswers] = useState(false);
+  const [seeCriteria, setSeeCriteria] = useState(false);
 
   const [selectedShareGroups, setSelectedShareGroups] = useState<string[]>([]);
 
-  const handleAssessmentMethod = (event: SelectChangeEvent) => {
-    setAssessmentMethod(event.target.value as string);
-  };
+  const shareTaskListMutation = useMutation((data: ShareDataType) => shareTaskList(data), {
+    onSuccess: () => setTestToShare(null),
+  });
 
-  const handleCriteriaView = (event: SelectChangeEvent) => {
-    setCriteriaView(event.target.value as string);
+  const handleTaskListShare = async () => {
+    await shareTaskListMutation.mutate({
+      list_uuid: testToShare.list_uuid,
+      groups: selectedShareGroups,
+      see_answers: seeAnswers,
+      see_criteria: seeCriteria,
+      replay,
+      appreciable,
+      deadline: withDeadline ? dayjs(deadline).format('YYYY-MM-DDThh:mm:ss.SSSZ') : 'null',
+      time_limit: withTimeLimit ? Number(timeLimit) : 'null',
+    });
   };
 
   return (
@@ -94,74 +108,72 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
               {testToShare.name}
             </Typography>
             <Typography color={'gray'} size={'small'}>
-              {'Заданий - 0'}
+              {'Заданий - '} {testToShare.task_amount}
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime`}>
             <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime_time`}>
               <TitledCheckbox
                 name={'deadline'}
-                checked={deadline}
-                onChange={() => setDeadline(!deadline)}>
+                checked={withDeadline}
+                onChange={() => setWithDeadline(!withDeadline)}>
                 Дедлайн
               </TitledCheckbox>
-              {deadline && (
+              {withDeadline && (
                 <div className={`${DEFAULT_CLASSNAME}_share_content_config_deadline`}>
-                  <DatePicker />
-                  <TimePicker />
+                  <DateTimePicker
+                    label="Выберите дедлайн"
+                    value={deadline}
+                    onChange={(newValue) => setDeadline(newValue!)}
+                  />
                 </div>
               )}
-              <TitledCheckbox name={'mark'} checked={mark} onChange={() => setMark(!mark)}>
+              <TitledCheckbox
+                name={'mark'}
+                checked={appreciable}
+                onChange={() => setAppreciable(!appreciable)}>
                 Оценка
               </TitledCheckbox>
               <TitledCheckbox
                 name={'timeLimit'}
-                checked={timeLimit}
-                onChange={() => setTimeLimit(!timeLimit)}>
+                checked={withTimeLimit}
+                onChange={() => setWithTimeLimit(!withTimeLimit)}>
                 Ограничение по времени
               </TitledCheckbox>
-              {timeLimit && (
+              {withTimeLimit && (
                 <div className={`${DEFAULT_CLASSNAME}_share_content_config_timeDeadline`}>
                   <Typography>Ограничение по времени (мин.)</Typography>
                   <input
                     type={'text'}
-                    value={timeLimitValue}
-                    onChange={(e) => setTimeLimitValue(e.currentTarget.value)}
+                    value={timeLimit}
+                    onChange={(e) => setTimeLimit(+e.currentTarget.value)}
                   />
                 </div>
               )}
-              <TitledCheckbox name={'retry'} checked={retry} onChange={() => setRetry(!retry)}>
+              <TitledCheckbox name={'retry'} checked={replay} onChange={() => setReplay(!replay)}>
                 Можно перепройти
               </TitledCheckbox>
               <TitledCheckbox
                 name={'answers'}
-                checked={answers}
-                onChange={() => setAnswers(!answers)}>
+                checked={seeAnswers}
+                onChange={() => setSeeAnswers(!seeAnswers)}>
                 Смотр. ответы после сдачи
               </TitledCheckbox>
-
-              <div className={`${DEFAULT_CLASSNAME}_share_select_container`}>
-                <Select
-                  labelId="assessmentMethod"
-                  id="assessmentMethod"
-                  value={assessmentMethod}
-                  onChange={handleAssessmentMethod}>
-                  <MenuItem value={'Оценивание по ФГОС'}>Оценивание по ФГОС</MenuItem>
-                </Select>
-
-                <Select
-                  labelId="criteriaView"
-                  id="criteriaView"
-                  value={criteriaView}
-                  onChange={handleCriteriaView}>
-                  <MenuItem value={'Просмотр учеником'}>Просмотр учеником</MenuItem>
-                </Select>
-              </div>
+              <TitledCheckbox
+                name={'criteria'}
+                checked={seeCriteria}
+                onChange={() => setSeeCriteria(!seeCriteria)}>
+                Просмотр критериев
+              </TitledCheckbox>
             </div>
           </div>
-          <div className={`${DEFAULT_CLASSNAME}_share_content_config_confirm`}>
-            <Typography>Отправить задание</Typography> <CheckIcon />
-          </div>
+          <Button
+            className={'share-btn'}
+            title={'Отправить задание'}
+            icon={<CheckIcon />}
+            disabled={!selectedShareGroups.length}
+            onClick={handleTaskListShare}
+          />
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import { useFormik } from 'formik';
 import { Input } from 'common/input/input.tsx';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
-import { validateFn } from './utils.ts';
+import { loginAfterRegister, validateFn } from './utils.ts';
 
 import './registration.scss';
 import {
@@ -14,6 +14,8 @@ import {
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoginRoutes } from 'constants/routes.ts';
 import { GROUP_REF_LINK } from 'constants/api.ts';
+import { useMutation } from 'react-query';
+import { useDispatch } from 'react-redux';
 
 const DEFAULT_CLASSNAME = 'registration';
 
@@ -28,18 +30,11 @@ export interface RegistrationValues {
 
 export const RegistrationPage: FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const params = useParams();
 
   const [isTutorRegister, setIsTutorRegister] = useState<boolean>(true);
   const changeModeHandler = () => setIsTutorRegister(!isTutorRegister);
-
-  const handleTutorRegister = async (values: RegistrationValues) => {
-    const res = await createNewTutor(values);
-
-    if ('tutor_uuid' in res) {
-      navigate(LoginRoutes.LOGIN);
-    }
-  };
 
   const handleLoginStudentWithRef = () =>
     navigate(params.groupId ? `${LoginRoutes.LOGIN}/ref/${params.groupId}` : LoginRoutes.LOGIN);
@@ -54,15 +49,9 @@ export const RegistrationPage: FC = () => {
 
       const referralLink = `${GROUP_REF_LINK}${groupId}`;
 
-      const res = await createNewStudentWithRef({ ...values, referralLink });
-      if (res.status === 'SUCCESSFULLY_ADDED') {
-        navigate(LoginRoutes.LOGIN);
-      }
+      createStudentWithRefMutation.mutate({ ...values, referralLink });
     } else {
-      const res = await createNewStudent(values);
-      if ('student_uuid' in res) {
-        navigate(LoginRoutes.LOGIN);
-      }
+      createStudentMutation.mutate(values);
     }
   };
 
@@ -78,6 +67,48 @@ export const RegistrationPage: FC = () => {
       isTutorRegister ? handleTutorRegister(values) : handleStudentRegister(values),
     validate: (values) => validateFn(values),
   });
+
+  const createNewTutorMutation = useMutation(
+    (data: { name: string; surname: string; login: string; password: string }) =>
+      createNewTutor(data),
+    {
+      onSuccess: async () => {
+        await loginAfterRegister(registerFrom.values, dispatch);
+        registerFrom.resetForm();
+      },
+    },
+  );
+
+  const createStudentMutation = useMutation(
+    (data: { name: string; surname: string; login: string; password: string }) =>
+      createNewStudent(data),
+    {
+      onSuccess: async () => {
+        await loginAfterRegister(registerFrom.values, dispatch);
+        registerFrom.resetForm();
+      },
+    },
+  );
+
+  const createStudentWithRefMutation = useMutation(
+    (data: {
+      name: string;
+      surname: string;
+      login: string;
+      password: string;
+      referralLink: string;
+    }) => createNewStudentWithRef(data),
+    {
+      onSuccess: async () => {
+        await loginAfterRegister(registerFrom.values, dispatch);
+        registerFrom.resetForm();
+      },
+    },
+  );
+
+  const handleTutorRegister = async (values: RegistrationValues) => {
+    await createNewTutorMutation.mutate(values);
+  };
 
   return (
     <div className={DEFAULT_CLASSNAME}>

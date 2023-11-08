@@ -14,6 +14,8 @@ import { useNavigate } from 'react-router-dom';
 import { LoginRoutes } from 'constants/routes.ts';
 import { logoutUser } from 'services/login/login.ts';
 import { clearLocalStorage } from 'utils/app.utils.ts';
+import { useMutation } from 'react-query';
+import { Notification } from '../../common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
@@ -25,6 +27,15 @@ export const UpperBar: FC = () => {
   const { name, surname, email, photo } = userData!;
 
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const logoutMutation = useMutation((token: string) => logoutUser(token), {
+    onSuccess: () => {
+      clearAppStateHandler();
+      setIsLoggingOut(false);
+      navigate(LoginRoutes.LOGIN);
+    },
+  });
 
   const clearAppStateHandler = () => {
     clearLocalStorage();
@@ -36,16 +47,23 @@ export const UpperBar: FC = () => {
   };
 
   const logoutHandler = async () => {
-    await logoutUser(localStorage.getItem('refreshToken')!);
-    await logoutUser(localStorage.getItem('accessToken')!);
-
-    navigate(LoginRoutes.LOGIN);
-
-    clearAppStateHandler();
+    setIsLoggingOut(true);
+    await logoutMutation.mutate(localStorage.getItem('refreshToken')!);
+    await logoutMutation.mutate(localStorage.getItem('accessToken')!);
   };
 
   return (
     <div className={DEFAULT_CLASSNAME}>
+      {logoutMutation.isLoading && (
+        <Notification
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          autoHideDuration={3000}
+          message={'Выход из системы'}
+          open={isLoggingOut}
+          onClose={() => setIsLoggingOut(!isLoggingOut)}
+        />
+      )}
+
       <div className={`${DEFAULT_CLASSNAME}_notifications`}>
         <NotificationIcon />
       </div>
@@ -56,7 +74,6 @@ export const UpperBar: FC = () => {
         }}>
         <ProfileIcon />
       </div>
-
       {menuOpened && (
         <div className={`${DEFAULT_CLASSNAME}_menu`}>
           <div className={`${DEFAULT_CLASSNAME}_menu_photo`}>

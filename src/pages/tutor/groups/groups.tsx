@@ -112,14 +112,6 @@ const Groups: FC<GroupsProps> = memo((props) => {
         )}
       </div>
       <div className={`${DEFAULT_CLASSNAME}_students`}>
-        {!selectedGroup && (
-          <div className={`${DEFAULT_CLASSNAME}_students_empty`}>
-            <Typography size={'large'} color={'purple'}>
-              Выберите группу чтобы просмотреть учеников
-            </Typography>
-          </div>
-        )}
-
         {selectedGroup && isGroupLoading && <Typography>Загрузка...</Typography>}
 
         {selectedGroup && !isGroupLoading && !selectedGroupData?.students?.length && (

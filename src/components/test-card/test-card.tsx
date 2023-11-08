@@ -21,6 +21,7 @@ export interface TestCardProps {
       topic: string;
       course: string;
       name: string;
+      task_amount: number;
     } | null>
   >;
   onClick?: () => void;
@@ -65,6 +66,7 @@ export const TestCard: FC<TestCardProps> = (props) => {
             topic,
             course: subject,
             name,
+            task_amount: tasks,
           });
         }}>
         <ShareIcon />

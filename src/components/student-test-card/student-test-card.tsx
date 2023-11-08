@@ -4,6 +4,8 @@ import { Typography } from 'common/typography/typography.tsx';
 
 import './student-test-card.scss';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setCurrentTaskList } from 'store/student/student.slice.ts';
 
 const DEFAULT_CLASSNAME = 'student-test-card';
 
@@ -21,10 +23,13 @@ interface StudentTestCardProps {
 
 export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const { id, subject, topic, name, tasksAmount, deadline, passTime = new Date(), status } = props;
 
   const handleTestClick = () => {
+    dispatch(setCurrentTaskList({ id, name }));
+
     if (status === 'done') {
       navigate(`/assignments/result/${id}`);
     } else {
@@ -52,7 +57,10 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
         </div>
         <div className={`${DEFAULT_CLASSNAME}_color`}></div>
       </div>
-      <div className={`${DEFAULT_CLASSNAME}_status`} onClick={handleTestClick}>
+      <button
+        disabled={status === 'pending' && tasksAmount === 0}
+        className={`${DEFAULT_CLASSNAME}_status`}
+        onClick={handleTestClick}>
         {status === 'pending' && <Typography>Сдать тест</Typography>}
         {status === 'pending' && !!deadline && (
           <Typography>Дедлайн {deadline.toString()}</Typography>
@@ -60,7 +68,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
         {status === 'done' && passTime && (
           <Typography>Сдано {passTime.toLocaleDateString()}</Typography>
         )}
-      </div>
+      </button>
     </div>
   );
 };

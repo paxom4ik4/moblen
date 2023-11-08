@@ -1,5 +1,6 @@
 import { Tutor } from 'types/tutor.ts';
 import { Student } from 'types/student.ts';
+import { UserData } from '../../constants/appTypes.ts';
 
 export const remapTutorData = (tutorData: Tutor) => {
   return {
@@ -22,4 +23,9 @@ export const remapStudentData = (studentData: Student) => {
     email: studentData?.email ?? null,
     photo: studentData?.student_photo ?? null,
   };
+};
+
+export const handleDataStoring = (userData: UserData, role: string) => {
+  localStorage.setItem('userData', JSON.stringify(userData));
+  localStorage.setItem('appMode', role);
 };

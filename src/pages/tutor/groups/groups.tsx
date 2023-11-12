@@ -112,7 +112,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
         )}
       </div>
       <div className={`${DEFAULT_CLASSNAME}_students`}>
-        {!selectedGroup && (
+        {!selectedGroup && groups?.length > 0 && (
           <div className={`${DEFAULT_CLASSNAME}_students_empty`}>
             <Typography size={'large'} color={'purple'}>
               Выберите группу чтобы просмотреть учеников
@@ -121,7 +121,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
         )}
 
         {selectedGroup && isGroupLoading && <Typography>Загрузка...</Typography>}
-
+        {groups?.length == 0 ? <Typography><div style={{marginTop:'50%', marginLeft: '50%', width: '250px'}}>У вас нет преподавателей/групп</div></Typography> : <></>}
         {selectedGroup && !isGroupLoading && !selectedGroupData?.students?.length && (
           <Typography color={'purple'}>В данной группе нет студентов</Typography>
         )}
@@ -140,11 +140,13 @@ const Groups: FC<GroupsProps> = memo((props) => {
             />
           ))}
         {!viewMode && (
+          <Tooltip title="удалить">
           <div
             className={`${DEFAULT_CLASSNAME}_trash ${isOver && `${DEFAULT_CLASSNAME}_trash_drop`}`}
             ref={drop}>
             <TrashIcon />
           </div>
+          </Tooltip>
         )}
       </div>
     </div>

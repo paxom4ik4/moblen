@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { LoginRoutes } from 'constants/routes.ts';
 import { logoutUser } from 'services/login/login.ts';
 import { clearLocalStorage } from 'utils/app.utils.ts';
+import {  ClickAwayListener } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
@@ -45,6 +46,7 @@ export const UpperBar: FC = () => {
   };
 
   return (
+    <ClickAwayListener onClickAway={() => setMenuOpened(false)}>
     <div className={DEFAULT_CLASSNAME}>
       <div className={`${DEFAULT_CLASSNAME}_notifications`}>
         <NotificationIcon />
@@ -78,5 +80,6 @@ export const UpperBar: FC = () => {
         </div>
       )}
     </div>
+    </ClickAwayListener>
   );
 };

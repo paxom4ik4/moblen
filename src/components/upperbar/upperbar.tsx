@@ -16,6 +16,7 @@ import { logoutUser } from 'services/login/login.ts';
 import { clearLocalStorage } from 'utils/app.utils.ts';
 import { useMutation } from 'react-query';
 import { Notification } from '../../common/notification/notification.tsx';
+import {  ClickAwayListener } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
@@ -53,6 +54,7 @@ export const UpperBar: FC = () => {
   };
 
   return (
+    <ClickAwayListener onClickAway={() => setMenuOpened(false)}>
     <div className={DEFAULT_CLASSNAME}>
       {logoutMutation.isLoading && (
         <Notification
@@ -95,5 +97,6 @@ export const UpperBar: FC = () => {
         </div>
       )}
     </div>
+    </ClickAwayListener>
   );
 };

@@ -146,7 +146,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               onChange={(e) => setNewAssetText(e.target.value)}
               placeholder={'Описание картинки'}
               className={`${DEFAULT_CLASSNAME}_new-assets_content_text`}
-            />
+            /> 
             <div className={`${DEFAULT_CLASSNAME}_new-asset_buttons`}>
               <button onClick={closeNewAssetHandler}>
                 <CloseIcon />

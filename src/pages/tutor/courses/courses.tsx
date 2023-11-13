@@ -32,6 +32,7 @@ import './courses.scss';
 import { DateCalendar } from '@mui/x-date-pickers';
 import { ConfirmModal } from '../../../components/confirm-modal/confirm-modal.tsx';
 import { Notification } from '../../../common/notification/notification.tsx';
+import { Tooltip } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -446,9 +447,13 @@ const Courses: FC = memo(() => {
         )}
       </div>
 
-      <div ref={drop} className={`${DEFAULT_CLASSNAME}_delete ${isOver && 'courses-delete-drop'}`}>
-        <TrashIcon />
-      </div>
+      <Tooltip title="Удалить">
+        <div
+          ref={drop}
+          className={`${DEFAULT_CLASSNAME}_delete ${isOver && 'courses-delete-drop'}`}>
+          <TrashIcon />
+        </div>
+      </Tooltip>
     </div>
   );
 });

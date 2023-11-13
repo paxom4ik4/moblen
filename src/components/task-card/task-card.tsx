@@ -11,6 +11,7 @@ import { Typography } from 'common/typography/typography.tsx';
 import { Asset } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { createTask, deleteTask } from 'services/tasks';
+import { Tooltip } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -146,7 +147,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               onChange={(e) => setNewAssetText(e.target.value)}
               placeholder={'Описание картинки'}
               className={`${DEFAULT_CLASSNAME}_new-assets_content_text`}
-            /> 
+            />
             <div className={`${DEFAULT_CLASSNAME}_new-asset_buttons`}>
               <button onClick={closeNewAssetHandler}>
                 <CloseIcon />
@@ -256,14 +257,18 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       )}
 
       {!editModeDisabled && !isCreateMode && (
-        <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
-          <TrashIcon />
-        </div>
+        <Tooltip title={'Удалить'}>
+          <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
+            <TrashIcon />
+          </div>
+        </Tooltip>
       )}
       {isCreateMode && (
-        <div className={`${DEFAULT_CLASSNAME}_save`} onClick={saveNewTaskHandler}>
-          <CheckIcon />
-        </div>
+        <Tooltip title={'Сохранить'}>
+          <div className={`${DEFAULT_CLASSNAME}_save`} onClick={saveNewTaskHandler}>
+            <CheckIcon />
+          </div>
+        </Tooltip>
       )}
     </div>
   );

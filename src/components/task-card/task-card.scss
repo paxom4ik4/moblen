@@ -120,13 +120,22 @@
     }
   }
 
+  &_trash svg {
+    width: 28px;
+    height: 28px;
+  }
+
   &_trash,
   &_save {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: absolute;
     right: 12px;
-    bottom: 8px;
+    bottom: 12px;
     transition: 0.3s;
     z-index: 5;
+
 
     &:hover {
       cursor: pointer;

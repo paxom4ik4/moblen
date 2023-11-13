@@ -24,8 +24,11 @@ const TestResult: FC = memo(() => {
 
   const { name, id: taskListId, selectedStudent } = currentTaskList!;
 
-  const { data: tasks } = useQuery('completedTasks', () =>
-    getCompletedTaskList({ list_uuid: taskListId ?? id, student_uuid: selectedStudent ?? uuid }),
+  const { data: tasks } = useQuery(['completedTasks', selectedStudent, uuid], () =>
+    getCompletedTaskList({
+      list_uuid: taskListId ?? id,
+      student_uuid: selectedStudent?.length ? selectedStudent : uuid,
+    }),
   );
 
   const [maxScore, setMaxScore] = useState(0);

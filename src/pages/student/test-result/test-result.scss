@@ -1,14 +1,19 @@
 .test-result {
   width: 100%;
   max-height: 100%;
+  min-height: 100%;
   position: relative;
-  top: -32px;
+  top: -28px;
+
+  .task-pass-card_criteria-container {
+    top: 0;
+  }
 
   &_title {
     display: flex;
     flex-direction: row;
     gap: 32px;
-    margin-bottom: 32px;
+    margin-bottom: 16px;
 
     &_maxScore p {
       color: #f77126;
@@ -27,17 +32,21 @@
 
     &_item {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       gap: 20px;
       border-radius: 15px;
 
       &_task {
-        width: 50%;
+        width: 100%;
       }
 
       &_analytics {
+        gap: 12px;
+        display: flex;
+        flex-direction: column;
         padding: 16px;
-        width: 50%;
+        margin-left: 1px;
+        width: 100%;
         background-color: #fefbff;
         border-radius: 15px;
         box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);

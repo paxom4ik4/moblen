@@ -37,6 +37,7 @@ interface CoursesShareProps {
     name: string;
     task_amount: number;
   };
+  setTaskListShared: Dispatch<SetStateAction<boolean>>;
 }
 
 export const CoursesShare: FC<CoursesShareProps> = (props) => {
@@ -44,7 +45,7 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
 
   const { data: groups } = useQuery('groups', () => getTutorGroups(userData!.uuid));
 
-  const { setTestToShare, testToShare } = props;
+  const { setTestToShare, testToShare, setTaskListShared } = props;
 
   const [withDeadline, setWithDeadline] = useState(false);
   const [withTimeLimit, setWithTimeLimit] = useState(false);
@@ -73,6 +74,8 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
       deadline: withDeadline ? dayjs(deadline).format('YYYY-MM-DDThh:mm:ss.SSSZ') : 'null',
       time_limit: withTimeLimit ? Number(timeLimit) : 'null',
     });
+
+    setTaskListShared(true);
   };
 
   return (

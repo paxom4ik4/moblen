@@ -24,6 +24,36 @@ const studentAPI = {
       (res) => res.data,
     );
   },
+  getCompletedTaskList: ({
+    student_uuid,
+    list_uuid,
+  }: {
+    student_uuid: string;
+    list_uuid: string;
+  }) => {
+    return API.get(`${STUDENT_URL}/${student_uuid}/completed-tasks/by-tasklist/${list_uuid}`).then(
+      (res) => res.data,
+    );
+  },
+  sendTaskListAnswers: ({
+    student_uuid,
+    list_uuid,
+    answers,
+  }: {
+    student_uuid: string;
+    list_uuid: string;
+    answers: { task_uuid: string; answer: string }[];
+  }) => {
+    return API.post(`${STUDENT_URL}/${student_uuid}/send-tasklist/${list_uuid}/`, answers).then(
+      (res) => res.data,
+    );
+  },
 };
 
-export const { getStudentInfo, deleteFromGroup, getStudentTaskLists } = studentAPI;
+export const {
+  getStudentInfo,
+  deleteFromGroup,
+  getStudentTaskLists,
+  getCompletedTaskList,
+  sendTaskListAnswers,
+} = studentAPI;

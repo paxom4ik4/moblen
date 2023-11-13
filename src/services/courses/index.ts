@@ -24,10 +24,8 @@ const coursesAPI = {
       (res) => res.data,
     );
   },
-  deleteCourse: ({ tutorId, course_uuid }: { tutorId: string; course_uuid: string }) => {
-    return API.delete(`${COURSES_API_URL}/by-tutor/${tutorId}/${course_uuid}`).then(
-      (res) => res.data,
-    );
+  deleteCourse: ({ course_uuid }: { course_uuid: string }) => {
+    return API.delete(`${COURSES_API_URL}/${course_uuid}/`).then((res) => res.data);
   },
 };
 
@@ -35,7 +33,7 @@ const coursesAPI = {
 
 const topicsAPI = {
   createTopic: ({ course_uuid, topic_name }: { course_uuid: string; topic_name: string }) => {
-    return API.post(`${TOPICS_API_URL}/by-courses/${course_uuid}`, {
+    return API.post(`${TOPICS_API_URL}/by-courses/${course_uuid}/`, {
       topic_name,
       course_uuid,
     }).then((res) => res.data);
@@ -58,10 +56,8 @@ const topicsAPI = {
       course_uuid: courseId,
     }).then((res) => res.data);
   },
-  deleteTopic: ({ course_uuid, topic_uuid }: { course_uuid: string; topic_uuid: string }) => {
-    return API.delete(`${TOPICS_API_URL}/by-course/${course_uuid}/${topic_uuid}`).then(
-      (res) => res.data,
-    );
+  deleteTopic: ({ topic_uuid }: { topic_uuid: string }) => {
+    return API.delete(`${TOPICS_API_URL}/${topic_uuid}/`).then((res) => res.data);
   },
 };
 

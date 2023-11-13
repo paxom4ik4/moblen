@@ -27,13 +27,13 @@ button:disabled, button:disabled:hover {
 }
 
 .app {
-  width: calc(100vw - 132px);
-  height: calc(100vh - 140px);
+  width: calc(100vw - 120px);
+  height: calc(100vh - 120px);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 112px;
-  margin-top: 120px;
+  margin-left: 100px;
+  margin-top: 100px;
 
   &_title {
     display: flex;
@@ -41,7 +41,7 @@ button:disabled, button:disabled:hover {
     flex-direction: row;
     position: absolute;
     top: 32px;
-    left: 112px;
+    left: 100px;
     font-size: 20px;
     gap: 8px;
 

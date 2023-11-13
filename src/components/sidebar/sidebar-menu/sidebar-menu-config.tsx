@@ -21,6 +21,7 @@ export const sidebarMenuConfig: SidebarMenuItem[] = [
   {
     path: '/results',
     icon: <StatisticsIcon />,
+    disabled: true,
   },
   {
     path: '/assignments',

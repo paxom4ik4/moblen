@@ -12,11 +12,14 @@ import { Tutor } from 'types/tutor.ts';
 import { RootState } from 'store/store.ts';
 import { setActiveCourse, setActiveTopic, setActiveTutor } from 'store/student/student.slice.ts';
 import { TaskList } from 'types/task.ts';
+import { Notification } from 'common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'tests';
 
 interface TestsProps {
   resultsView?: boolean;
+  studentId?: string;
+  selectedStudent?: string;
 }
 
 const Tests: FC<TestsProps> = memo((props) => {
@@ -25,7 +28,7 @@ const Tests: FC<TestsProps> = memo((props) => {
     (state: RootState) => state.student,
   );
 
-  const { resultsView = false } = props;
+  const { resultsView = false, selectedStudent } = props;
 
   const { userData } = useSelector((state: RootState) => state.userData);
 
@@ -33,14 +36,19 @@ const Tests: FC<TestsProps> = memo((props) => {
     data: studentData,
     isLoading: isStudentDataLoading,
     isLoadingError,
-  } = useQuery('studentData', () => getStudentInfo(userData!.uuid));
+  } = useQuery(['studentData'], () =>
+    getStudentInfo(resultsView ? selectedStudent! : userData!.uuid),
+  );
 
   const {
     data: studentTaskLists,
     isLoading: isDataLoading,
     isLoadingError: isTaskListLoadingError,
-  } = useQuery(['taskLists', activeTutor], () =>
-    getStudentTaskLists({ student_uuid: userData!.uuid!, tutor_uuid: activeTutor ?? null }),
+  } = useQuery(['taskLists', activeTutor, selectedStudent], () =>
+    getStudentTaskLists({
+      student_uuid: resultsView ? selectedStudent! : userData!.uuid,
+      tutor_uuid: resultsView ? userData!.uuid : activeTutor,
+    }),
   );
 
   const [topics, setTopics] = useState<{ topic_uuid: string; topic_name: string }[]>([]);
@@ -48,19 +56,41 @@ const Tests: FC<TestsProps> = memo((props) => {
 
   useEffect(() => {
     batch(() => {
-      dispatch(setActiveTopic(null));
-      dispatch(setActiveCourse(null));
+      if (activeTutor && studentTaskLists) {
+        batch(() => {
+          dispatch(
+            setActiveCourse({
+              id: studentTaskLists[0].course_uuid,
+              name: studentTaskLists[0].course_name,
+            }),
+          );
+
+          dispatch(
+            setActiveTopic({
+              id: studentTaskLists[0].topics[0].topic_uuid,
+              name: studentTaskLists[0].topics[0].topic_name,
+            }),
+          );
+        });
+      }
     });
-  }, [activeTutor]);
+  }, [activeTutor, studentTaskLists]);
 
   useEffect(() => {
-    const currentTopics = studentTaskLists?.find(
-      (item: { course_uuid: string }) => item.course_uuid === activeCourse?.id,
-    )?.topics;
+    if (studentTaskLists?.length) {
+      const currentTopics = studentTaskLists?.find(
+        (item: { course_uuid: string }) => item.course_uuid === activeCourse?.id,
+      )?.topics;
 
-    setTopics(currentTopics);
-    dispatch(setActiveTopic(null));
-  }, [activeCourse]);
+      if (currentTopics?.length) {
+        setTopics(currentTopics);
+
+        dispatch(
+          setActiveTopic({ id: currentTopics[0].topic_uuid, name: currentTopics[0].topic_name }),
+        );
+      }
+    }
+  }, [activeCourse, studentTaskLists]);
 
   useEffect(() => {
     const currentTopics = studentTaskLists?.find(
@@ -73,6 +103,14 @@ const Tests: FC<TestsProps> = memo((props) => {
 
     setTaskLists(currentTaskLists ?? []);
   }, [activeTopic]);
+
+  useEffect(() => {
+    if (studentData?.tutors?.length && !activeTutor) {
+      dispatch(setActiveTutor(studentData.tutors[0].tutor_uuid));
+    }
+  }, [studentData]);
+
+  const [testPassed, setTestPassed] = useState(false);
 
   if (isStudentDataLoading || isDataLoading) {
     return <Typography>Загрузка...</Typography>;
@@ -92,8 +130,19 @@ const Tests: FC<TestsProps> = memo((props) => {
 
   const showTasks = activeCourse && activeTopic && !!taskLists?.length;
 
+  const resultTaskList = resultsView
+    ? taskLists.filter((list: TaskList) => list.status[0] === 'решено')
+    : taskLists;
+
   return (
     <>
+      <Notification
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        autoHideDuration={3000}
+        message={'Тест отправлен на проверку'}
+        open={testPassed}
+        onClose={() => setTestPassed(!testPassed)}
+      />
       {!resultsView && (
         <div className={`${DEFAULT_CLASSNAME}_tutors`}>
           {!!studentData?.tutors &&
@@ -178,14 +227,16 @@ const Tests: FC<TestsProps> = memo((props) => {
             </div>
             <div className={`${DEFAULT_CLASSNAME}_tasks`}>
               {showTasks &&
-                taskLists.map((test: TaskList) => (
+                resultTaskList.map((test: TaskList) => (
                   <StudentTestCard
+                    selectedStudent={selectedStudent}
+                    resultsView={resultsView}
                     key={test.list_uuid}
                     id={test.list_uuid}
                     name={test.list_name}
                     subject={activeCourse.name}
                     topic={activeTopic.name}
-                    status={'pending'}
+                    status={test.status}
                     tasksAmount={test.task_count}
                   />
                 ))}

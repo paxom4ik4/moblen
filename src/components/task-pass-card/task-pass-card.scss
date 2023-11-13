@@ -1,23 +1,28 @@
 .task-pass-card {
   background-color: #e1e2ec;
-  border-radius: 15px 15px 0 0;
+  border-radius: 0 0 15px 15px;
   padding: 16px;
   position: relative;
   width: 100%;
 
   &_criteria-container {
     position: relative;
-    top: 0;
+    top: -20px;
     width: calc(100% - 2px);
     margin-left: 1px;
-    padding: 24px 12px;
-    border-radius: 0 0 15px 15px;
+    padding: 20px 12px;
+    border-radius: 15px;
     box-shadow: 0 0 2px 1px rgba(0, 0, 0, 0.3);
+
+    &_title {
+      margin-bottom: 12px;
+    }
   }
 
   &_upper {
+    width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 16px;
   }
 
@@ -110,7 +115,7 @@
 
   &_task,
   &_criteria {
-    width: 50%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;

@@ -1,4 +1,4 @@
-import { FC, useState, MouseEvent, useEffect, memo } from 'react';
+import { FC, useState, useEffect, memo } from 'react';
 import { useDrop } from 'react-dnd';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,6 +30,8 @@ import { setActiveCourse, setActiveTopic } from 'store/courses/courses.slice.ts'
 
 import './courses.scss';
 import { DateCalendar } from '@mui/x-date-pickers';
+import { ConfirmModal } from '../../../components/confirm-modal/confirm-modal.tsx';
+import { Notification } from '../../../common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -89,29 +91,23 @@ const Courses: FC = memo(() => {
   );
 
   const deleteTaskListMutation = useMutation(
-    (data: { topic_uuid: string; list_uuid: string }) => deleteTaskList(data),
+    (data: { list_uuid: string }) => deleteTaskList(data),
     {
       onSuccess: () => queryClient.invalidateQueries('taskList'),
     },
   );
 
-  const deleteCourseMutation = useMutation(
-    (data: { course_uuid: string; tutorId: string }) => deleteCourse(data),
-    {
-      onSuccess: () => queryClient.invalidateQueries('courses'),
-    },
-  );
+  const deleteCourseMutation = useMutation((data: { course_uuid: string }) => deleteCourse(data), {
+    onSuccess: () => queryClient.invalidateQueries('courses'),
+  });
 
-  const deleteTopicMutation = useMutation(
-    (data: { course_uuid: string; topic_uuid: string }) => deleteTopic(data),
-    {
-      onSuccess: () => queryClient.invalidateQueries('topics'),
-    },
-  );
+  const deleteTopicMutation = useMutation((data: { topic_uuid: string }) => deleteTopic(data), {
+    onSuccess: () => queryClient.invalidateQueries('topics'),
+  });
 
   const handleDeleteTest = async (id: string) => {
     if (activeTopic) {
-      await deleteTaskListMutation.mutate({ list_uuid: id, topic_uuid: activeTopic! });
+      await deleteTaskListMutation.mutate({ list_uuid: id });
     }
   };
 
@@ -145,26 +141,29 @@ const Courses: FC = memo(() => {
     }
   };
 
-  const deleteCourseHandler = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-
+  const deleteCourseHandler = async () => {
     if (activeCourse) {
-      await deleteCourseMutation.mutate({ course_uuid: activeCourse, tutorId: userData!.uuid });
+      await deleteCourseMutation.mutate({ course_uuid: activeCourse });
       setActiveCourse(null);
       setActiveTopic(null);
     }
+
+    setIsCourseDeleting(false);
   };
 
-  const deleteTopicHandler = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-
+  const deleteTopicHandler = async () => {
     if (activeCourse && activeTopic) {
-      await deleteTopicMutation.mutate({ course_uuid: activeCourse, topic_uuid: activeTopic });
+      await deleteTopicMutation.mutate({ topic_uuid: activeTopic });
 
       setActiveCourse(null);
       setActiveTopic(null);
     }
+
+    setIsTopicDeleting(false);
   };
+
+  const [isCourseDeleting, setIsCourseDeleting] = useState(false);
+  const [isTopicDeleting, setIsTopicDeleting] = useState(false);
 
   // creating / editing topics
   const [addNewTopic, setAddNewTopic] = useState(false);
@@ -174,6 +173,7 @@ const Courses: FC = memo(() => {
   const [isCreatingNewTest, setIsCreatingNewTest] = useState<{
     list_uuid: string;
     list_name: string;
+    editable: boolean;
   } | null>(null);
   const [isTaskListCreating, setIsTaskListCreating] = useState(false);
 
@@ -200,6 +200,8 @@ const Courses: FC = memo(() => {
 
   const [calendarOpened, setCalendarOpened] = useState<boolean>(false);
 
+  const [taskListShared, setTaskListShared] = useState(false);
+
   const createNewTestContent = (
     <div className={`${DEFAULT_CLASSNAME}_new-test_modal`}>
       <div
@@ -219,7 +221,9 @@ const Courses: FC = memo(() => {
                 taskListName: isCreatingNewTest!.list_name,
               }),
             );
-            navigate(`/assignments/create-test/${isCreatingNewTest.list_uuid}`);
+            navigate(
+              `/assignments/create-test/${isCreatingNewTest.list_uuid}?editable=${isCreatingNewTest.editable}`,
+            );
             setIsCreatingNewTest(null);
           }
         }}>
@@ -247,7 +251,8 @@ const Courses: FC = memo(() => {
     </div>
   );
 
-  const showBackgroundShadow = isCreatingNewTest || testToShare || calendarOpened;
+  const showBackgroundShadow =
+    isCreatingNewTest || testToShare || calendarOpened || isCourseDeleting || isTopicDeleting;
 
   if (isLoading) {
     return (
@@ -267,11 +272,41 @@ const Courses: FC = memo(() => {
 
   return (
     <div className={DEFAULT_CLASSNAME}>
+      <Notification
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        autoHideDuration={3000}
+        message={'Задание отправлено по группам'}
+        open={taskListShared}
+        onClose={() => setTaskListShared(!taskListShared)}
+      />
+
       {showBackgroundShadow && <div className={`backdrop-shadow`} />}
 
-      {testToShare && <CoursesShare testToShare={testToShare} setTestToShare={setTestToShare} />}
+      {testToShare && (
+        <CoursesShare
+          setTaskListShared={setTaskListShared}
+          testToShare={testToShare}
+          setTestToShare={setTestToShare}
+        />
+      )}
       {!!isCreatingNewTest && createNewTestContent}
       {calendarOpened && calendarContent}
+
+      {isCourseDeleting && (
+        <ConfirmModal
+          label={`курс ${activeCourseName}`}
+          reject={() => setIsCourseDeleting(false)}
+          confirm={deleteCourseHandler}
+        />
+      )}
+
+      {isTopicDeleting && (
+        <ConfirmModal
+          label={`тему ${activeTopicName}`}
+          confirm={deleteTopicHandler}
+          reject={() => setIsTopicDeleting(false)}
+        />
+      )}
 
       <div className={`${DEFAULT_CLASSNAME}_subjects`}>
         <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
@@ -290,7 +325,7 @@ const Courses: FC = memo(() => {
                 </Typography>
                 {course.course_uuid === activeCourse && (
                   <button
-                    onClick={deleteCourseHandler}
+                    onClick={() => setIsCourseDeleting(true)}
                     className={`${DEFAULT_CLASSNAME}_list-item_delete`}>
                     <TrashIcon />
                   </button>
@@ -300,6 +335,7 @@ const Courses: FC = memo(() => {
           {addNewCourse && (
             <div className={`${DEFAULT_CLASSNAME}_subjects_list-item`}>
               <input
+                autoFocus={true}
                 onChange={(e) => setNewSubjectName(e.currentTarget.value)}
                 value={newSubjectName}
                 placeholder={'Новый предмет'}
@@ -336,7 +372,7 @@ const Courses: FC = memo(() => {
                   </Typography>
                   {topic.topic_uuid === activeTopic && (
                     <button
-                      onClick={deleteTopicHandler}
+                      onClick={() => setIsTopicDeleting(true)}
                       className={`${DEFAULT_CLASSNAME}_list-item_delete`}>
                       <TrashIcon />
                     </button>
@@ -346,6 +382,7 @@ const Courses: FC = memo(() => {
             {addNewTopic && (
               <div className={`${DEFAULT_CLASSNAME}_topics_list-item`}>
                 <input
+                  autoFocus={true}
                   onChange={(e) => setNewTopicName(e.currentTarget.value)}
                   value={newTopicName}
                   placeholder={'Новая тема'}
@@ -378,7 +415,11 @@ const Courses: FC = memo(() => {
           taskList.map((test) => (
             <TestCard
               onClick={() =>
-                setIsCreatingNewTest({ list_uuid: test.list_uuid, list_name: test.list_name })
+                setIsCreatingNewTest({
+                  list_uuid: test.list_uuid,
+                  list_name: test.list_name,
+                  editable: test.editable,
+                })
               }
               id={test.list_uuid}
               name={test.list_name}

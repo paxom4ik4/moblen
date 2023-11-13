@@ -12,6 +12,13 @@ export interface Task {
   format: string;
 }
 
+export interface CompletedTask {
+  answer: string;
+  response: string;
+  score: string;
+  task: Task;
+}
+
 export interface TaskList {
   list_uuid: string;
   list_name: string;
@@ -22,6 +29,7 @@ export interface TaskList {
   replay: boolean;
   see_answers: boolean;
   see_criteria: boolean;
+  status: [string, number?, number?];
 }
 
 export interface TaskWithAnswer extends Task {

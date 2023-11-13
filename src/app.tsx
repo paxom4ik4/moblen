@@ -135,6 +135,7 @@ const App: FC = () => {
     <>
       <Route path={TutorRoutes.RESULTS} element={<Results />} />
       <Route path={TutorRoutes.GROUPS} element={<Groups />} />
+      <Route path={TutorRoutes.GROUPS_RESULT} element={<TestResult />} />
       <Route path={TutorRoutes.CREATE_TEST} element={<CreateTest />} />
       <Route path={TutorRoutes.ASSIGNMENTS} element={<Courses />} />
     </>

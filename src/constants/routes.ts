@@ -1,6 +1,7 @@
 export enum TutorRoutes {
   RESULTS = '/results',
   GROUPS = '/groups',
+  GROUPS_RESULT = '/groups/result/:id',
   ASSIGNMENTS = '/assignments',
   CREATE_TEST = '/assignments/create-test/:id',
 }

@@ -15,9 +15,9 @@ import './group-card.scss';
 
 import { createTutorGroup } from 'services/tutor';
 import { addNewStudent, deleteGroup, editGroupName, refreshGroupLink } from 'services/groups';
-import { deleteFromGroup } from '../../services/student/student.ts';
-import { Notification } from '../../common/notification/notification.tsx';
-import { Typography } from '../../common/typography/typography.tsx';
+import { deleteFromGroup } from 'services/student/student.ts';
+import { Notification } from 'common/notification/notification.tsx';
+import { Typography } from 'common/typography/typography.tsx';
 
 const DEFAULT_CLASSNAME = 'group-card';
 
@@ -150,9 +150,9 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
   return (
     <div
       ref={drop}
-      className={`${DEFAULT_CLASSNAME} ${
-        active && `active-${DEFAULT_CLASSNAME}`
-      } ${isOver} && group-card-drop`}
+      className={`${DEFAULT_CLASSNAME} ${active && `active-${DEFAULT_CLASSNAME}`} ${
+        isOver && 'group-card-drop'
+      } ${isNewGroupCreating && `${DEFAULT_CLASSNAME}_creating_new`}`}
       onClick={onClick ?? onGroupCartClickHandler}>
       {!hideIcon && (
         <div className={`${DEFAULT_CLASSNAME}_icon`}>
@@ -177,6 +177,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
           <input
             onChange={(e) => setNewGroupName(e.currentTarget.value)}
             className={`${DEFAULT_CLASSNAME}_text-name`}
+            autoFocus={true}
             value={newGroupName}
           />
         )}

@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
 
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
@@ -6,10 +6,12 @@ import { Typography } from 'common/typography/typography.tsx';
 import { Asset, TaskWithAnswer } from 'types/task.ts';
 
 import './task-pass-card.scss';
+import { Answers } from 'pages/student/pass-test/pass-test.tsx';
 
 const DEFAULT_CLASSNAME = 'task-pass-card';
 
 interface TaskPassCardProps {
+  id: string;
   answer?: string;
   mode?: 'view' | 'pass';
   text: string;
@@ -20,13 +22,34 @@ interface TaskPassCardProps {
   taskAssets?: Asset[];
   setTasksWithStudentAnswers?: Dispatch<SetStateAction<TaskWithAnswer[]>>;
   tasksWithStudentAnswers?: TaskWithAnswer[];
+
+  currentScore?: string;
+
+  answers?: Answers;
+  onAnswerChange?: (id: string, answer: string) => void;
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
-  const { answer, mode = 'pass', text, maxScore, index, taskAssets, criteria } = props;
+  const {
+    answers,
+    onAnswerChange,
+    answer,
+    id,
+    mode = 'pass',
+    text,
+    maxScore,
+    index,
+    taskAssets,
+    criteria,
+    currentScore,
+  } = props;
 
-  const [studentAnswer, setStudentAnswer] = useState('');
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
+
+  const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    const newAnswer = event.target.value;
+    onAnswerChange!(id, newAnswer);
+  };
 
   return (
     <>
@@ -46,10 +69,10 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
               <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
                 {mode === 'pass' && (
                   <textarea
-                    rows={5}
+                    rows={1}
                     placeholder={'Запишите ответ...'}
-                    value={studentAnswer}
-                    onChange={(e) => setStudentAnswer(e.currentTarget.value)}
+                    value={answers![id]}
+                    onChange={(e) => handleInputChange(e)}
                   />
                 )}
                 {mode === 'view' && <Typography>{answer}</Typography>}
@@ -61,7 +84,9 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
         <div className={`${DEFAULT_CLASSNAME}_task_score`}>
           <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
             <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-              <Typography weight={'bold'}>Баллов: {maxScore}</Typography>
+              <Typography weight={'bold'}>
+                {`Баллов: ${currentScore ? `${currentScore} / ${maxScore}` : maxScore}`}
+              </Typography>
             </div>
           </div>
 
@@ -94,6 +119,9 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
 
       {isCriteriaOpened && (
         <div className={`${DEFAULT_CLASSNAME}_criteria-container`}>
+          <Typography size={'small'} className={`${DEFAULT_CLASSNAME}_criteria-container_title`}>
+            Критерии
+          </Typography>
           <Typography>{criteria}</Typography>
         </div>
       )}

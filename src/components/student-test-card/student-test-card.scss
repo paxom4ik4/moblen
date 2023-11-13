@@ -3,6 +3,7 @@
   flex-direction: column;
   border-radius: 0 15px 15px 15px;
   background: #ffffff;
+  min-width: 278px;
 
   &_status {
     outline: none;
@@ -22,25 +23,25 @@
     }
   }
 
-  &:nth-child(1n) .student-test-card_color {
-    background-color: #f77126;
-  }
-
-  &:nth-child(2n) .student-test-card_color {
+  &_color.red {
     background-color: #dd4848;
   }
-
-  &:nth-child(3n) .student-test-card_color {
+  &_color.orange {
+    background-color: #f77126;
+  }
+  &_color.yellow {
     background-color: #efc222;
   }
-
-  &:nth-child(4n) .student-test-card_color {
+  &_color.light-green {
     background-color: #92e20e;
+  }
+  &_color.green {
+    background-color: #16ff05;
   }
 
   &_color {
-    width: 90px;
-    height: 80px;
+    width: 72px;
+    height: 72px;
     border-radius: 0 15px 0 0;
   }
 

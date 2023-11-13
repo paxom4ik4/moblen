@@ -21,15 +21,7 @@ export interface StudentCardProps {
 }
 
 export const StudentCard: FC<StudentCardProps> = (props) => {
-  const {
-    active = false,
-    groupId,
-    id,
-    name = 'Студент',
-    surname = 'Студентович',
-    imgUrl,
-    resultsViewMode = false,
-  } = props;
+  const { active = false, groupId, id, name = 'Студент', surname = 'Студентович', imgUrl } = props;
 
   const dispatch = useDispatch();
 
@@ -39,9 +31,7 @@ export const StudentCard: FC<StudentCardProps> = (props) => {
     collect: (monitor) => ({ isDragging: monitor.isDragging() }),
   });
 
-  const handleStudentClick = () => {
-    resultsViewMode && dispatch(setSelectedStudent(id));
-  };
+  const handleStudentClick = () => dispatch(setSelectedStudent(id));
 
   return (
     <div

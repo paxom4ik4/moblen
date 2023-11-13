@@ -69,7 +69,10 @@ const tasksAPI = {
   deleteTask: ({ taskId }: { taskId: string }) => {
     return API.delete(`${TASK_URL}/${taskId}/`).then((res) => res.data);
   },
+  getAllFormats: () => {
+    return API.get(`${TASK_URL}/get-all-formats/`).then((res) => res.data);
+  },
 };
 
 export const { getTaskList, deleteTaskList, createTaskList, shareTaskList } = tasklistAPI;
-export const { getTasks, createTask, deleteTask } = tasksAPI;
+export const { getTasks, createTask, deleteTask, getAllFormats } = tasksAPI;

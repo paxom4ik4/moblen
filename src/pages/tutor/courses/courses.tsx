@@ -106,15 +106,18 @@ const Courses: FC = memo(() => {
     onSuccess: () => queryClient.invalidateQueries('topics'),
   });
 
-  const handleDeleteTest = async (id: string) => {
+  const [isTestDeleting, setIsTestDeleting] = useState<false | string>(false);
+
+  const handleDeleteTest = async () => {
     if (activeTopic) {
-      await deleteTaskListMutation.mutate({ list_uuid: id });
+      await deleteTaskListMutation.mutate({ list_uuid: isTestDeleting.toString() });
+      setIsTestDeleting(false);
     }
   };
 
   const [{ isOver }, drop] = useDrop(() => ({
     accept: DraggableTypes.TEST_CARD,
-    drop: (item: { id: string }) => handleDeleteTest(item.id),
+    drop: (item: { id: string }) => setIsTestDeleting(item.id),
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
@@ -253,7 +256,12 @@ const Courses: FC = memo(() => {
   );
 
   const showBackgroundShadow =
-    isCreatingNewTest || testToShare || calendarOpened || isCourseDeleting || isTopicDeleting;
+    isCreatingNewTest ||
+    testToShare ||
+    calendarOpened ||
+    isCourseDeleting ||
+    isTopicDeleting ||
+    isTestDeleting;
 
   if (isLoading) {
     return (
@@ -309,11 +317,20 @@ const Courses: FC = memo(() => {
         />
       )}
 
+      {isTestDeleting && (
+        <ConfirmModal
+          label={'список заданий'}
+          confirm={handleDeleteTest}
+          reject={() => setIsTestDeleting(false)}
+        />
+      )}
+
       <div className={`${DEFAULT_CLASSNAME}_subjects`}>
         <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
           {!!courses?.length &&
             courses.map((course) => (
               <div
+                key={course.course_uuid}
                 onClick={() => {
                   dispatch(setActiveCourse(course.course_uuid));
                   dispatch(setActiveTopic(null));
@@ -362,6 +379,7 @@ const Courses: FC = memo(() => {
               !isTopicsLoading &&
               topics.map((topic) => (
                 <div
+                  key={topic.topic_uuid}
                   className={`${DEFAULT_CLASSNAME}_topics_list-item ${
                     topic.topic_uuid === activeTopic && 'active-topic'
                   }`}

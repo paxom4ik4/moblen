@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useQuery } from 'react-query';
-import { getTasks } from 'services/tasks';
+import { getAllFormats, getTasks } from 'services/tasks';
 import { TutorRoutes } from 'constants/routes.ts';
 import { Task } from 'types/task.ts';
 
@@ -24,6 +24,8 @@ const CreateTest: FC = memo(() => {
 
   const { id: paramsTaskListId } = useParams();
   const isEditModeDisabled = location.href.includes('editable=false');
+
+  const { data: taskFormats } = useQuery('formats', () => getAllFormats());
 
   const { taskListId, taskListName, courseName, topicName } = useSelector(
     (store: RootState) => store.createTask,
@@ -87,6 +89,7 @@ const CreateTest: FC = memo(() => {
         {!!tasksData?.length &&
           tasksData?.map((task: Task, index: number) => (
             <TaskCard
+              key={task.task_uuid}
               taskId={task.task_uuid}
               taskListId={taskListId!}
               text={task.task_condition}
@@ -100,6 +103,7 @@ const CreateTest: FC = memo(() => {
 
         {isNewTask && (
           <TaskCard
+            taskFormats={taskFormats}
             taskListId={taskListId!}
             isCreateMode
             setIsCreatingMode={setIsNewTask}

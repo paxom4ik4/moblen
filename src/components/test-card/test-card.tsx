@@ -109,7 +109,7 @@ export const TestCardCreate: FC<TestCardCreateProps> = (props) => {
           type={'text'}
           value={newTaskListName}
           onChange={(e) => setNewTaskListName(e.currentTarget.value)}
-          placeholder={'Введите название теста...'}
+          placeholder={'Введите название списка заданий...'}
         />
       </div>
       <div className={`${DEFAULT_CLASSNAME}_share`} onClick={handleNewTaskListCreate}>

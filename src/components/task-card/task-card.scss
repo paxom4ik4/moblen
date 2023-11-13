@@ -4,6 +4,10 @@
   padding: 16px 24px 16px 12px;
   position: relative;
 
+  .MuiSelect-select {
+    padding: 4px !important;
+  }
+
   &_upper {
     display: flex;
     flex-direction: row;

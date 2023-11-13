@@ -11,7 +11,7 @@ import { Typography } from 'common/typography/typography.tsx';
 import { Asset } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { createTask, deleteTask } from 'services/tasks';
-import { Tooltip } from '@mui/material';
+import { MenuItem, Select, SelectChangeEvent, Tooltip } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -28,6 +28,11 @@ export interface TaskCardProps {
   isCreateMode?: boolean;
   editModeDisabled?: boolean;
   setIsCreatingMode?: Dispatch<SetStateAction<boolean>>;
+
+  taskFormats?: {
+    subject: string;
+    task_format: string;
+  }[];
 }
 
 export const TaskCard: FC<TaskCardProps> = (props) => {
@@ -43,6 +48,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     index,
     taskAssets,
     editModeDisabled = false,
+    taskFormats = [],
   } = props;
 
   const queryClient = useQueryClient();
@@ -51,6 +57,10 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const [taskCriteria, setTaskCriteria] = useState<string>(criteria);
   const [taskFormat, setTaskFormat] = useState<string>(criteria);
   const [taskMaxScore, setTaskMaxScore] = useState<number | null>(maxScore);
+
+  const handleFormatChange = (event: SelectChangeEvent) => {
+    setTaskFormat(event.target.value as string);
+  };
 
   // assets
   const [assets, setAssets] = useState<Asset[]>(taskAssets ?? []);
@@ -195,12 +205,17 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
               <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
               {isCreateMode && (
-                <input
+                <Select
                   placeholder={'Формат задания'}
                   value={taskFormat}
-                  type={'text'}
-                  onChange={(e) => setTaskFormat(e.currentTarget.value)}
-                />
+                  onChange={handleFormatChange}
+                  multiple={false}>
+                  {taskFormats.map((item) => (
+                    <MenuItem key={item.task_format} value={item.task_format}>
+                      {item.task_format}
+                    </MenuItem>
+                  ))}
+                </Select>
               )}
               {!isCreateMode && <Typography>{format}</Typography>}
             </div>
@@ -233,7 +248,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       {isCreateMode && !!assets.length && (
         <div className={`${DEFAULT_CLASSNAME}_files`}>
           {assets.map((asset) => (
-            <div className={`${DEFAULT_CLASSNAME}_files_item`}>
+            <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
               <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
               <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
                 {asset.text}
@@ -246,7 +261,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       {!!taskAssets?.length && (
         <div className={`${DEFAULT_CLASSNAME}_files`}>
           {assets.map((asset) => (
-            <div className={`${DEFAULT_CLASSNAME}_files_item`}>
+            <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
               <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
               <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
                 {asset.text}

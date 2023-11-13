@@ -56,19 +56,19 @@ const Tests: FC<TestsProps> = memo((props) => {
 
   useEffect(() => {
     batch(() => {
-      if (activeTutor && studentTaskLists) {
+      if (activeTutor && studentTaskLists?.length) {
         batch(() => {
           dispatch(
             setActiveCourse({
-              id: studentTaskLists[0].course_uuid,
-              name: studentTaskLists[0].course_name,
+              id: studentTaskLists[0]?.course_uuid,
+              name: studentTaskLists[0]?.course_name,
             }),
           );
 
           dispatch(
             setActiveTopic({
-              id: studentTaskLists[0].topics[0].topic_uuid,
-              name: studentTaskLists[0].topics[0].topic_name,
+              id: studentTaskLists[0]?.topics[0]?.topic_uuid,
+              name: studentTaskLists[0]?.topics[0]?.topic_name,
             }),
           );
         });
@@ -93,15 +93,17 @@ const Tests: FC<TestsProps> = memo((props) => {
   }, [activeCourse, studentTaskLists]);
 
   useEffect(() => {
-    const currentTopics = studentTaskLists?.find(
-      (item: { course_uuid: string }) => item.course_uuid === activeCourse?.id,
-    )?.topics;
+    if (studentTaskLists?.length) {
+      const currentTopics = studentTaskLists?.find(
+        (item: { course_uuid: string }) => item.course_uuid === activeCourse?.id,
+      )?.topics;
 
-    const currentTaskLists = currentTopics?.find(
-      (item: { topic_uuid: string }) => item.topic_uuid === activeTopic?.id,
-    )?.tasklists;
+      const currentTaskLists = currentTopics?.find(
+        (item: { topic_uuid: string }) => item.topic_uuid === activeTopic?.id,
+      )?.tasklists;
 
-    setTaskLists(currentTaskLists ?? []);
+      setTaskLists(currentTaskLists ?? []);
+    }
   }, [activeTopic]);
 
   useEffect(() => {
@@ -120,7 +122,7 @@ const Tests: FC<TestsProps> = memo((props) => {
     return <Typography>Произошла ошибка во время загруки... Попробуйте позже</Typography>;
   }
 
-  if (!studentData.tutors.length) {
+  if (!studentData?.tutors?.length) {
     return (
       <Typography color={'purple'} size={'large'}>
         У вас нет преподавателей / групп

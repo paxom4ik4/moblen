@@ -1,16 +1,16 @@
 .titled-checkbox {
-  padding: 12px 16px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: row;
   background: #ffffff;
-  border-radius: 28px;
+  border-radius: 14px;
   width: 100%;
   justify-content: space-between;
   align-items: center;
 
   input[type='checkbox'] {
     width: 16px;
-    height: 16px;
+    height: 12px;
   }
 
   input[type='checkbox']:checked {

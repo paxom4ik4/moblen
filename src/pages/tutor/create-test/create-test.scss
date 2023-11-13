@@ -1,29 +1,28 @@
 .app-create-test {
-  padding: 0 24px;
-  height: 100%;
+  height: calc(100% + 64px);
   width: 100%;
-
   display: flex;
-  gap: 16px;
-
-  textarea {
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
-    border-radius: 15px;
-    width: 100%;
-    height: 100%;
-    font-size: 16px;
-    font-weight: 400;
-    color: #1b1b1f;
-    &:focus {
-      outline: 1px solid rgba(0, 0, 0, 0.5);
-    }
-  }
+  position: relative;
+  top: -36px;
+  flex-direction: column;
 
   &_text-container {
     position: relative;
-    top: -72px;
-    height: calc(100% + 10px);
-    width: 35%;
+    height: 70px;
+    padding-left: 16px;
+    width: fit-content;
+    gap: 48px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    &_ball {
+      width: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
 
     &_title {
       position: absolute;
@@ -43,15 +42,10 @@
 
   &_text-container_name {
     width: 100%;
-    padding-bottom: 12px;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-
-    &-text {
-      width: 80%;
-    }
 
     &-title {
       padding-bottom: 8px;
@@ -68,7 +62,7 @@
 
     &-work input {
       width: 100%;
-      padding: 2px 0;
+      padding: 4px;
       outline: none;
       font-size: 18px;
       border: none;
@@ -76,18 +70,18 @@
   }
 
   &_tasks-container {
-    padding: 4px 12px;
+    padding: 4px 0 4px 16px;
     overflow-y: scroll;
     position: relative;
-    top: -80px;
-    width: 65%;
+    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: calc(100% + 80px);
 
     textarea {
-      padding: 2px;
+      width: 100%;
+      padding: 4px;
     }
 
     &_addItem {
@@ -119,12 +113,27 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        width: 44px;
+        outline: none;
+        border: none;
         height: 44px;
+        gap: 12px;
+        width: 190px;
+        text-align: left;
         background-color: #ffffff;
         border-radius: 12px;
-        box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
         transition: 0.3s;
+
+        &_icon {
+          width: 42px;
+          height: 42px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background-color: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);
+          transition: 0.3s;
+        }
 
         &:hover {
           cursor: pointer;

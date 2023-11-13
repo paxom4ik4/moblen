@@ -1,0 +1,44 @@
+.confirm-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+
+  &_buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    align-self: flex-end;
+
+    button {
+      cursor: pointer;
+      background: none;
+      outline: none;
+      border: 1px solid #6750a4;
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: 0.3s;
+
+      &:hover {
+        opacity: 0.7;
+      }
+
+      svg {
+        padding: 8px;
+        width: 40px;
+        height: 49px;
+      }
+    }
+  }
+}

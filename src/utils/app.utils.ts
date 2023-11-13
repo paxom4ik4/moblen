@@ -1,5 +1,3 @@
-import { Test } from '../types/test.ts';
-import { mockedTask } from '../types/task.ts';
 import { AppModes } from '../constants/appTypes.ts';
 
 export const routeConfig = [
@@ -25,43 +23,6 @@ export const studentRouteConfig = [
   {
     title: 'Задания',
     path: '/assignments',
-  },
-];
-
-// MOCKED WHILE BE READY
-
-export const mockedTests: Test[] = [
-  {
-    id: 'student-test-1',
-    name: 'ДЗ #1',
-    subject: 'Англ',
-    topic: 'Первая тема',
-    status: 'done',
-    tasks: [mockedTask, mockedTask, mockedTask],
-  },
-  {
-    id: 'student-test-1',
-    name: 'ДЗ #2',
-    subject: 'Англ',
-    topic: 'Первая тема',
-    status: 'done',
-    tasks: [mockedTask, mockedTask],
-  },
-  {
-    id: 'student-test-1',
-    name: 'ДЗ #3',
-    subject: 'Англ',
-    topic: 'Первая тема',
-    status: 'done',
-    tasks: [mockedTask, mockedTask, mockedTask],
-  },
-  {
-    id: 'student-test-2',
-    name: 'ДЗ #4',
-    subject: 'Англ',
-    topic: 'Первая тема',
-    status: 'done',
-    tasks: [mockedTask, mockedTask, mockedTask, mockedTask, mockedTask],
   },
 ];
 

@@ -1,4 +1,4 @@
-import { FC, useEffect, memo } from 'react';
+import { FC, memo, useEffect, useState } from 'react';
 
 import TutorIcon from 'assets/icons/tutor-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
@@ -6,18 +6,20 @@ import { StudentTestCard } from 'components/student-test-card/student-test-card.
 
 import './tests.scss';
 import { useQuery } from 'react-query';
-import { getStudentInfo } from 'services/student/student.ts';
-import { useDispatch, useSelector } from 'react-redux';
+import { getStudentInfo, getStudentTaskLists } from 'services/student/student.ts';
+import { batch, useDispatch, useSelector } from 'react-redux';
 import { Tutor } from 'types/tutor.ts';
-import { getTopics, getTutorsCourses } from 'services/courses';
 import { RootState } from 'store/store.ts';
 import { setActiveCourse, setActiveTopic, setActiveTutor } from 'store/student/student.slice.ts';
-import { mockedTests } from 'utils/app.utils.ts';
+import { TaskList } from 'types/task.ts';
+import { Notification } from 'common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'tests';
 
 interface TestsProps {
   resultsView?: boolean;
+  studentId?: string;
+  selectedStudent?: string;
 }
 
 const Tests: FC<TestsProps> = memo((props) => {
@@ -26,7 +28,7 @@ const Tests: FC<TestsProps> = memo((props) => {
     (state: RootState) => state.student,
   );
 
-  const { resultsView = false } = props;
+  const { resultsView = false, selectedStudent } = props;
 
   const { userData } = useSelector((state: RootState) => state.userData);
 
@@ -34,28 +36,87 @@ const Tests: FC<TestsProps> = memo((props) => {
     data: studentData,
     isLoading: isStudentDataLoading,
     isLoadingError,
-  } = useQuery('studentData', () => getStudentInfo(userData!.uuid));
-
-  const { data: courseData, isLoading: isCourseDataLoading } = useQuery(
-    ['courses', activeTutor],
-    () => getTutorsCourses(activeTutor ?? ''),
+  } = useQuery(['studentData'], () =>
+    getStudentInfo(resultsView ? selectedStudent! : userData!.uuid),
   );
+
+  const {
+    data: studentTaskLists,
+    isLoading: isDataLoading,
+    isLoadingError: isTaskListLoadingError,
+  } = useQuery(['taskLists', activeTutor, selectedStudent], () =>
+    getStudentTaskLists({
+      student_uuid: resultsView ? selectedStudent! : userData!.uuid,
+      tutor_uuid: resultsView ? userData!.uuid : activeTutor,
+    }),
+  );
+
+  const [topics, setTopics] = useState<{ topic_uuid: string; topic_name: string }[]>([]);
+  const [taskLists, setTaskLists] = useState([]);
 
   useEffect(() => {
-    if (courseData?.length) {
-      dispatch(setActiveCourse(courseData[0].course_uuid));
+    batch(() => {
+      if (activeTutor && studentTaskLists) {
+        batch(() => {
+          dispatch(
+            setActiveCourse({
+              id: studentTaskLists[0].course_uuid,
+              name: studentTaskLists[0].course_name,
+            }),
+          );
+
+          dispatch(
+            setActiveTopic({
+              id: studentTaskLists[0].topics[0].topic_uuid,
+              name: studentTaskLists[0].topics[0].topic_name,
+            }),
+          );
+        });
+      }
+    });
+  }, [activeTutor, studentTaskLists]);
+
+  useEffect(() => {
+    if (studentTaskLists?.length) {
+      const currentTopics = studentTaskLists?.find(
+        (item: { course_uuid: string }) => item.course_uuid === activeCourse?.id,
+      )?.topics;
+
+      if (currentTopics?.length) {
+        setTopics(currentTopics);
+
+        dispatch(
+          setActiveTopic({ id: currentTopics[0].topic_uuid, name: currentTopics[0].topic_name }),
+        );
+      }
     }
-  }, [courseData, dispatch]);
+  }, [activeCourse, studentTaskLists]);
 
-  const { data: topics, isLoading: isTopicsLoading } = useQuery(['topics', activeCourse], () =>
-    getTopics(activeCourse ?? null),
-  );
+  useEffect(() => {
+    const currentTopics = studentTaskLists?.find(
+      (item: { course_uuid: string }) => item.course_uuid === activeCourse?.id,
+    )?.topics;
 
-  if (isStudentDataLoading) {
+    const currentTaskLists = currentTopics?.find(
+      (item: { topic_uuid: string }) => item.topic_uuid === activeTopic?.id,
+    )?.tasklists;
+
+    setTaskLists(currentTaskLists ?? []);
+  }, [activeTopic]);
+
+  useEffect(() => {
+    if (studentData?.tutors?.length && !activeTutor) {
+      dispatch(setActiveTutor(studentData.tutors[0].tutor_uuid));
+    }
+  }, [studentData]);
+
+  const [testPassed, setTestPassed] = useState(false);
+
+  if (isStudentDataLoading || isDataLoading) {
     return <Typography>Загрузка...</Typography>;
   }
 
-  if (isLoadingError) {
+  if (isLoadingError || isTaskListLoadingError) {
     return <Typography>Произошла ошибка во время загруки... Попробуйте позже</Typography>;
   }
 
@@ -67,15 +128,27 @@ const Tests: FC<TestsProps> = memo((props) => {
     );
   }
 
-  const showTasks = activeTutor && activeCourse && activeTopic;
+  const showTasks = activeCourse && activeTopic && !!taskLists?.length;
+
+  const resultTaskList = resultsView
+    ? taskLists.filter((list: TaskList) => list.status[0] === 'решено')
+    : taskLists;
 
   return (
     <>
+      <Notification
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        autoHideDuration={3000}
+        message={'Тест отправлен на проверку'}
+        open={testPassed}
+        onClose={() => setTestPassed(!testPassed)}
+      />
       {!resultsView && (
         <div className={`${DEFAULT_CLASSNAME}_tutors`}>
           {!!studentData?.tutors &&
             studentData.tutors.map((tutor: Tutor) => (
               <div
+                key={tutor.tutor_uuid}
                 onClick={() => dispatch(setActiveTutor(tutor.tutor_uuid))}
                 className={`${DEFAULT_CLASSNAME}_tutors_item ${
                   activeTutor === tutor.tutor_uuid ? 'active-tutor-item' : ''
@@ -94,21 +167,29 @@ const Tests: FC<TestsProps> = memo((props) => {
         </div>
       )}
       <div className={DEFAULT_CLASSNAME}>
-        {activeTutor ? (
+        {activeTutor && (
           <>
             <div className={`${DEFAULT_CLASSNAME}_subjects`}>
               <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
-                {isCourseDataLoading && <Typography>Загрузка...</Typography>}
+                {isDataLoading && <Typography>Загрузка...</Typography>}
 
-                {courseData?.map((course) => (
+                {studentTaskLists?.map((course: { course_uuid: string; course_name: string }) => (
                   <div
-                    onClick={() => dispatch(setActiveCourse(course.course_uuid))}
+                    key={course.course_uuid}
+                    onClick={() =>
+                      dispatch(
+                        setActiveCourse({
+                          id: course.course_uuid,
+                          name: course.course_name,
+                        }),
+                      )
+                    }
                     className={`${DEFAULT_CLASSNAME}_subjects_list-item ${
-                      course.course_uuid === activeCourse && 'active-subject'
+                      course.course_uuid === activeCourse?.id && 'active-subject'
                     }`}>
                     <Typography
                       className={`${
-                        course.course_uuid === activeCourse && 'active-subject-title'
+                        course.course_uuid === activeCourse?.id && 'active-subject-title'
                       }`}>
                       {course.course_name}
                     </Typography>
@@ -118,17 +199,26 @@ const Tests: FC<TestsProps> = memo((props) => {
             </div>
             <div className={`${DEFAULT_CLASSNAME}_topics`}>
               <div className={`${DEFAULT_CLASSNAME}_topics_list`}>
-                {isTopicsLoading && <Typography>Загрузка...</Typography>}
-
                 {activeCourse &&
-                  topics?.map((topic) => (
+                  topics?.length &&
+                  topics.map((topic: { topic_uuid: string; topic_name: string }) => (
                     <div
+                      key={topic.topic_uuid}
                       className={`${DEFAULT_CLASSNAME}_topics_list-item ${
-                        topic.topic_uuid === activeTopic && 'student-active-topic-item'
+                        topic.topic_uuid === activeTopic?.id && 'student-active-topic-item'
                       }`}
-                      onClick={() => dispatch(setActiveTopic(topic.topic_uuid))}>
+                      onClick={() =>
+                        dispatch(
+                          setActiveTopic({
+                            id: topic.topic_uuid,
+                            name: topic.topic_name,
+                          }),
+                        )
+                      }>
                       <Typography
-                        className={`${topic.topic_uuid === activeTopic && 'student-active-topic'}`}>
+                        className={`${
+                          topic.topic_uuid === activeTopic?.id && 'student-active-topic'
+                        }`}>
                         {topic.topic_name}
                       </Typography>
                     </div>
@@ -136,26 +226,22 @@ const Tests: FC<TestsProps> = memo((props) => {
               </div>
             </div>
             <div className={`${DEFAULT_CLASSNAME}_tasks`}>
-              {showTasks ? (
-                mockedTests.map((test) => (
+              {showTasks &&
+                resultTaskList.map((test: TaskList) => (
                   <StudentTestCard
-                    id={test.id}
-                    name={test.name}
-                    subject={test.subject}
-                    topic={test.topic}
+                    selectedStudent={selectedStudent}
+                    resultsView={resultsView}
+                    key={test.list_uuid}
+                    id={test.list_uuid}
+                    name={test.list_name}
+                    subject={activeCourse.name}
+                    topic={activeTopic.name}
                     status={test.status}
-                    tasksAmount={test.tasks.length}
+                    tasksAmount={test.task_count}
                   />
-                ))
-              ) : (
-                <Typography color={'purple'}>Выберите курс и тему</Typography>
-              )}
+                ))}
             </div>
           </>
-        ) : (
-          <Typography className={`${DEFAULT_CLASSNAME}_select_tutor`} color={'purple'}>
-            Выберите преподавателя чтобы просмотреть задания
-          </Typography>
         )}
       </div>
     </>

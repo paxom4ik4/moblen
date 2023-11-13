@@ -27,7 +27,7 @@ const Results: FC = memo(() => {
       </div>
       {!!selectedStudent && (
         <div className={`${DEFAULT_CLASSNAME}_tests`}>
-          <Tests resultsView />
+          <Tests selectedStudent={selectedStudent} resultsView />
         </div>
       )}
     </div>

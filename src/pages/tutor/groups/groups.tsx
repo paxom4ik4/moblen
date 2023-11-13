@@ -1,5 +1,5 @@
-import { FC, memo, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { FC, memo, useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 
 import './groups.scss';
 import { GroupCard } from 'components/group-card/group-card.tsx';
@@ -17,6 +17,8 @@ import { useDrop } from 'react-dnd';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
 import { deleteFromGroup } from 'services/student/student.ts';
 import { Tooltip } from '@mui/material';
+import { clearSelectedStudent } from 'store/results/results.slice.ts';
+import Tests from '../../student/tests/tests.tsx';
 
 const DEFAULT_CLASSNAME = 'groups';
 
@@ -29,8 +31,17 @@ const Groups: FC<GroupsProps> = memo((props) => {
 
   const queryClient = useQueryClient();
 
-  const { userData } = useSelector((state: RootState) => state.userData);
   const { selectedStudent } = useSelector((state: RootState) => state.results);
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    return () => {
+      dispatch(clearSelectedStudent());
+    };
+  }, [dispatch]);
+
+  const { userData } = useSelector((state: RootState) => state.userData);
   const [isNewGroupCreating, setIsNewGroupCreating] = useState(false);
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
@@ -65,6 +76,12 @@ const Groups: FC<GroupsProps> = memo((props) => {
     }),
   }));
 
+  useEffect(() => {
+    if (groups?.length && !selectedGroup) {
+      setSelectedGroup(groups[0]);
+    }
+  }, [groups]);
+
   const createNewGroupHandler = () => setIsNewGroupCreating(true);
 
   if (isLoading) {
@@ -76,79 +93,80 @@ const Groups: FC<GroupsProps> = memo((props) => {
   }
 
   return (
-    <div className={DEFAULT_CLASSNAME}>
-      <div className={`${DEFAULT_CLASSNAME}_list`}>
-        {groups?.map((group) => (
-          <GroupCard
-            hideControls={viewMode}
-            hideIcon={viewMode && !!selectedStudent}
-            key={group.group_uuid}
-            onClick={() => setSelectedGroup(group)}
-            id={group.group_uuid}
-            active={selectedGroup === group}
-            name={group.group_name}
-            amount={group.students?.length}
-            iconUrl={group.iconUrl}
-            url={group.url}
-          />
-        ))}
-
-        {isNewGroupCreating && (
-          <GroupCard
-            name={'Новая группа'}
-            editMode={true}
-            setIsNewGroupCreating={setIsNewGroupCreating}
-            isNewGroupCreating={isNewGroupCreating}
-          />
-        )}
-        {!viewMode && (
-          <Tooltip title="Создать новую группу">
-            <div
-              className={`${DEFAULT_CLASSNAME}_list-add`}
-              onClick={() => createNewGroupHandler()}>
-              <AddIcon />
-            </div>
-          </Tooltip>
-        )}
-      </div>
-      <div className={`${DEFAULT_CLASSNAME}_students`}>
-        {!selectedGroup && groups?.length > 0 && (
-          <div className={`${DEFAULT_CLASSNAME}_students_empty`}>
-            <Typography size={'large'} color={'purple'}>
-              Выберите группу чтобы просмотреть учеников
-            </Typography>
-          </div>
-        )}
-
-        {selectedGroup && isGroupLoading && <Typography>Загрузка...</Typography>}
-        {groups?.length == 0 ? <Typography><div style={{marginTop:'50%', marginLeft: '50%', width: '250px'}}>У вас нет преподавателей/групп</div></Typography> : <></>}
-        {selectedGroup && !isGroupLoading && !selectedGroupData?.students?.length && (
-          <Typography color={'purple'}>В данной группе нет студентов</Typography>
-        )}
-
-        {selectedGroup &&
-          selectedGroupData &&
-          selectedGroupData?.students?.map((student: Student) => (
-            <StudentCard
-              active={viewMode && student.student_uuid === selectedStudent}
-              resultsViewMode={viewMode}
-              groupId={selectedGroup.group_uuid}
-              id={student.student_uuid}
-              key={student.student_uuid}
-              name={student.student_name}
-              surname={student.student_surname}
+    <div className={`${DEFAULT_CLASSNAME}_wrapper ${!!selectedStudent && 'results_view'}`}>
+      <div className={DEFAULT_CLASSNAME}>
+        <div className={`${DEFAULT_CLASSNAME}_list`}>
+          {groups?.map((group) => (
+            <GroupCard
+              hideControls={viewMode}
+              hideIcon={viewMode && !!selectedStudent}
+              key={group.group_uuid}
+              onClick={() => setSelectedGroup(group)}
+              id={group.group_uuid}
+              active={selectedGroup === group}
+              name={group.group_name}
+              amount={group.students?.length}
+              iconUrl={group.iconUrl}
+              url={group.url}
             />
           ))}
-        {!viewMode && (
+
+          {isNewGroupCreating && (
+            <GroupCard
+              name={'Новая группа'}
+              editMode={true}
+              setIsNewGroupCreating={setIsNewGroupCreating}
+              isNewGroupCreating={isNewGroupCreating}
+            />
+          )}
+          {!viewMode && (
+            <Tooltip title="Создать новую группу">
+              <div
+                className={`${DEFAULT_CLASSNAME}_list-add`}
+                onClick={() => createNewGroupHandler()}>
+                <AddIcon />
+              </div>
+            </Tooltip>
+          )}
+        </div>
+        <div className={`${DEFAULT_CLASSNAME}_students`}>
+          {selectedGroup && isGroupLoading && <Typography>Загрузка...</Typography>}
+
+          {groups?.length == 0 ? <Typography><div style={{marginTop:'50%', marginLeft: '50%', width: '250px'}}>У вас нет преподавателей/групп</div></Typography> : <></>}
+
+          {selectedGroup && !isGroupLoading && !selectedGroupData?.students?.length && (
+            <Typography color={'purple'}>В данной группе нет студентов</Typography>
+          )}
+
+          {selectedGroup &&
+            selectedGroupData &&
+            selectedGroupData?.students?.map((student: Student) => (
+              <StudentCard
+                active={student.student_uuid === selectedStudent}
+                resultsViewMode={viewMode}
+                groupId={selectedGroup.group_uuid}
+                id={student.student_uuid}
+                key={student.student_uuid}
+                name={student.student_name}
+                surname={student.student_surname}
+              />
+            ))}
+          {!viewMode && (
           <Tooltip title="удалить">
-          <div
-            className={`${DEFAULT_CLASSNAME}_trash ${isOver && `${DEFAULT_CLASSNAME}_trash_drop`}`}
-            ref={drop}>
-            <TrashIcon />
-          </div>
-          </Tooltip>
-        )}
+            <div
+              className={`${DEFAULT_CLASSNAME}_trash ${isOver && `${DEFAULT_CLASSNAME}_trash_drop`}`}
+              ref={drop}>
+                <TrashIcon />
+              </div>
+            </Tooltip>
+          )}
+        </div>
       </div>
+      {!!selectedStudent && (
+        <div className={`${DEFAULT_CLASSNAME}_tests`}>
+          <Tests selectedStudent={selectedStudent} studentId={selectedStudent} resultsView />
+        </div>
+      )}
     </div>
   );
 });

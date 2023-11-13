@@ -21,10 +21,11 @@ export interface TaskCardProps {
   criteria: string;
   maxScore: number | null;
   format: string;
-  taskAssets?: Asset[] | null;
+  taskAssets?: Asset[];
   index?: number;
 
   isCreateMode?: boolean;
+  editModeDisabled?: boolean;
   setIsCreatingMode?: Dispatch<SetStateAction<boolean>>;
 }
 
@@ -40,6 +41,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     maxScore,
     index,
     taskAssets,
+    editModeDisabled = false,
   } = props;
 
   const queryClient = useQueryClient();
@@ -68,12 +70,9 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     },
   );
 
-  const deleteTaskMutation = useMutation(
-    (data: { taskListId: string; taskId: string }) => deleteTask(data),
-    {
-      onSuccess: () => queryClient.invalidateQueries('tasks'),
-    },
-  );
+  const deleteTaskMutation = useMutation((data: { taskId: string }) => deleteTask(data), {
+    onSuccess: () => queryClient.invalidateQueries('tasks'),
+  });
 
   const saveNewTaskHandler = () => {
     if (taskText.length && taskCriteria.length && taskMaxScore && taskMaxScore !== 0) {
@@ -97,7 +96,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const deleteTaskHandler = () => {
     if (taskId && taskListId) {
       deleteTaskMutation.mutate({
-        taskListId,
         taskId,
       });
     }
@@ -257,7 +255,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         </div>
       )}
 
-      {!isCreateMode && (
+      {!editModeDisabled && !isCreateMode && (
         <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
           <TrashIcon />
         </div>

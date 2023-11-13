@@ -1,8 +1,7 @@
-import { FC, useEffect, useRef, useState, memo } from 'react';
+import { FC, useEffect, useState, memo } from 'react';
 
 import './create-test.scss';
 
-import CutIcon from 'assets/icons/cut-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import AddIcon from 'assets/icons/add-icon.svg';
 
@@ -14,8 +13,8 @@ import { RootState } from 'store/store.ts';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useQuery } from 'react-query';
 import { getTasks } from 'services/tasks';
+import { TutorRoutes } from 'constants/routes.ts';
 import { Task } from 'types/task.ts';
-import { TutorRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -24,6 +23,7 @@ const CreateTest: FC = memo(() => {
   const dispatch = useDispatch();
 
   const { id: paramsTaskListId } = useParams();
+  const isEditModeDisabled = location.href.includes('editable=false');
 
   const { taskListId, taskListName, courseName, topicName } = useSelector(
     (store: RootState) => store.createTask,
@@ -33,21 +33,18 @@ const CreateTest: FC = memo(() => {
     getTasks(taskListId || paramsTaskListId!),
   );
 
-  const textContainerRef = useRef<HTMLTextAreaElement>(null);
-
   const [maxScore, setMaxScore] = useState(0);
-  const [testText, setTestText] = useState('');
 
   useEffect(() => {
     if (tasksData) {
       setMaxScore(
-        tasksData.tasks.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
+        tasksData?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
       );
     }
   }, [tasksData]);
 
   const [isNewTask, setIsNewTask] = useState(false);
-  const [newTaskText, setNewTaskText] = useState('');
+  const [newTaskText] = useState('');
 
   const addNewTaskHandler = () => setIsNewTask(true);
 
@@ -56,69 +53,48 @@ const CreateTest: FC = memo(() => {
     navigate(TutorRoutes.ASSIGNMENTS);
   };
 
-  const handleCreateTaskFromText = () => {
-    const cursorStart = textContainerRef.current!.selectionStart;
-    const cursorEnd = textContainerRef.current!.selectionEnd;
-
-    setIsNewTask(true);
-
-    setNewTaskText(testText.substring(cursorStart, cursorEnd));
-  };
-
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={`${DEFAULT_CLASSNAME}_text-container`}>
-        <div className={`${DEFAULT_CLASSNAME}_text-container_name`}>
-          <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
-            <div className={`${DEFAULT_CLASSNAME}_text-container_name-title`}>
-              <Typography color={'purple'} weight={'bold'}>
-                {courseName} - {topicName}
-              </Typography>
-            </div>
-            <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>
-              <Typography size={'large'}>{taskListName}</Typography>
-            </div>
+        <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
+          <div className={`${DEFAULT_CLASSNAME}_text-container_name-title`}>
+            <Typography color={'purple'} weight={'bold'}>
+              {courseName} - {topicName}
+            </Typography>
           </div>
-          <div
-            className={`${DEFAULT_CLASSNAME}_text-container_name-cut`}
-            onClick={handleCreateTaskFromText}>
-            <CutIcon />
+          <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>
+            <Typography size={'large'} weight={'bold'}>
+              {taskListName}
+            </Typography>
           </div>
         </div>
-        <Typography className={`${DEFAULT_CLASSNAME}_text-container_title`}>
-          Текст заданий
-        </Typography>
-        <textarea
-          ref={textContainerRef}
-          className={`${DEFAULT_CLASSNAME}_text-container_main`}
-          value={testText}
-          onChange={(e) => setTestText(e.currentTarget.value)}></textarea>
-      </div>
-      <div className={`${DEFAULT_CLASSNAME}_tasks-container`}>
-        <div className={`${DEFAULT_CLASSNAME}_tasks-container_title`}>
-          <div>
-            Общий макс. балл
-            <div className={`${DEFAULT_CLASSNAME}_tasks-container_title_maxScore`}>{maxScore}</div>
-          </div>
-          <div
-            className={`${DEFAULT_CLASSNAME}_tasks-container_title_save`}
-            onClick={saveTestHandler}>
+        <div className={`${DEFAULT_CLASSNAME}_text-container_ball`}>
+          <Typography color={'purple'}>Сумма баллов</Typography>
+          <div className={`${DEFAULT_CLASSNAME}_tasks-container_title_maxScore`}>{maxScore}</div>
+        </div>
+        <button
+          className={`${DEFAULT_CLASSNAME}_tasks-container_title_save`}
+          onClick={saveTestHandler}>
+          <div className={`${DEFAULT_CLASSNAME}_tasks-container_title_save_icon`}>
             <CheckIcon />
           </div>
-        </div>
+          <Typography color={'purple'}>Завершить создание</Typography>
+        </button>
+      </div>
+      <div className={`${DEFAULT_CLASSNAME}_tasks-container`}>
         {isLoading && <Typography>Загрузка заданий...</Typography>}
 
-        {!!tasksData?.tasks?.length &&
-          tasksData.tasks?.map((task: Task, index: number) => (
+        {!!tasksData?.length &&
+          tasksData?.map((task: Task, index: number) => (
             <TaskCard
               taskId={task.task_uuid}
               taskListId={taskListId!}
-              taskAssets={task.task_image}
               text={task.task_condition}
               criteria={task.criteria}
               maxScore={task.max_ball}
               format={task.format}
               index={index + 1}
+              editModeDisabled={isEditModeDisabled}
             />
           ))}
 
@@ -133,11 +109,13 @@ const CreateTest: FC = memo(() => {
             format={'standard'}
           />
         )}
-        <div
-          className={`${DEFAULT_CLASSNAME}_tasks-container_addItem`}
-          onClick={() => addNewTaskHandler()}>
-          <AddIcon />
-        </div>
+        {!isEditModeDisabled && (
+          <div
+            className={`${DEFAULT_CLASSNAME}_tasks-container_addItem`}
+            onClick={() => addNewTaskHandler()}>
+            <AddIcon />
+          </div>
+        )}
       </div>
     </div>
   );

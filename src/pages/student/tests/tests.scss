@@ -15,9 +15,9 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: 160px;
+    width: fit-content;
     gap: 24px;
-    margin-right: 24px;
+    margin-right: 20px;
 
     &_item {
       display: flex;
@@ -49,11 +49,11 @@
   &_subjects {
     display: flex;
     flex-direction: row;
-    background-color: #fff;
     border-radius: 16px;
     position: absolute;
-    top: -59px;
-    transition: 0.3s;
+    width: 100%;
+    top: -42px;
+    left: 0;
 
     &_list {
       display: flex;
@@ -63,14 +63,15 @@
 
       &-item {
         position: relative;
-        top: 5px;
         background-color: #c5c6d0;
         border-radius: 10px 10px 0 0;
-        padding: 10px 16px 10px;
+        padding: 8px 16px 16px;
         transition: top 0.3s ease 0s;
         display: flex;
+        justify-content: center;
         align-items: center;
         gap: 12px;
+        height: 38px;
 
         &:hover {
           cursor: pointer;
@@ -84,7 +85,7 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    margin: 20px;
+    margin: 0 20px;
     border-bottom: 1px solid #757780;
 
     &_list {
@@ -92,14 +93,14 @@
       display: flex;
       flex-direction: row;
       column-gap: 20px;
-      padding: 20px 0;
+      padding: 16px 0;
       align-items: center;
 
       &-item {
         transition: 0.3s;
         background-color: #fbf8fd;
         border-radius: 16px;
-        padding: 16px 14px;
+        padding: 4px 12px;
         color: #757780;
         font-size: 14px;
         font-weight: 500;
@@ -108,7 +109,7 @@
         display: flex;
         align-items: center;
         gap: 12px;
-        height: 30px;
+        height: 28px;
 
         &:hover {
           cursor: pointer;
@@ -127,7 +128,7 @@
     flex-direction: row;
     column-gap: 32px;
     row-gap: 20px;
-    padding: 0 24px;
+    padding: 16px 20px;
     flex-wrap: wrap;
     transition: 0.3s;
   }
@@ -151,9 +152,10 @@
 
 .active-subject {
   background-color: #e1e2ec;
-  position: relative;
-  top: 24px;
-  transition: background-color 0.4s;
+  height: 36px;
+  top: 6px;
+  padding-top: 12px;
+  transition: all 0.4s;
 }
 
 .active-tutor-item {

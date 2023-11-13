@@ -1,18 +1,17 @@
 import API from '../index.ts';
+import { ShareDataType } from '../../types/share.data.type.ts';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
 
 const tasklistAPI = {
   createTaskList: ({ list_name, topic_uuid }: { list_name: string; topic_uuid: string }) => {
-    return API.post(`${TASK_LIST_URL}/by-topic/${topic_uuid}`, { list_name }).then(
+    return API.post(`${TASK_LIST_URL}/by-topic/${topic_uuid}/`, { list_name }).then(
       (res) => res.data,
     );
   },
-  deleteTaskList: ({ list_uuid, topic_uuid }: { list_uuid: string; topic_uuid: string }) => {
-    return API.delete(`${TASK_LIST_URL}/by-topic/${topic_uuid}/${list_uuid}`).then(
-      (res) => res.data,
-    );
+  deleteTaskList: ({ list_uuid }: { list_uuid: string }) => {
+    return API.delete(`${TASK_LIST_URL}/${list_uuid}/`).then((res) => res.data);
   },
   getTaskList: (
     topic_uuid: string | null,
@@ -22,22 +21,24 @@ const tasklistAPI = {
       list_uuid: string;
       topic_uuid: string;
       list_name: string;
+      editable: boolean;
     }[]
   > | null => {
     if (!topic_uuid) return null;
 
     try {
-      return API.get(`${TASK_LIST_URL}/by-topic/${topic_uuid}`).then((res) => res.data);
+      return API.get(`${TASK_LIST_URL}/by-topic/${topic_uuid}/`).then((res) => res.data);
     } catch (error) {
       console.log('Error fetching TaskList');
       return null;
     }
   },
-  editTaskList: ({ listName, topicId }: { listName: string; topicId: string }) => {
-    return API.patch(`${TASK_LIST_URL}/get-by-topic/${topicId}`, {
-      list_name: listName,
-      topic_uuid: topicId,
-    }).then((res) => res.data);
+  shareTaskList: (data: ShareDataType) => {
+    const { list_uuid, ...taskListData } = data;
+
+    return API.post(`${TASK_LIST_URL}/${list_uuid}/share/`, { ...taskListData }).then(
+      (res) => res.data,
+    );
   },
 };
 
@@ -58,17 +59,17 @@ const tasksAPI = {
     format: string;
     max_ball: number;
   }) => {
-    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}`, {
+    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, {
       task_condition,
       criteria,
       max_ball,
       format,
     }).then((res) => res.data);
   },
-  deleteTask: ({ taskListId, taskId }: { taskListId: string; taskId: string }) => {
-    return API.delete(`${TASK_URL}/by-tasklist/${taskListId}/${taskId}`).then((res) => res.data);
+  deleteTask: ({ taskId }: { taskId: string }) => {
+    return API.delete(`${TASK_URL}/${taskId}/`).then((res) => res.data);
   },
 };
 
-export const { getTaskList, deleteTaskList, createTaskList, editTaskList } = tasklistAPI;
+export const { getTaskList, deleteTaskList, createTaskList, shareTaskList } = tasklistAPI;
 export const { getTasks, createTask, deleteTask } = tasksAPI;

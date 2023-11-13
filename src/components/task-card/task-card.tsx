@@ -11,7 +11,7 @@ import { Typography } from 'common/typography/typography.tsx';
 import { Asset } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { createTask, deleteTask } from 'services/tasks';
-import { MenuItem, Select, SelectChangeEvent, Tooltip } from '@mui/material';
+import { ListSubheader, MenuItem, Select, SelectChangeEvent, Tooltip } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -31,7 +31,7 @@ export interface TaskCardProps {
 
   taskFormats?: {
     subject: string;
-    task_format: string;
+    formats: string[];
   }[];
 }
 
@@ -138,6 +138,15 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     }
   };
 
+  const renderFormatGroup = (group: { subject: string; formats: string[] }) => {
+    const items = group.formats.map((format) => (
+      <MenuItem key={format} value={format}>
+        {format}
+      </MenuItem>
+    ));
+    return [<ListSubheader>{group.subject}</ListSubheader>, items];
+  };
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       {addNewAsset && (
@@ -206,15 +215,12 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
               {isCreateMode && (
                 <Select
-                  placeholder={'Формат задания'}
-                  value={taskFormat}
+                  fullWidth
+                  value={taskFormat || ''}
                   onChange={handleFormatChange}
-                  multiple={false}>
-                  {taskFormats.map((item) => (
-                    <MenuItem key={item.task_format} value={item.task_format}>
-                      {item.task_format}
-                    </MenuItem>
-                  ))}
+                  defaultValue=""
+                  MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
+                  {taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
                 </Select>
               )}
               {!isCreateMode && <Typography>{format}</Typography>}

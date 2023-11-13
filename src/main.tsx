@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store.ts';
 
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { StyledEngineProvider } from '@mui/material';
 
 const queryClient = new QueryClient();
 
@@ -16,7 +17,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Router>
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <App />
+          <StyledEngineProvider injectFirst>
+            <App />
+          </StyledEngineProvider>
         </QueryClientProvider>
       </Provider>
     </Router>

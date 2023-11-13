@@ -15,6 +15,7 @@ import { useQuery } from 'react-query';
 import { getAllFormats, getTasks } from 'services/tasks';
 import { TutorRoutes } from 'constants/routes.ts';
 import { Task } from 'types/task.ts';
+import { CircularProgress } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -84,7 +85,7 @@ const CreateTest: FC = memo(() => {
         </button>
       </div>
       <div className={`${DEFAULT_CLASSNAME}_tasks-container`}>
-        {isLoading && <Typography>Загрузка заданий...</Typography>}
+        {isLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
 
         {!!tasksData?.length &&
           tasksData?.map((task: Task, index: number) => (

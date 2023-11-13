@@ -14,8 +14,10 @@ import { useDispatch, batch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { handleDataStoring, remapStudentData, remapTutorData } from './utils.ts';
-import { LoginRoutes, StudentRoutes, TutorRoutes } from '../../constants/routes.ts';
-import { GROUP_REF_LINK } from '../../constants/api.ts';
+import { LoginRoutes, TutorRoutes } from 'constants/routes.ts';
+import { GROUP_REF_LINK } from 'constants/api.ts';
+import { useMutation } from 'react-query';
+import { CircularProgress } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -44,14 +46,31 @@ export const LoginPage: FC = () => {
   //   </>
   // );
 
-  const loginHandler = async (values: { login: string; password: string }) => {
-    try {
-      const loginValues = params?.groupId
-        ? { ...values, referral_link: `${GROUP_REF_LINK}${params.groupId}` }
-        : values;
+  const { isLoading, mutateAsync: loginUserMutation } = useMutation(
+    (data: { login: string; password: string; referral_link?: string }) => loginUser(data),
+    {
+      onSuccess: () => {
+        navigate(TutorRoutes.ASSIGNMENTS);
+      },
+      onError: () => {
+        form.resetForm({
+          values: { login: '', password: '' },
+          errors: { password: 'Проверьте логин и пароль' },
+        });
+      },
+    },
+  );
 
-      const res = await loginUser(loginValues);
-      const { status, role, user, token } = res;
+  const loginHandler = async (values: { login: string; password: string }) => {
+    const loginValues = params?.groupId
+      ? { ...values, referral_link: `${GROUP_REF_LINK}${params.groupId}` }
+      : values;
+
+    try {
+      const loginData = await loginUserMutation(loginValues);
+
+      const { status, role, user, token } = await loginData;
+
       if (status === 'AUTHORIZED') {
         localStorage.setItem('accessToken', token.access_token);
         localStorage.setItem('refreshToken', token.refresh_token);
@@ -59,8 +78,6 @@ export const LoginPage: FC = () => {
 
         if (role === 'tutor') {
           const tutorData = remapTutorData(user);
-
-          navigate(TutorRoutes.ASSIGNMENTS);
 
           batch(() => {
             dispatch(setUser(tutorData));
@@ -71,8 +88,6 @@ export const LoginPage: FC = () => {
         } else {
           const studentData = remapStudentData(user);
 
-          navigate(StudentRoutes.ASSIGNMENTS);
-
           batch(() => {
             dispatch(setUser(studentData));
             dispatch(setAppMode(role));
@@ -82,10 +97,7 @@ export const LoginPage: FC = () => {
         }
       }
     } catch (error) {
-      form.resetForm({
-        values: { login: '', password: '' },
-        errors: { password: 'Проверьте логин и пароль' },
-      });
+      console.log('Error while authorization');
     }
   };
 
@@ -164,9 +176,13 @@ export const LoginPage: FC = () => {
             <button className={`${DEFAULT_CLASSNAME}_form_vk`} onClick={handleVKLogin}>
               <VKIcon />
             </button>
-            <button className={`${DEFAULT_CLASSNAME}_form_submit`} type="submit">
-              <CheckIcon />
-            </button>
+            {isLoading ? (
+              <CircularProgress sx={{ color: '#c8caff' }} />
+            ) : (
+              <button className={`${DEFAULT_CLASSNAME}_form_submit`} type="submit">
+                <CheckIcon />
+              </button>
+            )}
           </div>
         </div>
       </form>

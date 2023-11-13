@@ -32,7 +32,7 @@ import './courses.scss';
 import { DateCalendar } from '@mui/x-date-pickers';
 import { ConfirmModal } from '../../../components/confirm-modal/confirm-modal.tsx';
 import { Notification } from '../../../common/notification/notification.tsx';
-import { Tooltip } from '@mui/material';
+import { CircularProgress, Tooltip } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -266,7 +266,7 @@ const Courses: FC = memo(() => {
   if (isLoading) {
     return (
       <div className={DEFAULT_CLASSNAME}>
-        <Typography>Загрузка...</Typography>
+        <CircularProgress sx={{ color: '#c8caff' }} />
       </div>
     );
   }

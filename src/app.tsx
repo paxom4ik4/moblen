@@ -5,6 +5,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/ru.js';
 
 import Sidebar from 'components/sidebar/sidebar.tsx';
 import { UpperBar } from 'components/upperbar/upperbar.tsx';
@@ -25,11 +26,11 @@ import {
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
 import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
-import { Typography } from './common/typography/typography.tsx';
 
 import MenuIcon from 'assets/icons/menu-item.svg';
 import { axiosAddAuthToken } from './services/tokenHelper.ts';
 import { refreshToken } from './services/login/login.ts';
+import { CircularProgress } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app';
 
@@ -180,15 +181,13 @@ const App: FC = () => {
 
   const fallbackScreen = (
     <div className={'fallback'}>
-      <Typography color={'purple'} weight={'bold'}>
-        Загрузка...
-      </Typography>
+      <CircularProgress sx={{ color: '#c8caff' }} />
     </div>
   );
 
   return (
     <DndProvider backend={HTML5Backend}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <LocalizationProvider adapterLocale={'ru'} dateAdapter={AdapterDayjs}>
         <Suspense fallback={fallbackScreen}>{userData ? appContent : loginContent}</Suspense>
       </LocalizationProvider>
     </DndProvider>

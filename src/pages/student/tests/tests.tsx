@@ -13,6 +13,7 @@ import { RootState } from 'store/store.ts';
 import { setActiveCourse, setActiveTopic, setActiveTutor } from 'store/student/student.slice.ts';
 import { TaskList } from 'types/task.ts';
 import { Notification } from 'common/notification/notification.tsx';
+import { CircularProgress } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'tests';
 
@@ -115,7 +116,7 @@ const Tests: FC<TestsProps> = memo((props) => {
   const [testPassed, setTestPassed] = useState(false);
 
   if (isStudentDataLoading || isDataLoading) {
-    return <Typography>Загрузка...</Typography>;
+    return <CircularProgress sx={{ color: '#c8caff' }} />;
   }
 
   if (isLoadingError || isTaskListLoadingError) {
@@ -173,7 +174,7 @@ const Tests: FC<TestsProps> = memo((props) => {
           <>
             <div className={`${DEFAULT_CLASSNAME}_subjects`}>
               <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
-                {isDataLoading && <Typography>Загрузка...</Typography>}
+                {isDataLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
 
                 {studentTaskLists?.map((course: { course_uuid: string; course_name: string }) => (
                   <div

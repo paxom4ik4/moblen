@@ -16,9 +16,10 @@ import { Student } from 'types/student.ts';
 import { useDrop } from 'react-dnd';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
 import { deleteFromGroup } from 'services/student/student.ts';
-import { Tooltip } from '@mui/material';
+import { CircularProgress, Tooltip } from '@mui/material';
 import { clearSelectedStudent } from 'store/results/results.slice.ts';
 import Tests from '../../student/tests/tests.tsx';
+import GroupCardLoader from '../../../components/group-card/group-card-loader/group-card-loader.tsx';
 
 const DEFAULT_CLASSNAME = 'groups';
 
@@ -87,7 +88,11 @@ const Groups: FC<GroupsProps> = memo((props) => {
   if (isLoading) {
     return (
       <div className={DEFAULT_CLASSNAME}>
-        <Typography>Загрузка...</Typography>
+        <div className={`${DEFAULT_CLASSNAME}_list`}>
+          <GroupCardLoader />
+          <GroupCardLoader />
+          <GroupCardLoader />
+        </div>
       </div>
     );
   }
@@ -130,7 +135,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
           )}
         </div>
         <div className={`${DEFAULT_CLASSNAME}_students`}>
-          {selectedGroup && isGroupLoading && <Typography>Загрузка...</Typography>}
+          {selectedGroup && isGroupLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
 
           {groups?.length == 0 ? (
             <Typography>

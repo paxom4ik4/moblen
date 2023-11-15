@@ -1,9 +1,10 @@
 .student-test-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   border-radius: 0 15px 15px 15px;
   background: #ffffff;
-  min-width: 278px;
+  width: 290px;
 
   &_status {
     outline: none;
@@ -13,6 +14,18 @@
     text-align: center;
     padding: 12px;
     transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &_passTime {
+      display: flex;
+      flex-direction: row;
+      gap: 4px;
+      text-align: center;
+      justify-self: center;
+      align-self: center;
+    }
 
     &:hover {
       cursor: pointer;
@@ -21,6 +34,10 @@
       border-bottom-right-radius: 15px;
       opacity: 0.8;
     }
+  }
+
+  &_status.red-border {
+    border-color: #dd4848;
   }
 
   &_color.red {
@@ -39,9 +56,22 @@
     background-color: #16ff05;
   }
 
+  &_deadline {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    right: 0;
+    width: 71px;
+    height: 71px;
+    border-radius: 0 15px 0 0;
+  }
+
   &_color {
-    width: 72px;
-    height: 72px;
+    position: absolute;
+    right: 0;
+    width: 71px;
+    height: 71px;
     border-radius: 0 15px 0 0;
   }
 
@@ -54,6 +84,13 @@
       flex-direction: column;
       gap: 2px;
       padding: 8px 24px 8px 16px;
+
+      &_name-container {
+        width: 176px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
     }
   }
 }

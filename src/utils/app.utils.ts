@@ -47,3 +47,12 @@ export const getStoredAppMode = (): AppModes | null => {
 
   return AppModes.student;
 };
+
+export const dateTimeConfig = {
+  hour12: false,
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+};

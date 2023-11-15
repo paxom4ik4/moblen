@@ -8,6 +8,7 @@ import { useDrag } from 'react-dnd';
 import { DraggableTypes } from '../../types/draggable/draggable.types.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { createTaskList } from '../../services/tasks';
+import { TextField } from '@mui/material';
 
 export interface TestCardProps {
   id: string;
@@ -105,11 +106,12 @@ export const TestCardCreate: FC<TestCardCreateProps> = (props) => {
         <div className={`${DEFAULT_CLASSNAME}_subject-topic`}>
           {subject} - {topic}
         </div>
-        <input
+        <TextField
           type={'text'}
           value={newTaskListName}
           onChange={(e) => setNewTaskListName(e.currentTarget.value)}
-          placeholder={'Введите название списка заданий...'}
+          placeholder={'Cписок заданий...'}
+          inputProps={{ maxLength: 24 }}
         />
       </div>
       <div className={`${DEFAULT_CLASSNAME}_share`} onClick={handleNewTaskListCreate}>

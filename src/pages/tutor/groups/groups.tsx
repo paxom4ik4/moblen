@@ -125,7 +125,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
             />
           )}
           {!viewMode && (
-            <Tooltip title="Создать новую группу">
+            <Tooltip placement={'top'} title="Создать новую группу">
               <div
                 className={`${DEFAULT_CLASSNAME}_list-add`}
                 onClick={() => createNewGroupHandler()}>
@@ -148,7 +148,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
           )}
 
           {selectedGroup && !isGroupLoading && !selectedGroupData?.students?.length && (
-            <Typography color={'purple'}>В данной группе нет студентов</Typography>
+            <Typography></Typography>
           )}
 
           {selectedGroup &&
@@ -165,7 +165,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
               />
             ))}
           {!viewMode && (
-            <Tooltip title="Удалить">
+            <Tooltip placement={'top'} title="Удалить">
               <div
                 className={`${DEFAULT_CLASSNAME}_trash ${
                   isOver && `${DEFAULT_CLASSNAME}_trash_drop`

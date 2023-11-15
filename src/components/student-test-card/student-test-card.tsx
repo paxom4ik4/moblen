@@ -9,6 +9,8 @@ import { setCurrentTaskList } from 'store/student/student.slice.ts';
 import { RootState } from 'store/store.ts';
 import { AppModes } from 'constants/appTypes.ts';
 
+import DeadlineIcon from './deadline.svg';
+
 const DEFAULT_CLASSNAME = 'student-test-card';
 
 interface StudentTestCardProps {
@@ -17,7 +19,7 @@ interface StudentTestCardProps {
   topic: string;
   name: string;
   tasksAmount: number;
-  deadline?: Date;
+  deadline?: string;
   passTime?: Date;
   status: [string, number?, number?];
   onClick?: () => void;
@@ -45,6 +47,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     deadline,
     passTime = new Date(),
     status,
+    resultsView = false,
   } = props;
 
   const [listStatus, score, maxScore] = status;
@@ -85,7 +88,11 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_content_info_name`}>
-            <Typography size={'large'}>{name}</Typography>
+            <Typography
+              size={'large'}
+              className={`${DEFAULT_CLASSNAME}_content_info_name-container`}>
+              {name}
+            </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_content_info_tasks`}>
             <Typography color={'gray'} size={'small'}>
@@ -97,22 +104,92 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
           <div
             className={`${DEFAULT_CLASSNAME}_color ${getCardColor(
               getTaskScorePercentage(score, maxScore)!,
-            )}`}></div>
+            )}`}
+          />
+        )}
+        {listStatus !== LIST_STATUS.completed && listStatus !== LIST_STATUS.check && deadline && (
+          <div className={`${DEFAULT_CLASSNAME}_deadline`}>
+            <DeadlineIcon />
+          </div>
         )}
       </div>
-      <button
-        disabled={listStatus === LIST_STATUS.pending && tasksAmount === 0}
-        className={`${DEFAULT_CLASSNAME}_status`}
-        onClick={handleTestClick}>
-        {listStatus === LIST_STATUS.check && <Typography>На проверке</Typography>}
-        {listStatus === LIST_STATUS.pending && <Typography>Сдать тест</Typography>}
-        {listStatus === LIST_STATUS.pending && !!deadline && (
-          <Typography>Дедлайн {deadline.toString()}</Typography>
-        )}
-        {listStatus === LIST_STATUS.completed && passTime && (
-          <Typography>Сдано {passTime.toLocaleDateString()}</Typography>
-        )}
-      </button>
+      {resultsView && (
+        <button
+          disabled={
+            (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
+            listStatus !== LIST_STATUS.completed
+          }
+          className={`${DEFAULT_CLASSNAME}_status ${
+            listStatus === LIST_STATUS.pending && !!deadline && 'red-border'
+          }`}
+          onClick={handleTestClick}>
+          {listStatus === LIST_STATUS.check && <Typography>На проверке</Typography>}
+          {listStatus === LIST_STATUS.pending && !deadline && <Typography>Не сдан</Typography>}
+          {listStatus === LIST_STATUS.pending && !!deadline && (
+            <Typography color={'red'}>
+              Дедлайн{' '}
+              {new Date(deadline).toLocaleString('da-DK', {
+                hour12: false,
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Typography>
+          )}
+          {listStatus === LIST_STATUS.completed && passTime && (
+            <Typography className={`${DEFAULT_CLASSNAME}_status_passTime`}>
+              <Typography color={'gray'}>Сдано</Typography>{' '}
+              {passTime.toLocaleString('da-DK', {
+                hour12: false,
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Typography>
+          )}
+        </button>
+      )}
+      {!resultsView && (
+        <button
+          disabled={listStatus === LIST_STATUS.pending && tasksAmount === 0}
+          className={`${DEFAULT_CLASSNAME}_status ${
+            listStatus === LIST_STATUS.pending && !!deadline && 'red-border'
+          }`}
+          onClick={handleTestClick}>
+          {listStatus === LIST_STATUS.check && <Typography>На проверке</Typography>}
+          {listStatus === LIST_STATUS.pending && !deadline && <Typography>Сдать тест</Typography>}
+          {listStatus === LIST_STATUS.pending && !!deadline && (
+            <Typography color={'red'}>
+              Дедлайн{' '}
+              {new Date(deadline).toLocaleString('da-DK', {
+                hour12: false,
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Typography>
+          )}
+          {listStatus === LIST_STATUS.completed && passTime && (
+            <Typography className={`${DEFAULT_CLASSNAME}_status_passTime`}>
+              <Typography color={'gray'}>Сдано</Typography>{' '}
+              {passTime.toLocaleString('da-DK', {
+                hour12: false,
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Typography>
+          )}
+        </button>
+      )}
     </div>
   );
 };

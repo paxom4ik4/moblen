@@ -2,12 +2,12 @@
   transition: 0.3s;
 
   .groups {
-    width: 50%;
+    width: 45%;
     transition: 0.3s;
   }
 
   .groups_tests {
-    width: 50%;
+    width: 55%;
     transition: 0.3s;
   }
 }
@@ -79,7 +79,12 @@
   &_trash {
     position: absolute;
     right: 20px;
-    bottom: 32px;
+    bottom: 20px;
+
+    svg {
+      width: 36px;
+      height: 36px;
+    }
   }
 }
 

@@ -385,6 +385,7 @@ const Courses: FC = memo(() => {
                   }`}
                   onClick={() => dispatch(setActiveTopic(topic.topic_uuid))}>
                   <Typography
+                    className={`${DEFAULT_CLASSNAME}_topics_list-item_name`}
                     size={'small'}
                     color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
                     {topic.topic_name}
@@ -401,6 +402,7 @@ const Courses: FC = memo(() => {
             {addNewTopic && (
               <div className={`${DEFAULT_CLASSNAME}_topics_list-item`}>
                 <input
+                  maxLength={16}
                   autoFocus={true}
                   onChange={(e) => setNewTopicName(e.currentTarget.value)}
                   value={newTopicName}
@@ -426,8 +428,6 @@ const Courses: FC = memo(() => {
         )}
       </div>
       <div className={`${DEFAULT_CLASSNAME}_tasks`}>
-        {!activeTopic && <Typography color={'purple'}>Выберите или создайте тему</Typography>}
-
         {activeTopic &&
           !isTaskListLoading &&
           Array.isArray(taskList) &&
@@ -465,7 +465,7 @@ const Courses: FC = memo(() => {
         )}
       </div>
 
-      <Tooltip title="Удалить">
+      <Tooltip placement={'top'} title="Удалить">
         <div
           ref={drop}
           className={`${DEFAULT_CLASSNAME}_delete ${isOver && 'courses-delete-drop'}`}>

@@ -143,7 +143,13 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
 
   const onGroupCartClickHandler = () => {
     if (hideControls) {
-      setSelectedShareGroups!([id!, ...selectedShareGroups!]);
+      if (selectedShareGroups?.includes(id!)) {
+        setSelectedShareGroups!(selectedShareGroups.filter((item) => item !== id));
+      }
+
+      if (!selectedShareGroups?.includes(id!)) {
+        setSelectedShareGroups!([id!, ...selectedShareGroups!]);
+      }
     }
   };
 
@@ -175,13 +181,18 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
       <div className={`${DEFAULT_CLASSNAME}_text`}>
         {isEditMode && (
           <input
+            maxLength={24}
             onChange={(e) => setNewGroupName(e.currentTarget.value)}
             className={`${DEFAULT_CLASSNAME}_text-name`}
             autoFocus={true}
             value={newGroupName}
           />
         )}
-        {!isEditMode && <Typography size={'default'}>{name}</Typography>}
+        {!isEditMode && (
+          <Typography className={`${DEFAULT_CLASSNAME}_text-name`} size={'default'}>
+            {name}
+          </Typography>
+        )}
         {!isEditMode && (
           <Typography size={'small'}>
             {amount === 0 ? 'Нет участников' : `Участников: ${amount}`}

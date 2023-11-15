@@ -6,7 +6,7 @@ import cl from 'classnames';
 
 export interface TypographyProps extends PropsWithChildren {
   size?: 'default' | 'small' | 'large';
-  color?: 'default' | 'gray' | 'purple';
+  color?: 'default' | 'gray' | 'purple' | 'red';
   weight?: 'default' | 'bold' | 'italic';
   className?: string;
   onClick?: () => void;

@@ -278,14 +278,14 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       )}
 
       {!editModeDisabled && !isCreateMode && (
-        <Tooltip title={'Удалить'}>
+        <Tooltip placement={'top'} title={'Удалить'}>
           <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
             <TrashIcon />
           </div>
         </Tooltip>
       )}
       {isCreateMode && (
-        <Tooltip title={'Сохранить'}>
+        <Tooltip placement={'top'} title={'Сохранить'}>
           <div className={`${DEFAULT_CLASSNAME}_save`} onClick={saveNewTaskHandler}>
             <CheckIcon />
           </div>

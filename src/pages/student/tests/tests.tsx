@@ -45,11 +45,14 @@ const Tests: FC<TestsProps> = memo((props) => {
     data: studentTaskLists,
     isLoading: isDataLoading,
     isLoadingError: isTaskListLoadingError,
-  } = useQuery(['taskLists', activeTutor, selectedStudent], () =>
-    getStudentTaskLists({
-      student_uuid: resultsView ? selectedStudent! : userData!.uuid,
-      tutor_uuid: resultsView ? userData!.uuid : activeTutor,
-    }),
+  } = useQuery(
+    ['taskLists', activeTutor, selectedStudent],
+    () =>
+      getStudentTaskLists({
+        student_uuid: resultsView ? selectedStudent! : userData!.uuid,
+        tutor_uuid: resultsView ? userData!.uuid : activeTutor,
+      }),
+    { refetchInterval: 5000 },
   );
 
   const [topics, setTopics] = useState<{ topic_uuid: string; topic_name: string }[]>([]);
@@ -132,10 +135,6 @@ const Tests: FC<TestsProps> = memo((props) => {
   }
 
   const showTasks = activeCourse && activeTopic && !!taskLists?.length;
-
-  const resultTaskList = resultsView
-    ? taskLists.filter((list: TaskList) => list.status[0] === 'решено')
-    : taskLists;
 
   return (
     <>
@@ -230,7 +229,7 @@ const Tests: FC<TestsProps> = memo((props) => {
             </div>
             <div className={`${DEFAULT_CLASSNAME}_tasks`}>
               {showTasks &&
-                resultTaskList.map((test: TaskList) => (
+                taskLists.map((test: TaskList) => (
                   <StudentTestCard
                     selectedStudent={selectedStudent}
                     resultsView={resultsView}
@@ -241,6 +240,7 @@ const Tests: FC<TestsProps> = memo((props) => {
                     topic={activeTopic.name}
                     status={test.status}
                     tasksAmount={test.task_count}
+                    deadline={test.deadline}
                   />
                 ))}
             </div>

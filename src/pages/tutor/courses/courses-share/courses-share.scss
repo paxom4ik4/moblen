@@ -11,6 +11,12 @@
   height: 90vh;
   overflow-y: auto;
 
+  &_infoText {
+    position: absolute;
+    bottom: 16px;
+    right: 20px;
+  }
+
   .MuiFormControl-root {
     width: 100%;
 

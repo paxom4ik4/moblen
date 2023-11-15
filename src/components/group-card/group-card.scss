@@ -8,9 +8,10 @@
   position: relative;
   display: flex;
   gap: 16px;
-  width: fit-content;
   user-select: none;
   height: fit-content;
+  width: 320px;
+  box-sizing: border-box;
 
   background-color: #fbf8fd;
   border-radius: 0 16px 16px 16px;
@@ -66,8 +67,11 @@
     &-name {
       font-size: 16px;
       border: none;
-      padding: 4px;
       border-radius: 4px;
+      width: 176px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     &-amount {

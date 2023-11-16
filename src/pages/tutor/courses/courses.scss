@@ -208,6 +208,11 @@
         height: 38px;
         max-width: 160px;
 
+        svg {
+          width: 16px;
+          height: 16px;
+        }
+
         p {
           overflow: hidden;
           text-overflow: ellipsis;
@@ -294,6 +299,11 @@
         min-width: 120px;
         width: fit-content;
         height: 30px;
+
+        &_edit {
+          height: 16px;
+          width: 16px;
+        }
 
         &_name {
           overflow: hidden;

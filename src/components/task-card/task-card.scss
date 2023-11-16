@@ -10,7 +10,7 @@
 
   &_upper {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 12px;
   }
 
@@ -47,7 +47,13 @@
   }
 
   &_task {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+
     &_score {
+      width: calc(50% - 8px);
       display: flex;
       flex-direction: row;
       justify-content: space-between;
@@ -76,7 +82,6 @@
     }
   }
 
-  &_task,
   &_criteria {
     width: 50%;
     display: flex;
@@ -104,8 +109,13 @@
     }
   }
 
+  &_task-container {
+    width: 50%;
+  }
+
   &_task-container,
   &_criteria-text {
+    height: 100%;
     background-color: #fff;
     border-radius: 15px;
     padding: 12px;

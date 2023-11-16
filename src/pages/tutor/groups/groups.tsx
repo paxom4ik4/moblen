@@ -137,14 +137,8 @@ const Groups: FC<GroupsProps> = memo((props) => {
         <div className={`${DEFAULT_CLASSNAME}_students`}>
           {selectedGroup && isGroupLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
 
-          {groups?.length == 0 ? (
-            <Typography>
-              <div style={{ marginTop: '50%', marginLeft: '50%', width: '250px' }}>
-                У вас нет преподавателей/групп
-              </div>
-            </Typography>
-          ) : (
-            <></>
+          {groups?.length == 0 && !isNewGroupCreating && (
+            <Typography color={'purple'}>{'У вас ещё нет групп'}</Typography>
           )}
 
           {selectedGroup && !isGroupLoading && !selectedGroupData?.students?.length && (

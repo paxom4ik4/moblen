@@ -49,7 +49,9 @@ const CreateTest: FC = memo(() => {
   const [isNewTask, setIsNewTask] = useState(false);
   const [newTaskText] = useState('');
 
-  const addNewTaskHandler = () => setIsNewTask(true);
+  const addNewTaskHandler = () => {
+    setIsNewTask(true);
+  };
 
   const saveTestHandler = () => {
     dispatch(clearCreateTask());

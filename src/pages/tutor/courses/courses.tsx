@@ -75,6 +75,10 @@ const Courses: FC = memo(() => {
   );
 
   useEffect(() => {
+    if (!topics?.length) {
+      dispatch(setActiveTopic(null));
+    }
+
     if (topics?.length && !activeTopic) {
       dispatch(setActiveTopic(topics[0].topic_uuid));
     }
@@ -159,7 +163,6 @@ const Courses: FC = memo(() => {
     if (activeCourse && activeTopic) {
       await deleteTopicMutation.mutate({ topic_uuid: activeTopic });
 
-      setActiveCourse(null);
       setActiveTopic(null);
     }
 
@@ -457,7 +460,7 @@ const Courses: FC = memo(() => {
             topic={activeTopicName}
           />
         )}
-        {activeTopic && (
+        {!!topics?.length && topics.some((item) => item.topic_uuid === activeTopic) && (
           <button
             onClick={() => setIsTaskListCreating(true)}
             className={`${DEFAULT_CLASSNAME}_tasks_add`}>

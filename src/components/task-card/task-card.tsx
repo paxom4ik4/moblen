@@ -117,8 +117,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     setNewAssetText('');
   };
 
-  // const addNewAssetHandler = () => setAddNewAsset(true);
-
   const closeNewAssetHandler = () => {
     setAddNewAsset(false);
     clearNewAsset();
@@ -196,58 +194,58 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               {!isCreateMode && <Typography>{text}</Typography>}
             </div>
           </div>
-          <div className={`${DEFAULT_CLASSNAME}_task_score`}>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-                Максимальный балл за задание
+          <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+            <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
+              <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
+              <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+                {isCreateMode && (
+                  <textarea
+                    placeholder={'Критерии задания'}
+                    value={taskCriteria}
+                    onChange={(e) => setTaskCriteria(e.currentTarget.value)}
+                  />
+                )}
+                {!isCreateMode && <Typography>{criteria}</Typography>}
               </div>
-              {isCreateMode && (
-                <input
-                  placeholder={'10'}
-                  value={taskMaxScore ?? 0}
-                  type={'text'}
-                  onChange={(e) => setTaskMaxScore(Number(e.currentTarget.value))}
-                />
-              )}
-              {!isCreateMode && <Typography>{maxScore}</Typography>}
             </div>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
-              {isCreateMode && (
-                <Select
-                  fullWidth
-                  value={taskFormat || ''}
-                  onChange={handleFormatChange}
-                  defaultValue=""
-                  MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
-                  {taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
-                </Select>
-              )}
-              {!isCreateMode && <Typography>{format}</Typography>}
-            </div>
+            {/*{isCreateMode && (*/}
+            {/*  <div*/}
+            {/*    className={`${DEFAULT_CLASSNAME}_criteria-attach`}*/}
+            {/*    onClick={() => addNewAssetHandler()}>*/}
+            {/*    <AttachIcon />*/}
+            {/*  </div>*/}
+            {/*)}*/}
           </div>
         </div>
-        <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-          <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
-            <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
-            <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-              {isCreateMode && (
-                <textarea
-                  placeholder={'Критерии задания'}
-                  value={taskCriteria}
-                  onChange={(e) => setTaskCriteria(e.currentTarget.value)}
-                />
-              )}
-              {!isCreateMode && <Typography>{criteria}</Typography>}
+        <div className={`${DEFAULT_CLASSNAME}_task_score`}>
+          <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
+              Максимальный балл за задание
             </div>
+            {isCreateMode && (
+              <input
+                placeholder={'10'}
+                value={taskMaxScore ?? 0}
+                type={'text'}
+                onChange={(e) => setTaskMaxScore(Number(e.currentTarget.value))}
+              />
+            )}
+            {!isCreateMode && <Typography>{maxScore}</Typography>}
           </div>
-          {/*{isCreateMode && (*/}
-          {/*  <div*/}
-          {/*    className={`${DEFAULT_CLASSNAME}_criteria-attach`}*/}
-          {/*    onClick={() => addNewAssetHandler()}>*/}
-          {/*    <AttachIcon />*/}
-          {/*  </div>*/}
-          {/*)}*/}
+          <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
+            {isCreateMode && (
+              <Select
+                fullWidth
+                value={taskFormat || ''}
+                onChange={handleFormatChange}
+                defaultValue=""
+                MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
+                {taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
+              </Select>
+            )}
+            {!isCreateMode && <Typography>{format}</Typography>}
+          </div>
         </div>
       </div>
 

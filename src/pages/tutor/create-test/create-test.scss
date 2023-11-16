@@ -70,7 +70,7 @@
   }
 
   &_tasks-container {
-    padding: 4px 0 4px 16px;
+    padding: 4px 8px 4px 16px;
     overflow-y: scroll;
     position: relative;
     height: 100%;
@@ -89,11 +89,15 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      width: 56px;
-      height: 56px;
+      min-width: 56px;
+      max-width: 56px;
+      min-height: 56px;
+      max-height: 56px;
+
       svg {
         width: 50%;
       }
+
       border-radius: 0 15px 15px 15px;
       color: #6750a4;
       box-shadow: 0 0 3px 1px rgba(0, 0, 0, 0.3);

@@ -141,3 +141,23 @@
     transition: 0.3s;
   }
 }
+
+.groups_list {
+  .group-card:nth-child(2n) {
+    .group-card_icon {
+      background-color: #F7C8FF !important;
+    }
+  }
+
+  .group-card_icon:nth-child(1n) {
+    .group-card_icon {
+      background-color: #c8caff !important;
+    }
+  }
+
+  .group-card:nth-child(3n) {
+    .group-card_icon {
+      background-color: #DDFFC8 !important;
+    }
+  }
+}

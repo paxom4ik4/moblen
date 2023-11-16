@@ -11,7 +11,15 @@ import { Typography } from 'common/typography/typography.tsx';
 import { Asset } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { createTask, deleteTask } from 'services/tasks';
-import { ListSubheader, MenuItem, Select, SelectChangeEvent, Tooltip } from '@mui/material';
+import {
+  ListSubheader,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  TextareaAutosize,
+  TextField,
+  Tooltip,
+} from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -91,7 +99,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         list_uuid: taskListId,
         format: taskFormat,
         criteria: taskCriteria,
-        max_ball: Number(taskMaxScore),
+        max_ball: +taskMaxScore,
         task_condition: taskText,
       });
 
@@ -159,7 +167,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               )}
               {newAssetImage && <img src={URL.createObjectURL(newAssetImage)} alt={'New Asset'} />}
             </div>
-            <textarea
+            <TextareaAutosize
               value={newAssetText}
               onChange={(e) => setNewAssetText(e.target.value)}
               placeholder={'Описание картинки'}
@@ -179,19 +187,21 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
       <div className={`${DEFAULT_CLASSNAME}_upper`}>
         <div className={`${DEFAULT_CLASSNAME}_task`}>
-          <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-            <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-              Задание {isCreateMode ? '' : index}
-            </div>
-            <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-              {isCreateMode && (
-                <textarea
-                  placeholder={'Текст задания'}
-                  value={taskText}
-                  onChange={(e) => setTaskText(e.currentTarget.value)}
-                />
-              )}
-              {!isCreateMode && <Typography>{text}</Typography>}
+          <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+            <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+              <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+                Задание {isCreateMode ? '' : index}
+              </div>
+              <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+                {isCreateMode && (
+                  <TextareaAutosize
+                    placeholder={'Текст задания'}
+                    value={taskText}
+                    onChange={(e) => setTaskText(e.currentTarget.value)}
+                  />
+                )}
+                {!isCreateMode && <Typography>{text}</Typography>}
+              </div>
             </div>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_criteria`}>
@@ -199,7 +209,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
               <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
                 {isCreateMode && (
-                  <textarea
+                  <TextareaAutosize
                     placeholder={'Критерии задания'}
                     value={taskCriteria}
                     onChange={(e) => setTaskCriteria(e.currentTarget.value)}
@@ -208,13 +218,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 {!isCreateMode && <Typography>{criteria}</Typography>}
               </div>
             </div>
-            {/*{isCreateMode && (*/}
-            {/*  <div*/}
-            {/*    className={`${DEFAULT_CLASSNAME}_criteria-attach`}*/}
-            {/*    onClick={() => addNewAssetHandler()}>*/}
-            {/*    <AttachIcon />*/}
-            {/*  </div>*/}
-            {/*)}*/}
           </div>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_task_score`}>
@@ -223,8 +226,8 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               Максимальный балл за задание
             </div>
             {isCreateMode && (
-              <input
-                placeholder={'10'}
+              <TextField
+                placeholder={'Балл за задание'}
                 value={taskMaxScore ?? 0}
                 type={'text'}
                 onChange={(e) => setTaskMaxScore(Number(e.currentTarget.value))}

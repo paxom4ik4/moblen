@@ -21,7 +21,7 @@ interface StudentTestCardProps {
   tasksAmount: number;
   deadline?: string;
   passTime?: Date;
-  status: [string, number?, number?];
+  status?: [string, number?, number?];
   onClick?: () => void;
   resultsView?: boolean;
   selectedStudent?: string;
@@ -47,7 +47,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     tasksAmount,
     deadline,
     passTime = new Date(),
-    status,
+    status = ['не решено'],
     resultsView = false,
     replay = false,
   } = props;

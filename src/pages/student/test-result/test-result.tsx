@@ -1,4 +1,4 @@
-import { FC, memo, useEffect, useState } from 'react';
+import { ChangeEvent, FC, memo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { CompletedTask } from 'types/task.ts';
@@ -12,8 +12,14 @@ import { RootState } from 'store/store.ts';
 import { useQuery } from 'react-query';
 import { getCompletedTaskList } from 'services/student/student.ts';
 import { AppModes } from '../../../constants/appTypes.ts';
+import { Pagination } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'test-result';
+
+interface ResultTask {
+  attempt: 1;
+  result: CompletedTask[];
+}
 
 const TestResult: FC = memo(() => {
   const { id } = useParams();
@@ -27,7 +33,7 @@ const TestResult: FC = memo(() => {
 
   const { name, id: taskListId, selectedStudent, replay } = currentTaskList!;
 
-  const { data: tasks } = useQuery(['completedTasks', selectedStudent, uuid], () =>
+  const { data: tasksHistory } = useQuery(['completedTasks', selectedStudent, uuid], () =>
     getCompletedTaskList({
       list_uuid: taskListId ?? id,
       student_uuid: selectedStudent?.length ? selectedStudent : uuid,
@@ -37,15 +43,38 @@ const TestResult: FC = memo(() => {
   const [maxScore, setMaxScore] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
 
+  const [currentAttempt, setCurrentAttempt] = useState(tasksHistory?.length - 1 ?? 0);
+  const [currentTask, setCurrentTask] = useState<ResultTask | null>(() =>
+    tasksHistory ? tasksHistory[currentAttempt] : null,
+  );
+
+  useEffect(() => {
+    if (tasksHistory) {
+      setCurrentAttempt(tasksHistory.length - 1);
+    }
+  }, [tasksHistory]);
+
+  useEffect(() => {
+    if (tasksHistory) {
+      setCurrentTask(tasksHistory[currentAttempt]);
+    }
+  }, [currentAttempt]);
+
   useEffect(() => {
     setMaxScore(
-      tasks?.reduce((score: number, task: CompletedTask) => score + Number(task.task.max_ball), 0),
+      currentTask?.result?.reduce(
+        (score: number, task: CompletedTask) => score + Number(task.task.max_ball),
+        0,
+      ) ?? 0,
     );
 
     setCurrentScore(
-      tasks?.reduce((score: number, task: CompletedTask) => score + Number(task.score), 0),
+      currentTask?.result?.reduce(
+        (score: number, task: CompletedTask) => score + Number(task.score),
+        0,
+      ) ?? 0,
     );
-  }, [tasks]);
+  }, [currentTask]);
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
@@ -53,6 +82,12 @@ const TestResult: FC = memo(() => {
 
   const handleReplayTest = () => {
     navigate(`/assignments/${id}`);
+  };
+
+  const handleAttemptChange = (event: ChangeEvent<unknown>, value: number) => {
+    event.preventDefault();
+
+    setCurrentAttempt(value - 1);
   };
 
   return (
@@ -67,6 +102,17 @@ const TestResult: FC = memo(() => {
               {name}
             </Typography>
           </div>
+          {tasksHistory?.length > 1 && (
+            <div className={`${DEFAULT_CLASSNAME}_pagination`}>
+              <Typography>Номер попытки</Typography>
+              <Pagination
+                size={'small'}
+                count={tasksHistory?.length}
+                page={currentAttempt + 1}
+                onChange={handleAttemptChange}
+              />
+            </div>
+          )}
           <div className={`${DEFAULT_CLASSNAME}_title_maxScore`}>
             <Typography color={'purple'}>{'Общий балл'}</Typography>
             <Typography weight={'bold'}>
@@ -80,7 +126,7 @@ const TestResult: FC = memo(() => {
           )}
         </div>
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>
-          {tasks?.map((task: CompletedTask, index: number) => (
+          {currentTask?.result?.map((task: CompletedTask, index: number) => (
             <div className={`${DEFAULT_CLASSNAME}_tasks_item`}>
               <div className={`${DEFAULT_CLASSNAME}_tasks_item_task`}>
                 <TaskPassCard

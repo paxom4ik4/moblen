@@ -8,6 +8,11 @@
     padding: 4px !important;
   }
 
+  .MuiInputBase-input {
+    padding: 4px !important;
+    font-size: 14px !important;
+  }
+
   &_upper {
     display: flex;
     flex-direction: column;
@@ -51,6 +56,7 @@
     display: flex;
     flex-direction: row;
     gap: 12px;
+    height: 100%;
 
     &_score {
       width: calc(50% - 8px);
@@ -110,7 +116,8 @@
   }
 
   &_task-container {
-    width: 50%;
+    width: 100%;
+    height: 100%;
   }
 
   &_task-container,
@@ -125,6 +132,7 @@
       border: none;
       box-shadow: none;
       border-radius: 4px;
+      resize: vertical;
     }
 
     &_title {

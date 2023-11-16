@@ -11,6 +11,7 @@ import TrashIcon from 'assets/icons/trash-icon.svg';
 import { TestCard, TestCardCreate } from 'components/test-card/test-card.tsx';
 import { CoursesShare } from './courses-share/courses-share.tsx';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 import { Typography } from 'common/typography/typography.tsx';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -210,36 +211,32 @@ const Courses: FC = memo(() => {
   const [taskListShared, setTaskListShared] = useState(false);
 
   const createNewTestContent = (
-    <div className={`${DEFAULT_CLASSNAME}_new-test_modal`}>
-      <div
-        className={`${DEFAULT_CLASSNAME}_new-test_modal_cancel`}
-        onClick={() => setIsCreatingNewTest(null)}>
-        <CancelIcon />
+    <ClickAwayListener onClickAway={() => setIsCreatingNewTest(null)}>
+      <div className={`${DEFAULT_CLASSNAME}_new-test_modal`}>
+        <button
+          onClick={() => {
+            if (isCreatingNewTest?.list_uuid && isCreatingNewTest?.list_name) {
+              dispatch(
+                setTaskToCreate({
+                  courseName: activeCourseName,
+                  topicName: activeTopicName,
+                  taskListId: isCreatingNewTest.list_uuid,
+                  taskListName: isCreatingNewTest!.list_name,
+                }),
+              );
+              navigate(
+                `/assignments/create-test/${isCreatingNewTest.list_uuid}?editable=${isCreatingNewTest.editable}`,
+              );
+              setIsCreatingNewTest(null);
+            }
+          }}>
+          Внести готовые задания
+        </button>
+        <button disabled={true} onClick={() => navigate('/assignments/generate-test')}>
+          Сгенерировать задания <LockIcon />
+        </button>
       </div>
-
-      <button
-        onClick={() => {
-          if (isCreatingNewTest?.list_uuid && isCreatingNewTest?.list_name) {
-            dispatch(
-              setTaskToCreate({
-                courseName: activeCourseName,
-                topicName: activeTopicName,
-                taskListId: isCreatingNewTest.list_uuid,
-                taskListName: isCreatingNewTest!.list_name,
-              }),
-            );
-            navigate(
-              `/assignments/create-test/${isCreatingNewTest.list_uuid}?editable=${isCreatingNewTest.editable}`,
-            );
-            setIsCreatingNewTest(null);
-          }
-        }}>
-        Внести готовые задания
-      </button>
-      <button disabled={true} onClick={() => navigate('/assignments/generate-test')}>
-        Сгенерировать задания <LockIcon />
-      </button>
-    </div>
+    </ClickAwayListener>
   );
 
   const calendarContent = (

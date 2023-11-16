@@ -239,7 +239,7 @@ const Tests: FC<TestsProps> = memo((props) => {
                     name={test.list_name}
                     subject={activeCourse.name}
                     topic={activeTopic.name}
-                    status={test.status}
+                    status={test?.status}
                     tasksAmount={test.task_count}
                     deadline={test.deadline}
                   />

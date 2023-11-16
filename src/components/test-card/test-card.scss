@@ -1,5 +1,4 @@
 .app-test-card {
-
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -12,7 +11,7 @@
   padding: 8px 16px;
   margin: 10px 0;
 
-  width: 265px;
+  width: 230px;
 
   .MuiFormControl-root {
     margin-top: 4px;
@@ -28,7 +27,7 @@
     border: none;
     padding: 4px;
     border-radius: 4px;
-    width: 170px;
+    width: 150px;
     height: 30px !important;
   }
 
@@ -39,20 +38,20 @@
 
   &_subject-topic {
     color: #6750a4;
-    font-size: 14px;
+    font-size: 12px;
   }
 
   &_name {
-    font-size: 16px;
+    font-size: 13px;
     padding: 4px 0;
-    width: 176px;
+    width: 150px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
   &_tasks {
-    font-size: 14px;
+    font-size: 11px;
     color: #44464f;
   }
 
@@ -61,8 +60,39 @@
     justify-content: center;
     align-items: center;
     padding: 6px;
+    width: 32px;
+    height: 32px;
 
-    border-radius: 15px;
+    border-radius: 12px;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+  }
+}
+
+@media (min-width: 1600px) {
+  .app-test-card {
+    width: 260px;
+
+    &_name {
+      font-size: 14px;
+      padding: 4px 0;
+      width: 170px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    &_tasks {
+      font-size: 12px;
+      color: #44464f;
+    }
+
+    &_content input {
+      margin: 4px 0;
+      border: none;
+      padding: 4px;
+      border-radius: 4px;
+      width: 170px;
+      height: 30px !important;
+    }
   }
 }

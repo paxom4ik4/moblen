@@ -83,7 +83,9 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
       <div className={`${DEFAULT_CLASSNAME}_content`}>
         <div className={`${DEFAULT_CLASSNAME}_content_info`}>
           <div className={`${DEFAULT_CLASSNAME}_content_info_subject`}>
-            <Typography color={'purple'}>
+            <Typography
+              color={'purple'}
+              className={`${DEFAULT_CLASSNAME}_content_info_subject-container`}>
               {subject} - {topic}
             </Typography>
           </div>
@@ -95,7 +97,10 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_content_info_tasks`}>
-            <Typography color={'gray'} size={'small'}>
+            <Typography
+              color={'gray'}
+              size={'small'}
+              className={`${DEFAULT_CLASSNAME}_content_info_tasks-container`}>
               {'Заданий'} - {tasksAmount}
             </Typography>
           </div>

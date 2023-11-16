@@ -353,6 +353,7 @@ const Courses: FC = memo(() => {
           {addNewCourse && (
             <div className={`${DEFAULT_CLASSNAME}_subjects_list-item`}>
               <input
+                maxLength={20}
                 autoFocus={true}
                 onChange={(e) => setNewSubjectName(e.currentTarget.value)}
                 value={newSubjectName}

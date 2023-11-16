@@ -28,12 +28,12 @@ button:disabled, button:disabled:hover {
 
 .app {
   width: calc(100vw - 120px);
-  height: calc(100vh - 132px);
+  height: calc(100vh - 112px);
   display: flex;
   justify-content: center;
   align-items: center;
   margin-left: 100px;
-  margin-top: 108px;
+  margin-top: 96px;
 
   &_title {
     display: flex;

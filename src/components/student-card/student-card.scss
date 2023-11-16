@@ -4,6 +4,8 @@
   align-items: center;
   transition: 0.3s;
   padding: 4px;
+  width: 82px;
+  height: fit-content;
 
   :hover {
     cursor: grab;
@@ -13,8 +15,8 @@
   font-weight: 300;
 
   &_name {
-    margin-top: 4px;
-    padding: 0 0 4px;
+    margin-top: 0;
+    padding: 0;
   }
 
   &_icon {
@@ -31,10 +33,42 @@
   transition: 0.5s;
 }
 
+@media (min-width: 1600px) {
+  .student-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: 0.3s;
+    padding: 4px;
+    width: 82px;
+    height: fit-content;
+
+    :hover {
+      cursor: grab;
+      opacity: 0.8;
+    }
+
+    font-weight: 300;
+
+    &_name {
+      margin-top: 4px;
+      padding: 0 0 4px;
+    }
+
+    &_icon {
+      padding: 4px;
+      border: 2px solid transparent;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
+}
+
 .student-cart-active {
   .student-cart_icon {
     transition: 0.3s ease-in;
-    padding: 6px;
+    padding: 4px;
     border: 2px solid #6750a4;
     border-radius: 50%;
     background-color: #d9e2ff;

@@ -4,7 +4,8 @@
   flex-direction: column;
   border-radius: 0 15px 15px 15px;
   background: #ffffff;
-  width: 290px;
+  width: 210px;
+  height: fit-content;
 
   &_status {
     outline: none;
@@ -12,7 +13,7 @@
     border: none;
     border-top: 1px solid black;
     text-align: center;
-    padding: 12px;
+    padding: 8px;
     transition: 0.3s;
     display: flex;
     justify-content: center;
@@ -62,16 +63,16 @@
     align-items: center;
     position: absolute;
     right: 0;
-    width: 71px;
-    height: 71px;
+    width: 57px;
+    height: 57px;
     border-radius: 0 15px 0 0;
   }
 
   &_color {
     position: absolute;
     right: 0;
-    width: 71px;
-    height: 71px;
+    width: 57px;
+    height: 57px;
     border-radius: 0 15px 0 0;
   }
 
@@ -83,13 +84,125 @@
       display: flex;
       flex-direction: column;
       gap: 2px;
-      padding: 8px 24px 8px 16px;
+      padding: 6px 12px;
 
-      &_name-container {
-        width: 176px;
+      &_subject-container {
+        font-size: 11px;
+        max-width: 124px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      &_name-container {
+        width: 128px;
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &_tasks-container {
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+@media (min-width: 1600px) {
+  .student-test-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-radius: 0 15px 15px 15px;
+    background: #ffffff;
+    width: 290px;
+
+    &_status {
+      outline: none;
+      background: transparent;
+      border: none;
+      border-top: 1px solid black;
+      text-align: center;
+      padding: 12px;
+      transition: 0.3s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      &_passTime {
+        display: flex;
+        flex-direction: row;
+        gap: 4px;
+        text-align: center;
+        justify-self: center;
+        align-self: center;
+      }
+
+      &:hover {
+        cursor: pointer;
+        background-color: rgba(234, 234, 234, 0.5);
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+        opacity: 0.8;
+      }
+    }
+
+    &_status.red-border {
+      border-color: #dd4848;
+    }
+
+    &_color.red {
+      background-color: #dd4848;
+    }
+    &_color.orange {
+      background-color: #f77126;
+    }
+    &_color.yellow {
+      background-color: #efc222;
+    }
+    &_color.light-green {
+      background-color: #92e20e;
+    }
+    &_color.green {
+      background-color: #16ff05;
+    }
+
+    &_deadline {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: absolute;
+      right: 0;
+      width: 71px;
+      height: 71px;
+      border-radius: 0 15px 0 0;
+    }
+
+    &_color {
+      position: absolute;
+      right: 0;
+      width: 71px;
+      height: 71px;
+      border-radius: 0 15px 0 0;
+    }
+
+    &_content {
+      display: flex;
+      flex-direction: row;
+
+      &_info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        padding: 8px 24px 8px 16px;
+
+        &_name-container {
+          width: 176px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
       }
     }
   }

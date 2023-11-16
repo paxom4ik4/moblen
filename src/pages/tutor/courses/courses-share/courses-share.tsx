@@ -179,7 +179,7 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
           />
         </div>
       </div>
-      <Typography size={'large'} color={'red'} className={`${DEFAULT_CLASSNAME}_share_infoText`}>
+      <Typography size={'default'} color={'red'} className={`${DEFAULT_CLASSNAME}_share_infoText`}>
         После отправки редактирование теста станет невозможным!
       </Typography>
     </div>

@@ -90,6 +90,20 @@ const TestResult: FC = memo(() => {
     setCurrentAttempt(value - 1);
   };
 
+  const getTaskScorePercentage = (score?: number, maxScore?: number) => {
+    if (!score || !maxScore) return;
+
+    return (score / maxScore) * 100;
+  };
+
+  const getScoreColor = (taskScore: number) => {
+    if (taskScore <= 15) return 'red';
+    if (taskScore > 15 && taskScore <= 30) return 'orange';
+    if (taskScore > 30 && taskScore <= 50) return 'yellow';
+    if (taskScore > 50 && taskScore <= 75) return 'light-green';
+    if (taskScore > 75) return 'green';
+  };
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={DEFAULT_CLASSNAME}>
@@ -115,7 +129,11 @@ const TestResult: FC = memo(() => {
           )}
           <div className={`${DEFAULT_CLASSNAME}_title_maxScore`}>
             <Typography color={'purple'}>{'Общий балл'}</Typography>
-            <Typography weight={'bold'}>
+            <Typography
+              className={`${DEFAULT_CLASSNAME}_title_maxScore_text ${getScoreColor(
+                getTaskScorePercentage(currentScore, maxScore)!,
+              )}`}
+              weight={'bold'}>
               {currentScore} / {maxScore}
             </Typography>
           </div>

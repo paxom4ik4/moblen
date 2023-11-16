@@ -47,8 +47,21 @@
     gap: 32px;
     margin-bottom: 16px;
 
-    &_maxScore p {
+
+    &_maxScore_text.red {
+      color: #dd4848;
+    }
+    &_maxScore_text.orange {
       color: #f77126;
+    }
+    &_maxScore_text.yellow {
+      color: #efc222;
+    }
+    &_maxScore_text.light-green {
+      color: #92e20e;
+    }
+    &_maxScore_text.green {
+      color: #0dbd00;
     }
 
     &_replay {

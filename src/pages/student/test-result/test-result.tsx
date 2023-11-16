@@ -1,5 +1,5 @@
 import { FC, memo, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { CompletedTask } from 'types/task.ts';
 
@@ -11,18 +11,21 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { useQuery } from 'react-query';
 import { getCompletedTaskList } from 'services/student/student.ts';
+import { AppModes } from '../../../constants/appTypes.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
 const TestResult: FC = memo(() => {
   const { id } = useParams();
 
+  const navigate = useNavigate();
+
   const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
   const { currentTaskList, activeTopic, activeCourse } = useSelector(
     (state: RootState) => state.student,
   )!;
 
-  const { name, id: taskListId, selectedStudent } = currentTaskList!;
+  const { name, id: taskListId, selectedStudent, replay } = currentTaskList!;
 
   const { data: tasks } = useQuery(['completedTasks', selectedStudent, uuid], () =>
     getCompletedTaskList({
@@ -44,6 +47,14 @@ const TestResult: FC = memo(() => {
     );
   }, [tasks]);
 
+  const { appMode } = useSelector((state: RootState) => state.appMode);
+
+  const isTutorMode = appMode === AppModes.tutor;
+
+  const handleReplayTest = () => {
+    navigate(`/assignments/${id}`);
+  };
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={DEFAULT_CLASSNAME}>
@@ -62,6 +73,11 @@ const TestResult: FC = memo(() => {
               {currentScore} / {maxScore}
             </Typography>
           </div>
+          {!isTutorMode && replay && (
+            <button onClick={handleReplayTest} className={`${DEFAULT_CLASSNAME}_title_replay`}>
+              <Typography color={'purple'}>{'Перепройти'}</Typography>
+            </button>
+          )}
         </div>
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>
           {tasks?.map((task: CompletedTask, index: number) => (

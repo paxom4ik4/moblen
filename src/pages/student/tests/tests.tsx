@@ -231,6 +231,7 @@ const Tests: FC<TestsProps> = memo((props) => {
               {showTasks &&
                 taskLists.map((test: TaskList) => (
                   <StudentTestCard
+                    replay={test.replay}
                     selectedStudent={selectedStudent}
                     resultsView={resultsView}
                     key={test.list_uuid}

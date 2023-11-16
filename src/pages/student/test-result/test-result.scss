@@ -18,6 +18,24 @@
     &_maxScore p {
       color: #f77126;
     }
+
+    &_replay {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      box-shadow: 0 1px 2px 1px rgba(0, 0, 0, 0.3);
+      border-radius: 100px;
+      background: transparent;
+      outline: none;
+      border: none;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
   }
 
   &_tasks {

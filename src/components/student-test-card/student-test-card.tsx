@@ -25,6 +25,7 @@ interface StudentTestCardProps {
   onClick?: () => void;
   resultsView?: boolean;
   selectedStudent?: string;
+  replay?: boolean;
 }
 
 enum LIST_STATUS {
@@ -48,6 +49,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     passTime = new Date(),
     status,
     resultsView = false,
+    replay = false,
   } = props;
 
   const [listStatus, score, maxScore] = status;
@@ -55,7 +57,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
   const handleTestClick = () => {
-    dispatch(setCurrentTaskList({ id, name, selectedStudent: selectedStudent ?? '' }));
+    dispatch(setCurrentTaskList({ id, name, replay, selectedStudent: selectedStudent ?? '' }));
 
     if (listStatus === LIST_STATUS.completed) {
       navigate(appMode === AppModes.tutor ? `/groups/result/${id}` : `/assignments/result/${id}`);

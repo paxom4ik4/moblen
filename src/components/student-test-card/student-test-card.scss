@@ -4,7 +4,7 @@
   flex-direction: column;
   border-radius: 0 15px 15px 15px;
   background: #ffffff;
-  width: 210px;
+  width: 220px;
   height: fit-content;
 
   &_status {
@@ -88,14 +88,14 @@
 
       &_subject-container {
         font-size: 11px;
-        max-width: 124px;
+        max-width: 140px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
       }
 
       &_name-container {
-        width: 128px;
+        width: 140px;
         font-size: 14px;
         overflow: hidden;
         text-overflow: ellipsis;

@@ -10,7 +10,7 @@ interface InitialState {
     id: string;
     name: string;
   };
-  currentTaskList: null | { name: string; id: string; selectedStudent?: string };
+  currentTaskList: null | { name: string; id: string; selectedStudent?: string; replay?: boolean };
 }
 
 const initialState: InitialState = {
@@ -35,7 +35,12 @@ const studentSlice = createSlice({
     },
     setCurrentTaskList: (
       state,
-      action: PayloadAction<{ id: string; name: string; selectedStudent: string } | null>,
+      action: PayloadAction<{
+        id: string;
+        name: string;
+        selectedStudent: string;
+        replay?: boolean;
+      } | null>,
     ) => {
       state.currentTaskList = action.payload;
     },

@@ -9,6 +9,12 @@
   .groups_tests {
     width: 55%;
     transition: 0.3s;
+
+    .tests_tasks {
+      gap: 12px;
+      padding-left: 20px;
+      padding-right: 12px;
+    }
   }
 
   .student-cart {

@@ -4,6 +4,7 @@ export enum TutorRoutes {
   GROUPS_RESULT = '/groups/result/:id',
   ASSIGNMENTS = '/assignments',
   CREATE_TEST = '/assignments/create-test/:id',
+  GENERATE_TEST = '/assignments/generate-test/:id',
 }
 
 export enum StudentRoutes {

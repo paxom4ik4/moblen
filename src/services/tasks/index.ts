@@ -1,8 +1,10 @@
 import API from '../index.ts';
 import { ShareDataType } from '../../types/share.data.type.ts';
+import { GenerateTaskPayload } from '../../types/task.ts';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
+const GENERATE_URL = '/generate-task';
 
 const tasklistAPI = {
   createTaskList: ({ list_name, topic_uuid }: { list_name: string; topic_uuid: string }) => {
@@ -74,5 +76,12 @@ const tasksAPI = {
   },
 };
 
+const generateAPI = {
+  generateTask: (taskListId: string, data: GenerateTaskPayload) => {
+    return API.post(`${GENERATE_URL}/${taskListId}/`, { ...data }).then((res) => res.data);
+  },
+};
+
 export const { getTaskList, deleteTaskList, createTaskList, shareTaskList } = tasklistAPI;
 export const { getTasks, createTask, deleteTask, getAllFormats } = tasksAPI;
+export const { generateTask } = generateAPI;

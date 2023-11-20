@@ -36,3 +36,11 @@ export interface TaskList {
 export interface TaskWithAnswer extends Task {
   answer: string;
 }
+
+export interface GenerateTaskPayload {
+  text: string;
+  subject: string;
+  task_format: string;
+  max_score: number;
+  task_count: number;
+}

@@ -6,7 +6,6 @@ import AddIcon from 'assets/icons/add-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import AddSubjectIcon from 'assets/icons/add-subject-icon.svg';
 import CancelIcon from 'assets/icons/cancel-icon.svg';
-import LockIcon from 'assets/icons/lock-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import { TestCard, TestCardCreate } from 'components/test-card/test-card.tsx';
 import { CoursesShare } from './courses-share/courses-share.tsx';
@@ -36,6 +35,7 @@ import { DateCalendar } from '@mui/x-date-pickers';
 import { ConfirmModal } from '../../../components/confirm-modal/confirm-modal.tsx';
 import { Notification } from '../../../common/notification/notification.tsx';
 import { CircularProgress, Tooltip } from '@mui/material';
+import { setTaskToGenerate } from '../../../store/generate-task/generate-task.slice.ts';
 
 const DEFAULT_CLASSNAME = 'app-courses';
 
@@ -281,8 +281,22 @@ const Courses: FC = memo(() => {
           }}>
           Внести готовые задания
         </button>
-        <button disabled={true} onClick={() => navigate('/assignments/generate-test')}>
-          Сгенерировать задания <LockIcon />
+        <button
+          onClick={() => {
+            if (isCreatingNewTest?.list_uuid && isCreatingNewTest?.list_name) {
+              dispatch(
+                setTaskToGenerate({
+                  courseName: activeCourseName,
+                  topicName: activeTopicName,
+                  taskListId: isCreatingNewTest.list_uuid,
+                  taskListName: isCreatingNewTest!.list_name,
+                }),
+              );
+
+              navigate(`/assignments/generate-test/${isCreatingNewTest.list_uuid}`);
+            }
+          }}>
+          Сгенерировать задания
         </button>
       </div>
     </ClickAwayListener>

@@ -2,7 +2,6 @@ import { Dispatch, FC, SetStateAction, useState } from 'react';
 
 import './task-card.scss';
 
-// import AttachIcon from 'assets/icons/attach-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
@@ -10,7 +9,7 @@ import CloseIcon from 'assets/icons/cancel-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
 import { Asset } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
-import { createTask, deleteTask } from 'services/tasks';
+import { deleteTask } from 'services/tasks';
 import {
   ListSubheader,
   MenuItem,
@@ -23,99 +22,67 @@ import {
 
 const DEFAULT_CLASSNAME = 'task-card';
 
-export interface TaskCardProps {
-  taskId?: string;
-  taskListId: string;
-  text: string;
-  criteria: string;
-  maxScore: number | null;
-  format: string;
-  taskAssets?: Asset[];
-  index?: number;
+export type TaskCardProps =
+  | {
+      taskId?: string;
+      taskListId: string;
+      taskAssets?: Asset[];
+      index?: number;
 
-  isCreateMode?: boolean;
-  editModeDisabled?: boolean;
-  setIsCreatingMode?: Dispatch<SetStateAction<boolean>>;
+      isCreateMode: true;
 
-  taskFormats?: {
-    subject: string;
-    formats: string[];
-  }[];
-}
+      newTaskText: string;
+      newTaskCriteria: string;
+      newTaskFormat: string;
+      newTaskMaxScore: number | null;
+
+      setNewTaskText: Dispatch<SetStateAction<string>>;
+      setNewTaskCriteria: Dispatch<SetStateAction<string>>;
+      setNewTaskMaxScore: Dispatch<SetStateAction<number | null>>;
+      handleFormatChange: (event: SelectChangeEvent) => void;
+
+      saveNewTaskHandler: () => void;
+
+      taskFormats?: {
+        subject: string;
+        formats: string[];
+      }[];
+
+      editModeDisabled?: boolean;
+      setIsNewTask?: Dispatch<SetStateAction<boolean>>;
+    }
+  | {
+      isCreateMode: false;
+
+      text: string;
+      criteria: string;
+      maxScore: number | null;
+      format: string;
+      editModeDisabled?: boolean;
+
+      taskId?: string;
+      taskListId: string;
+      taskAssets?: Asset[];
+      index?: number;
+    };
 
 export const TaskCard: FC<TaskCardProps> = (props) => {
-  const {
-    taskId,
-    taskListId,
-    setIsCreatingMode,
-    isCreateMode = false,
-    text,
-    criteria,
-    format,
-    maxScore,
-    index,
-    taskAssets,
-    editModeDisabled = false,
-    taskFormats = [],
-  } = props;
-
   const queryClient = useQueryClient();
 
-  const [taskText, setTaskText] = useState<string>(text);
-  const [taskCriteria, setTaskCriteria] = useState<string>(criteria);
-  const [taskFormat, setTaskFormat] = useState<string>(criteria);
-  const [taskMaxScore, setTaskMaxScore] = useState<number | null>(maxScore);
-
-  const handleFormatChange = (event: SelectChangeEvent) => {
-    setTaskFormat(event.target.value as string);
-  };
-
   // assets
-  const [assets, setAssets] = useState<Asset[]>(taskAssets ?? []);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [addNewAsset, setAddNewAsset] = useState<boolean>(false);
   const [newAssetImage, setNewAssetImage] = useState<File | null>(null);
   const [newAssetText, setNewAssetText] = useState('');
-
-  const createTaskMutation = useMutation(
-    (data: {
-      list_uuid: string;
-      task_condition: string;
-      criteria: string;
-      format: string;
-      max_ball: number;
-    }) => createTask(data),
-    {
-      onSuccess: () => queryClient.invalidateQueries('tasks'),
-    },
-  );
 
   const deleteTaskMutation = useMutation((data: { taskId: string }) => deleteTask(data), {
     onSuccess: () => queryClient.invalidateQueries('tasks'),
   });
 
-  const saveNewTaskHandler = () => {
-    if (taskText.length && taskCriteria.length && taskMaxScore && taskMaxScore !== 0) {
-      createTaskMutation.mutate({
-        list_uuid: taskListId,
-        format: taskFormat,
-        criteria: taskCriteria,
-        max_ball: +taskMaxScore,
-        task_condition: taskText,
-      });
-
-      setTaskText('');
-      setTaskCriteria('');
-      setTaskMaxScore(null);
-      setAssets([]);
-
-      setIsCreatingMode!(false);
-    }
-  };
-
   const deleteTaskHandler = () => {
-    if (taskId && taskListId) {
+    if (props.taskId && props.taskListId) {
       deleteTaskMutation.mutate({
-        taskId,
+        taskId: props.taskId,
       });
     }
   };
@@ -190,17 +157,17 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
           <div className={`${DEFAULT_CLASSNAME}_criteria`}>
             <div className={`${DEFAULT_CLASSNAME}_task-container`}>
               <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-                Задание {isCreateMode ? '' : index}
+                Задание {props.isCreateMode ? '' : props.index}
               </div>
               <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                {isCreateMode && (
+                {props.isCreateMode && (
                   <TextareaAutosize
                     placeholder={'Текст задания'}
-                    value={taskText}
-                    onChange={(e) => setTaskText(e.currentTarget.value)}
+                    value={props.newTaskText}
+                    onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
                   />
                 )}
-                {!isCreateMode && <Typography>{text}</Typography>}
+                {!props.isCreateMode && <Typography>{props.text}</Typography>}
               </div>
             </div>
           </div>
@@ -208,14 +175,14 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
               <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
               <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                {isCreateMode && (
+                {props.isCreateMode && (
                   <TextareaAutosize
                     placeholder={'Критерии задания'}
-                    value={taskCriteria}
-                    onChange={(e) => setTaskCriteria(e.currentTarget.value)}
+                    value={props.newTaskCriteria}
+                    onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
                   />
                 )}
-                {!isCreateMode && <Typography>{criteria}</Typography>}
+                {!props.isCreateMode && <Typography>{props.criteria}</Typography>}
               </div>
             </div>
           </div>
@@ -225,34 +192,34 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
               Максимальный балл за задание
             </div>
-            {isCreateMode && (
+            {props.isCreateMode && (
               <TextField
                 placeholder={'Балл за задание'}
-                value={taskMaxScore ?? 0}
+                value={props.newTaskMaxScore ?? 0}
                 type={'text'}
-                onChange={(e) => setTaskMaxScore(Number(e.currentTarget.value))}
+                onChange={(e) => props.setNewTaskMaxScore(Number(e.currentTarget.value))}
               />
             )}
-            {!isCreateMode && <Typography>{maxScore}</Typography>}
+            {!props.isCreateMode && <Typography>{props.maxScore}</Typography>}
           </div>
           <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
             <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
-            {isCreateMode && (
+            {props.isCreateMode && (
               <Select
                 fullWidth
-                value={taskFormat || ''}
-                onChange={handleFormatChange}
+                value={props.newTaskFormat || ''}
+                onChange={props.handleFormatChange}
                 defaultValue=""
                 MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
-                {taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
+                {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
               </Select>
             )}
-            {!isCreateMode && <Typography>{format}</Typography>}
+            {!props.isCreateMode && <Typography>{props.format}</Typography>}
           </div>
         </div>
       </div>
 
-      {isCreateMode && !!assets.length && (
+      {props.isCreateMode && !!assets.length && (
         <div className={`${DEFAULT_CLASSNAME}_files`}>
           {assets.map((asset) => (
             <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
@@ -265,7 +232,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         </div>
       )}
 
-      {!!taskAssets?.length && (
+      {!!props.taskAssets?.length && (
         <div className={`${DEFAULT_CLASSNAME}_files`}>
           {assets.map((asset) => (
             <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
@@ -278,16 +245,21 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         </div>
       )}
 
-      {!editModeDisabled && !isCreateMode && (
+      {!props.editModeDisabled && !props.isCreateMode && (
         <Tooltip placement={'top'} title={'Удалить'}>
           <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
             <TrashIcon />
           </div>
         </Tooltip>
       )}
-      {isCreateMode && (
+      {props.isCreateMode && (
         <Tooltip placement={'top'} title={'Сохранить'}>
-          <div className={`${DEFAULT_CLASSNAME}_save`} onClick={saveNewTaskHandler}>
+          <div
+            className={`${DEFAULT_CLASSNAME}_save`}
+            onClick={() => {
+              props.saveNewTaskHandler();
+              props.setIsNewTask!(false);
+            }}>
             <CheckIcon />
           </div>
         </Tooltip>

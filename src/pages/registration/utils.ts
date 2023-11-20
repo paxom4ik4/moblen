@@ -11,7 +11,7 @@ const REQUIRED = 'Обязательное поле';
 const PASSWORD_MATCH = 'Пароли несовпадают';
 const WRONG_MAIL_FORMAT = 'Неверный формат Email';
 const WRONG_PHONE_FORMAT = 'Неверный формат телефона';
-const PASSWORD_CHECK_ERROR = 'Минимум 8 символов, cпецсимвол, верхний регистр';
+const PASSWORD_CHECK_ERROR = 'Минимум 8 символов, содержащий цифру';
 
 export const validateFn = (values: RegistrationValues) => {
   const errors: Partial<RegistrationValues> = {};
@@ -36,9 +36,7 @@ export const validateFn = (values: RegistrationValues) => {
 
   if (!values.password) {
     errors.password = REQUIRED;
-  } else if (
-    !/(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z!@#$%^&*]{8,}/g.test(values.password)
-  ) {
+  } else if (!/(?=.*[0-9])(?=.*[a-z])[0-9a-zA-Z!@#$%^&*]{8,}/g.test(values.password)) {
     errors.password = PASSWORD_CHECK_ERROR;
   }
 

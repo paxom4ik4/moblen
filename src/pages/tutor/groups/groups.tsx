@@ -106,7 +106,10 @@ const Groups: FC<GroupsProps> = memo((props) => {
               hideControls={viewMode}
               hideIcon={viewMode && !!selectedStudent}
               key={group.group_uuid}
-              onClick={() => setSelectedGroup(group)}
+              onClick={() => {
+                dispatch(clearSelectedStudent());
+                setSelectedGroup(group === selectedGroup ? null : group);
+              }}
               id={group.group_uuid}
               active={selectedGroup === group}
               name={group.group_name}

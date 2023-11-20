@@ -18,6 +18,7 @@ import { addNewStudent, deleteGroup, editGroupName, refreshGroupLink } from 'ser
 import { deleteFromGroup } from 'services/student/student.ts';
 import { Notification } from 'common/notification/notification.tsx';
 import { Typography } from 'common/typography/typography.tsx';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 const DEFAULT_CLASSNAME = 'group-card';
 
@@ -154,101 +155,106 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
   };
 
   return (
-    <div
-      ref={drop}
-      className={`${DEFAULT_CLASSNAME} ${active && `active-${DEFAULT_CLASSNAME}`} ${
-        isOver && 'group-card-drop'
-      } ${isNewGroupCreating && `${DEFAULT_CLASSNAME}_creating_new`}`}
-      onClick={onClick ?? onGroupCartClickHandler}>
-      {!hideIcon && (
-        <div className={`${DEFAULT_CLASSNAME}_icon`}>
-          {isEditMode && (
-            <input
-              disabled={true}
-              placeholder={'Название группы'}
-              onChange={(e) => setNewGroupImage(e.target.files![0])}
-              type={'file'}
-              className={`${DEFAULT_CLASSNAME}_icon-edit`}
-            />
-          )}
-          {isEditMode && newGroupImage && (
-            <img src={URL.createObjectURL(newGroupImage)} alt={'Group Icon'} />
-          )}
-          {iconUrl && <img src={URL.createObjectURL(iconUrl)} alt={'Group Icon'} />}
-          {!iconUrl && !newGroupImage && (newGroupName[0] ?? name[0])}
-        </div>
-      )}
-      <div className={`${DEFAULT_CLASSNAME}_text`}>
-        {isEditMode && (
-          <input
-            maxLength={24}
-            onChange={(e) => setNewGroupName(e.currentTarget.value)}
-            className={`${DEFAULT_CLASSNAME}_text-name`}
-            autoFocus={true}
-            value={newGroupName}
-          />
-        )}
-        {!isEditMode && (
-          <Typography className={`${DEFAULT_CLASSNAME}_text-name`} size={'default'}>
-            {name}
-          </Typography>
-        )}
-        {!isEditMode && (
-          <Typography size={'small'}>
-            {amount === 0 ? 'Нет участников' : `Участников: ${amount}`}
-          </Typography>
-        )}
-        {!hideControls && (
-          <div className={`${DEFAULT_CLASSNAME}_buttons`}>
-            {!isEditMode && (
-              <div className={`${DEFAULT_CLASSNAME}_buttons-edit`}>
-                <button onClick={() => setIsEditMode(true)}>
-                  <EditIcon />
-                </button>
-              </div>
+    <ClickAwayListener onClickAway={() => isNewGroupCreating && saveGroupHandler()}>
+      <div
+        ref={drop}
+        className={`${DEFAULT_CLASSNAME} ${active && `active-${DEFAULT_CLASSNAME}`} ${
+          isOver && 'group-card-drop'
+        } ${isNewGroupCreating && `${DEFAULT_CLASSNAME}_creating_new`}`}
+        onClick={onClick ?? onGroupCartClickHandler}>
+        {!hideIcon && (
+          <div className={`${DEFAULT_CLASSNAME}_icon`}>
+            {isEditMode && (
+              <input
+                disabled={true}
+                placeholder={'Название группы'}
+                onChange={(e) => setNewGroupImage(e.target.files![0])}
+                type={'file'}
+                className={`${DEFAULT_CLASSNAME}_icon-edit`}
+              />
             )}
-            {!isEditMode && (
-              <div
-                className={`${DEFAULT_CLASSNAME}_buttons-referral`}
-                onClick={() => {
-                  setCopiedTopClipboard(true);
-                  navigator.clipboard.writeText(url);
-                }}>
-                <LinkIcon />
-                <Notification
-                  anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-                  autoHideDuration={3000}
-                  message={'Реферальная ссылка скопирована'}
-                  open={copiedToClipboard}
-                  onClose={() => setCopiedTopClipboard(!copiedToClipboard)}
-                />
-                <div className={`${DEFAULT_CLASSNAME}_buttons-referral-link`}>{url}</div>
-              </div>
+            {isEditMode && newGroupImage && (
+              <img src={URL.createObjectURL(newGroupImage)} alt={'Group Icon'} />
             )}
-            <div className={`${DEFAULT_CLASSNAME}_buttons-refresh`}>
-              {isEditMode && (
-                <button
-                  onClick={() => saveGroupHandler()}
-                  className={`${DEFAULT_CLASSNAME}_buttons_save-new-group`}>
-                  <CheckIcon />{' '}
-                </button>
-              )}
-              {isEditMode && !isNewGroupCreating && (
-                <button
-                  onClick={() => deleteGroupHandler()}
-                  className={`${DEFAULT_CLASSNAME}_buttons_delete-group`}>
-                  <TrashIcon />{' '}
-                </button>
-              )}
-              {!isEditMode && (
-                <button onClick={handlerRefreshRefLink}>
-                  <RefreshIcon />
-                </button>
-              )}
-            </div>
+            {iconUrl && <img src={URL.createObjectURL(iconUrl)} alt={'Group Icon'} />}
+            {!iconUrl && !newGroupImage && (newGroupName[0] ?? name[0])}
           </div>
         )}
+        <div className={`${DEFAULT_CLASSNAME}_text`}>
+          {isEditMode && (
+            <input
+              maxLength={24}
+              onChange={(e) => setNewGroupName(e.currentTarget.value)}
+              className={`${DEFAULT_CLASSNAME}_text-name`}
+              autoFocus={true}
+              value={newGroupName}
+            />
+          )}
+          {!isEditMode && (
+            <Typography
+              onClick={() => active && setIsEditMode(true)}
+              className={`${DEFAULT_CLASSNAME}_text-name`}
+              size={'default'}>
+              {name}
+            </Typography>
+          )}
+          {!isEditMode && (
+            <Typography size={'small'}>
+              {amount === 0 ? 'Нет участников' : `Участников: ${amount}`}
+            </Typography>
+          )}
+          {!hideControls && (
+            <div className={`${DEFAULT_CLASSNAME}_buttons`}>
+              {!isEditMode && (
+                <div className={`${DEFAULT_CLASSNAME}_buttons-edit`}>
+                  <button onClick={() => setIsEditMode(true)}>
+                    <EditIcon />
+                  </button>
+                </div>
+              )}
+              {!isEditMode && (
+                <div
+                  className={`${DEFAULT_CLASSNAME}_buttons-referral`}
+                  onClick={() => {
+                    setCopiedTopClipboard(true);
+                    navigator.clipboard.writeText(url);
+                  }}>
+                  <LinkIcon />
+                  <Notification
+                    anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+                    autoHideDuration={3000}
+                    message={'Реферальная ссылка скопирована'}
+                    open={copiedToClipboard}
+                    onClose={() => setCopiedTopClipboard(!copiedToClipboard)}
+                  />
+                  <div className={`${DEFAULT_CLASSNAME}_buttons-referral-link`}>{url}</div>
+                </div>
+              )}
+              <div className={`${DEFAULT_CLASSNAME}_buttons-refresh`}>
+                {isEditMode && (
+                  <button
+                    onClick={saveGroupHandler}
+                    className={`${DEFAULT_CLASSNAME}_buttons_save-new-group`}>
+                    <CheckIcon />{' '}
+                  </button>
+                )}
+                {isEditMode && !isNewGroupCreating && (
+                  <button
+                    onClick={() => deleteGroupHandler()}
+                    className={`${DEFAULT_CLASSNAME}_buttons_delete-group`}>
+                    <TrashIcon />{' '}
+                  </button>
+                )}
+                {!isEditMode && (
+                  <button onClick={handlerRefreshRefLink}>
+                    <RefreshIcon />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ClickAwayListener>
   );
 };

@@ -33,9 +33,11 @@ const PassTest: FC = memo(() => {
 
   const { id } = useParams();
 
-  const { id: taskListId, name: taskListName } = useSelector(
-    (state: RootState) => state.student.currentTaskList,
-  )!;
+  const {
+    id: taskListId,
+    name: taskListName,
+    seeCriteria,
+  } = useSelector((state: RootState) => state.student.currentTaskList)!;
 
   const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
 
@@ -109,6 +111,7 @@ const PassTest: FC = memo(() => {
               maxScore={task.max_ball}
               format={task.format}
               index={index}
+              showCriteria={seeCriteria}
             />
           ))}
           <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>

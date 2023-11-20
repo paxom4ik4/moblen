@@ -176,12 +176,14 @@ export const RegistrationPage: FC = () => {
               className={`${DEFAULT_CLASSNAME}_footer_mode`}>
               <Typography color={'default'}>Есть аккаунт?</Typography> Войти
             </Typography>
-            <Typography
-              onClick={changeModeHandler}
-              color={'purple'}
-              className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-              Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'}
-            </Typography>
+            {!location.pathname.includes('ref') && (
+              <Typography
+                onClick={changeModeHandler}
+                color={'purple'}
+                className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+                Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'}
+              </Typography>
+            )}
           </div>
           <button className={`${DEFAULT_CLASSNAME}_form_submit`} type={'submit'}>
             <CheckIcon />

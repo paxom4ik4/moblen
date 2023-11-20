@@ -26,6 +26,9 @@ interface StudentTestCardProps {
   resultsView?: boolean;
   selectedStudent?: string;
   replay?: boolean;
+  seeCriteria?: boolean;
+  seeAnswers?: boolean;
+  sendDate?: string;
 }
 
 enum LIST_STATUS {
@@ -46,10 +49,12 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     name,
     tasksAmount,
     deadline,
-    passTime = new Date(),
     status = ['не решено'],
     resultsView = false,
     replay = false,
+    sendDate,
+    seeAnswers = true,
+    seeCriteria = true,
   } = props;
 
   const [listStatus, score, maxScore] = status;
@@ -57,7 +62,16 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
   const handleTestClick = () => {
-    dispatch(setCurrentTaskList({ id, name, replay, selectedStudent: selectedStudent ?? '' }));
+    dispatch(
+      setCurrentTaskList({
+        id,
+        name,
+        replay,
+        selectedStudent: selectedStudent ?? '',
+        seeAnswers,
+        seeCriteria,
+      }),
+    );
 
     if (listStatus === LIST_STATUS.completed) {
       navigate(appMode === AppModes.tutor ? `/groups/result/${id}` : `/assignments/result/${id}`);
@@ -145,10 +159,10 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
               })}
             </Typography>
           )}
-          {listStatus === LIST_STATUS.completed && passTime && (
+          {listStatus === LIST_STATUS.completed && sendDate && (
             <Typography className={`${DEFAULT_CLASSNAME}_status_passTime`}>
               <Typography color={'gray'}>Сдано</Typography>{' '}
-              {passTime.toLocaleString('da-DK', {
+              {new Date(sendDate).toLocaleString('da-DK', {
                 hour12: false,
                 day: '2-digit',
                 month: '2-digit',
@@ -182,10 +196,10 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
               })}
             </Typography>
           )}
-          {listStatus === LIST_STATUS.completed && passTime && (
+          {listStatus === LIST_STATUS.completed && sendDate && (
             <Typography className={`${DEFAULT_CLASSNAME}_status_passTime`}>
               <Typography color={'gray'}>Сдано</Typography>{' '}
-              {passTime.toLocaleString('da-DK', {
+              {new Date(sendDate).toLocaleString('da-DK', {
                 hour12: false,
                 day: '2-digit',
                 month: '2-digit',

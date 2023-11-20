@@ -47,21 +47,32 @@
     gap: 32px;
     margin-bottom: 16px;
 
+    &_back {
+      background-color: #f5f5f5;
+      padding: 4px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        opacity: 0.7;
+      }
+    }
 
     &_maxScore_text.red {
-      color: #dd4848;
+      color: #DD4848;
     }
     &_maxScore_text.orange {
-      color: #f77126;
+      color: #F77126;
     }
     &_maxScore_text.yellow {
-      color: #efc222;
+      color: #EFC222;
     }
     &_maxScore_text.light-green {
-      color: #92e20e;
+      color: #92E20E;
     }
     &_maxScore_text.green {
-      color: #0dbd00;
+      color: #49DA7A;
     }
 
     &_replay {

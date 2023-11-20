@@ -177,11 +177,14 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
             disabled={!selectedShareGroups.length}
             onClick={handleTaskListShare}
           />
+          <Typography
+            size={'small'}
+            color={'red'}
+            className={`${DEFAULT_CLASSNAME}_share_infoText`}>
+            После отправки редактирование теста станет невозможным!
+          </Typography>
         </div>
       </div>
-      <Typography size={'default'} color={'red'} className={`${DEFAULT_CLASSNAME}_share_infoText`}>
-        После отправки редактирование теста станет невозможным!
-      </Typography>
     </div>
   );
 };

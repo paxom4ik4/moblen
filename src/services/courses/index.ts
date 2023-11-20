@@ -19,8 +19,8 @@ const coursesAPI = {
 
     return API.get(`${COURSES_API_URL}/by-tutor/${tutorId}/`).then((res) => res.data);
   },
-  updateCourseName: ({ tutorId, courseName }: { tutorId: string; courseName: string }) => {
-    return API.patch(`${COURSES_API_URL}/by-tutor/${tutorId}/`, { course_name: courseName }).then(
+  updateCourseName: ({ courseId, courseName }: { courseId: string; courseName: string }) => {
+    return API.patch(`${COURSES_API_URL}/${courseId}/`, { course_name: courseName }).then(
       (res) => res.data,
     );
   },
@@ -50,10 +50,9 @@ const topicsAPI = {
       return null;
     }
   },
-  editTopicName: ({ courseId, topicName }: { courseId: string; topicName: string }) => {
-    return API.patch(`${TOPICS_API_URL}/by-tutor/${courseId}`, {
+  updateTopicName: ({ topicId, topicName }: { topicId: string; topicName: string }) => {
+    return API.patch(`${TOPICS_API_URL}/${topicId}`, {
       topic_name: topicName,
-      course_uuid: courseId,
     }).then((res) => res.data);
   },
   deleteTopic: ({ topic_uuid }: { topic_uuid: string }) => {
@@ -62,4 +61,4 @@ const topicsAPI = {
 };
 
 export const { createCourse, getTutorsCourses, updateCourseName, deleteCourse } = coursesAPI;
-export const { createTopic, getTopics, editTopicName, deleteTopic } = topicsAPI;
+export const { createTopic, getTopics, updateTopicName, deleteTopic } = topicsAPI;

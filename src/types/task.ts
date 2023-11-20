@@ -30,6 +30,7 @@ export interface TaskList {
   see_answers: boolean;
   see_criteria: boolean;
   status: [string, number?, number?];
+  sent_data?: string;
 }
 
 export interface TaskWithAnswer extends Task {

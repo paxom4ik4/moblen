@@ -231,7 +231,6 @@ const Tests: FC<TestsProps> = memo((props) => {
               {showTasks &&
                 taskLists.map((test: TaskList) => (
                   <StudentTestCard
-                    replay={test.replay}
                     selectedStudent={selectedStudent}
                     resultsView={resultsView}
                     key={test.list_uuid}
@@ -241,7 +240,11 @@ const Tests: FC<TestsProps> = memo((props) => {
                     topic={activeTopic.name}
                     status={test?.status}
                     tasksAmount={test.task_count}
+                    replay={test.replay}
                     deadline={test.deadline}
+                    seeCriteria={test.see_criteria}
+                    seeAnswers={test.see_answers}
+                    sendDate={test.sent_data}
                   />
                 ))}
             </div>

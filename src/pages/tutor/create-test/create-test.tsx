@@ -11,15 +11,17 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
-import { useQuery } from 'react-query';
-import { getAllFormats, getTasks } from 'services/tasks';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { createTask, getAllFormats, getTasks } from 'services/tasks';
 import { TutorRoutes } from 'constants/routes.ts';
 import { Task } from 'types/task.ts';
-import { CircularProgress } from '@mui/material';
+import { CircularProgress, SelectChangeEvent } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
 const CreateTest: FC = memo(() => {
+  const queryClient = useQueryClient();
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -47,15 +49,59 @@ const CreateTest: FC = memo(() => {
   }, [tasksData]);
 
   const [isNewTask, setIsNewTask] = useState(false);
-  const [newTaskText] = useState('');
 
   const addNewTaskHandler = () => {
-    setIsNewTask(true);
+    if (isNewTask) {
+      saveNewTaskHandler();
+    } else {
+      setIsNewTask(true);
+    }
   };
 
   const saveTestHandler = () => {
     dispatch(clearCreateTask());
     navigate(TutorRoutes.ASSIGNMENTS);
+  };
+
+  // Creating new task
+
+  const [newTaskText, setNewTaskText] = useState<string>('');
+  const [newTaskCriteria, setNewTaskCriteria] = useState<string>('');
+  const [newTaskFormat, setNewTaskFormat] = useState<string>('');
+  const [newTaskMaxScore, setNewTaskMaxScore] = useState<number | null>(null);
+
+  const handleFormatChange = (event: SelectChangeEvent) => {
+    setNewTaskFormat(event.target.value as string);
+  };
+
+  const createTaskMutation = useMutation(
+    (data: {
+      list_uuid: string;
+      task_condition: string;
+      criteria: string;
+      format: string;
+      max_ball: number;
+    }) => createTask(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('tasks'),
+    },
+  );
+
+  const saveNewTaskHandler = () => {
+    if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
+      createTaskMutation.mutate({
+        list_uuid: taskListId!,
+        format: newTaskFormat,
+        criteria: newTaskCriteria,
+        max_ball: +newTaskMaxScore,
+        task_condition: newTaskText,
+      });
+
+      setNewTaskText('');
+      setNewTaskCriteria('');
+      setNewTaskMaxScore(null);
+      setNewTaskFormat('');
+    }
   };
 
   return (
@@ -92,6 +138,7 @@ const CreateTest: FC = memo(() => {
         {!!tasksData?.length &&
           tasksData?.map((task: Task, index: number) => (
             <TaskCard
+              isCreateMode={false}
               key={task.task_uuid}
               taskId={task.task_uuid}
               taskListId={taskListId!}
@@ -106,14 +153,22 @@ const CreateTest: FC = memo(() => {
 
         {isNewTask && (
           <TaskCard
+            isCreateMode={true}
             taskFormats={taskFormats}
             taskListId={taskListId!}
-            isCreateMode
-            setIsCreatingMode={setIsNewTask}
-            text={newTaskText ?? ''}
-            criteria={''}
-            maxScore={null}
-            format={'standard'}
+            taskId={''}
+            editModeDisabled={false}
+            taskAssets={[]}
+            newTaskMaxScore={newTaskMaxScore}
+            newTaskFormat={newTaskFormat}
+            newTaskCriteria={newTaskCriteria}
+            newTaskText={newTaskText}
+            handleFormatChange={handleFormatChange}
+            setNewTaskMaxScore={setNewTaskMaxScore}
+            setNewTaskText={setNewTaskText}
+            setNewTaskCriteria={setNewTaskCriteria}
+            saveNewTaskHandler={saveNewTaskHandler}
+            setIsNewTask={setIsNewTask}
           />
         )}
         {!isEditModeDisabled && (

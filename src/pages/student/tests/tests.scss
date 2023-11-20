@@ -7,6 +7,14 @@
   border-top: 16px solid #c5c6d0;
   height: 100%;
 
+  .active-subject {
+    background-color: #e1e2ec;
+    height: 36px;
+    top: 6px;
+    padding-top: 14px;
+    transition: all 0.4s;
+  }
+
   &_select_tutor {
     padding: 16px;
   }
@@ -52,8 +60,7 @@
     border-radius: 16px;
     position: absolute;
     width: 100%;
-    top: -42px;
-    left: 0;
+    top: -38px;
 
     &_list {
       display: flex;
@@ -150,21 +157,11 @@
 .student-active-topic {
   color: #6750a4;
   transition: 0.3s;
-  font-weight: 500;
 }
 
 .active-subject-title {
   color: #6750a4;
   transition: 0.3s;
-  font-weight: 500;
-}
-
-.active-subject {
-  background-color: #e1e2ec;
-  height: 36px;
-  top: 6px;
-  padding-top: 12px;
-  transition: all 0.4s;
 }
 
 .active-tutor-item {

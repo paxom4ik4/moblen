@@ -7,6 +7,7 @@ import { Asset, TaskWithAnswer } from 'types/task.ts';
 
 import './task-pass-card.scss';
 import { Answers } from 'pages/student/pass-test/pass-test.tsx';
+import { TextareaAutosize } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'task-pass-card';
 
@@ -27,6 +28,9 @@ interface TaskPassCardProps {
 
   answers?: Answers;
   onAnswerChange?: (id: string, answer: string) => void;
+
+  showCriteria?: boolean;
+  showAnswers?: boolean;
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
@@ -42,6 +46,8 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     taskAssets,
     criteria,
     currentScore,
+    showCriteria = true,
+    showAnswers = true,
   } = props;
 
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
@@ -68,14 +74,15 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
               <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Ответ</div>
               <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
                 {mode === 'pass' && (
-                  <textarea
-                    rows={1}
+                  <TextareaAutosize
                     placeholder={'Запишите ответ...'}
                     value={answers![id]}
                     onChange={(e) => handleInputChange(e)}
                   />
                 )}
-                {mode === 'view' && <Typography>{answer}</Typography>}
+                {mode === 'view' && (
+                  <Typography>{showAnswers ? answer : 'Нельзя просмотреть ответ'}</Typography>
+                )}
               </div>
             </div>
           </div>
@@ -90,19 +97,21 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
             </div>
           </div>
 
-          <div
-            className={`${DEFAULT_CLASSNAME}_task_criteria`}
-            onClick={() => setIsCriteriaOpened(!isCriteriaOpened)}>
-            <Typography className={`${DEFAULT_CLASSNAME}_task_criteria_open`} size={'small'}>
-              Критерии{' '}
-              <div
-                className={`${DEFAULT_CLASSNAME}_task_criteria_open-icon ${
-                  isCriteriaOpened && 'rotated'
-                }`}>
-                <ArrowDown />
-              </div>
-            </Typography>
-          </div>
+          {showCriteria && (
+            <div
+              className={`${DEFAULT_CLASSNAME}_task_criteria`}
+              onClick={() => setIsCriteriaOpened(!isCriteriaOpened)}>
+              <Typography className={`${DEFAULT_CLASSNAME}_task_criteria_open`} size={'small'}>
+                Критерии{' '}
+                <div
+                  className={`${DEFAULT_CLASSNAME}_task_criteria_open-icon ${
+                    isCriteriaOpened && 'rotated'
+                  }`}>
+                  <ArrowDown />
+                </div>
+              </Typography>
+            </div>
+          )}
         </div>
 
         {!!taskAssets?.length && (

@@ -7,12 +7,13 @@ import { Typography } from 'common/typography/typography.tsx';
 import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
 
 import './test-result.scss';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { useQuery } from 'react-query';
 import { getCompletedTaskList } from 'services/student/student.ts';
 import { AppModes } from '../../../constants/appTypes.ts';
 import { Pagination } from '@mui/material';
+import { setSelectedStudent } from '../../../store/results/results.slice.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
@@ -31,7 +32,14 @@ const TestResult: FC = memo(() => {
     (state: RootState) => state.student,
   )!;
 
-  const { name, id: taskListId, selectedStudent, replay } = currentTaskList!;
+  const {
+    name,
+    id: taskListId,
+    selectedStudent,
+    replay,
+    seeCriteria,
+    seeAnswers,
+  } = currentTaskList!;
 
   const { data: tasksHistory } = useQuery(['completedTasks', selectedStudent, uuid], () =>
     getCompletedTaskList({
@@ -104,10 +112,20 @@ const TestResult: FC = memo(() => {
     if (taskScore > 75) return 'green';
   };
 
+  const dispatch = useDispatch();
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={DEFAULT_CLASSNAME}>
         <div className={`${DEFAULT_CLASSNAME}_title`}>
+          <div
+            className={`${DEFAULT_CLASSNAME}_title_back`}
+            onClick={() => {
+              isTutorMode && selectedStudent && dispatch(setSelectedStudent(selectedStudent));
+              navigate(-1);
+            }}>
+            Закрыть
+          </div>
           <div className={`${DEFAULT_CLASSNAME}_title_name`}>
             <Typography color={'purple'}>
               {activeCourse?.name} - {activeTopic?.name}
@@ -157,6 +175,8 @@ const TestResult: FC = memo(() => {
                   currentScore={task.score}
                   format={task.task.format}
                   index={index}
+                  showCriteria={seeCriteria || isTutorMode}
+                  showAnswers={seeAnswers || isTutorMode}
                 />
               </div>
               <div className={`${DEFAULT_CLASSNAME}_tasks_item_analytics`}>

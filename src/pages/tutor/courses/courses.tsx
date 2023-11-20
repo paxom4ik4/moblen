@@ -22,8 +22,10 @@ import {
   createTopic,
   deleteCourse,
   deleteTopic,
+  updateTopicName,
   getTopics,
   getTutorsCourses,
+  updateCourseName,
 } from 'services/courses';
 import { deleteTaskList, getTaskList } from 'services/tasks';
 import { setTaskToCreate } from 'store/create-task/create-task.slice.ts';
@@ -51,18 +53,18 @@ const Courses: FC = memo(() => {
     data: courses,
     isLoading,
     isLoadingError,
-  } = useQuery('courses', () => getTutorsCourses(userData!.uuid));
+  } = useQuery(['courses', userData?.uuid], () => getTutorsCourses(userData!.uuid));
 
   useEffect(() => {
-    if (courses?.length) {
+    if (courses?.length && !activeCourse) {
       dispatch(setActiveCourse(courses[0].course_uuid));
-    } else {
+    } else if (!courses?.length) {
       batch(() => {
         dispatch(setActiveCourse(null));
         dispatch(setActiveTopic(null));
       });
     }
-  }, [courses, dispatch]);
+  }, [courses, dispatch, userData?.uuid]);
 
   const createNewCourseMutation = useMutation(
     (data: { tutorId: string; courseName: string }) => createCourse(data),
@@ -71,8 +73,9 @@ const Courses: FC = memo(() => {
     },
   );
 
-  const { data: topics, isLoading: isTopicsLoading } = useQuery(['topics', activeCourse], () =>
-    getTopics(activeCourse ?? null),
+  const { data: topics, isLoading: isTopicsLoading } = useQuery(
+    ['topics', userData?.uuid, activeCourse],
+    () => getTopics(activeCourse ?? null),
   );
 
   useEffect(() => {
@@ -80,13 +83,18 @@ const Courses: FC = memo(() => {
       dispatch(setActiveTopic(null));
     }
 
+    if (courses?.length && !activeCourse) {
+      dispatch(setActiveCourse(courses[0].course_uuid));
+    }
+
     if (topics?.length && !activeTopic) {
       dispatch(setActiveTopic(topics[0].topic_uuid));
     }
-  }, [activeTopic, dispatch, topics]);
+  }, [activeTopic, dispatch, topics, userData?.uuid]);
 
-  const { data: taskList, isLoading: isTaskListLoading } = useQuery(['taskList', activeTopic], () =>
-    getTaskList(activeTopic ?? null),
+  const { data: taskList, isLoading: isTaskListLoading } = useQuery(
+    ['taskList', userData?.uuid, activeTopic],
+    () => getTaskList(activeTopic ?? null),
   );
 
   const createNewTopicMutation = useMutation(
@@ -177,6 +185,48 @@ const Courses: FC = memo(() => {
   const [addNewTopic, setAddNewTopic] = useState(false);
   const [newTopicName, setNewTopicName] = useState('');
 
+  const [courseNameEditing, setCourseNameEditing] = useState<false | string>(false);
+  const [newCourseName, setNewCourseName] = useState('');
+
+  const editCourseNameMutation = useMutation(
+    (data: { courseId: string; courseName: string }) => updateCourseName(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('courses'),
+    },
+  );
+
+  const handleCourseChangeName = () => {
+    if (typeof courseNameEditing === 'string') {
+      editCourseNameMutation.mutate({
+        courseId: courseNameEditing,
+        courseName: newCourseName,
+      });
+    }
+
+    setCourseNameEditing(false);
+  };
+
+  const [topicNameEditing, setTopicNameEditing] = useState<false | string>(false);
+  const [editTopicName, setEditTopicName] = useState('');
+
+  const editTopicNameMutation = useMutation(
+    (data: { topicId: string; topicName: string }) => updateTopicName(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('topics'),
+    },
+  );
+
+  const handleTopicChangeName = () => {
+    if (typeof topicNameEditing === 'string') {
+      editTopicNameMutation.mutate({
+        topicId: topicNameEditing,
+        topicName: editTopicName,
+      });
+    }
+
+    setTopicNameEditing(false);
+  };
+
   // new test creating
   const [isCreatingNewTest, setIsCreatingNewTest] = useState<{
     list_uuid: string;
@@ -207,7 +257,6 @@ const Courses: FC = memo(() => {
     '';
 
   const [calendarOpened, setCalendarOpened] = useState<boolean>(false);
-
   const [taskListShared, setTaskListShared] = useState(false);
 
   const createNewTestContent = (
@@ -338,9 +387,27 @@ const Courses: FC = memo(() => {
                 className={`${DEFAULT_CLASSNAME}_subjects_list-item ${
                   course.course_uuid === activeCourse && 'active-subject'
                 }`}>
-                <Typography color={course.course_uuid === activeCourse ? 'purple' : 'default'}>
-                  {course.course_name}
-                </Typography>
+                {course.course_uuid === courseNameEditing ? (
+                  <ClickAwayListener onClickAway={handleCourseChangeName}>
+                    <input
+                      maxLength={20}
+                      autoFocus={true}
+                      value={newCourseName}
+                      onChange={(e) => setNewCourseName(e.currentTarget.value)}
+                      type={'text'}
+                    />
+                  </ClickAwayListener>
+                ) : (
+                  <Typography
+                    onClick={() => {
+                      activeCourse === course.course_uuid &&
+                        setCourseNameEditing(course.course_uuid);
+                      setNewCourseName(course.course_name);
+                    }}
+                    color={course.course_uuid === activeCourse ? 'purple' : 'default'}>
+                    {course.course_name}
+                  </Typography>
+                )}
                 {course.course_uuid === activeCourse && (
                   <button
                     onClick={() => setIsCourseDeleting(true)}
@@ -351,20 +418,22 @@ const Courses: FC = memo(() => {
               </div>
             ))}
           {addNewCourse && (
-            <div className={`${DEFAULT_CLASSNAME}_subjects_list-item`}>
-              <input
-                maxLength={20}
-                autoFocus={true}
-                onChange={(e) => setNewSubjectName(e.currentTarget.value)}
-                value={newSubjectName}
-                placeholder={'Новый предмет'}
-              />
-              <div
-                className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}
-                onClick={saveNewSubjectHandler}>
-                <CheckIcon />
+            <ClickAwayListener onClickAway={saveNewSubjectHandler}>
+              <div className={`${DEFAULT_CLASSNAME}_subjects_list-item`}>
+                <input
+                  maxLength={20}
+                  autoFocus={true}
+                  onChange={(e) => setNewSubjectName(e.currentTarget.value)}
+                  value={newSubjectName}
+                  placeholder={'Новый предмет'}
+                />
+                <div
+                  className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}
+                  onClick={saveNewSubjectHandler}>
+                  <CheckIcon />
+                </div>
               </div>
-            </div>
+            </ClickAwayListener>
           )}
           <button
             className={`${DEFAULT_CLASSNAME}_subjects_add-new`}
@@ -385,12 +454,29 @@ const Courses: FC = memo(() => {
                     topic.topic_uuid === activeTopic && 'active-topic'
                   }`}
                   onClick={() => dispatch(setActiveTopic(topic.topic_uuid))}>
-                  <Typography
-                    className={`${DEFAULT_CLASSNAME}_topics_list-item_name`}
-                    size={'small'}
-                    color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
-                    {topic.topic_name}
-                  </Typography>
+                  {topic.topic_uuid === topicNameEditing ? (
+                    <ClickAwayListener onClickAway={handleTopicChangeName}>
+                      <input
+                        maxLength={16}
+                        autoFocus={true}
+                        value={editTopicName}
+                        onChange={(e) => setEditTopicName(e.currentTarget.value)}
+                        type={'text'}
+                      />
+                    </ClickAwayListener>
+                  ) : (
+                    <Typography
+                      onClick={() => {
+                        activeTopic === topic.topic_uuid && setTopicNameEditing(topic.topic_uuid);
+                        setEditTopicName(topic.topic_name);
+                      }}
+                      className={`${DEFAULT_CLASSNAME}_topics_list-item_name`}
+                      size={'small'}
+                      color={topic.topic_uuid === activeTopic ? 'purple' : 'default'}>
+                      {topic.topic_name}
+                    </Typography>
+                  )}
+
                   {topic.topic_uuid === activeTopic && (
                     <button
                       onClick={() => setIsTopicDeleting(true)}
@@ -401,20 +487,22 @@ const Courses: FC = memo(() => {
                 </div>
               ))}
             {addNewTopic && (
-              <div className={`${DEFAULT_CLASSNAME}_topics_list-item`}>
-                <input
-                  maxLength={16}
-                  autoFocus={true}
-                  onChange={(e) => setNewTopicName(e.currentTarget.value)}
-                  value={newTopicName}
-                  placeholder={'Новая тема'}
-                />
-                <div
-                  onClick={() => saveNewTopicHandler()}
-                  className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}>
-                  <CheckIcon />
+              <ClickAwayListener onClickAway={saveNewTopicHandler}>
+                <div className={`${DEFAULT_CLASSNAME}_topics_list-item`}>
+                  <input
+                    maxLength={16}
+                    autoFocus={true}
+                    onChange={(e) => setNewTopicName(e.currentTarget.value)}
+                    value={newTopicName}
+                    placeholder={'Новая тема'}
+                  />
+                  <div
+                    onClick={saveNewTopicHandler}
+                    className={`${DEFAULT_CLASSNAME}_topics_list-item_edit`}>
+                    <CheckIcon />
+                  </div>
                 </div>
-              </div>
+              </ClickAwayListener>
             )}
             <div className={`${DEFAULT_CLASSNAME}_topics_add`} onClick={() => setAddNewTopic(true)}>
               {' '}

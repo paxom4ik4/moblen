@@ -92,8 +92,6 @@ const App: FC = () => {
         dispatch(setUser(userData));
         dispatch(setAppMode(getStoredAppMode()));
       });
-    } else {
-      navigate(LoginRoutes.LOGIN);
     }
 
     (async () => {
@@ -173,6 +171,7 @@ const App: FC = () => {
 
   const loginContent = (
     <Routes>
+      <Route path="*" element={<Navigate to={LoginRoutes.LOGIN} replace />} />
       <Route path={LoginRoutes.LOGIN} element={<LoginPage />} />
       <Route path={LoginRoutes.LOGIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />

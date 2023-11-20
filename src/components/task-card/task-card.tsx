@@ -113,7 +113,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   const renderFormatGroup = (group: { subject: string; formats: string[] }) => {
     const items = group.formats.map((format) => (
-      <MenuItem key={format} value={format}>
+      <MenuItem key={format} value={`${group.subject},${format}`}>
         {format}
       </MenuItem>
     ));
@@ -214,7 +214,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
               </Select>
             )}
-            {!props.isCreateMode && <Typography>{props.format}</Typography>}
+            {!props.isCreateMode && <Typography>{props.format.replace(',', ': ')}</Typography>}
           </div>
         </div>
       </div>

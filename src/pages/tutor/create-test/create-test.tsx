@@ -12,10 +12,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { createTask, getAllFormats, getTasks } from 'services/tasks';
+import { createTask, editTaskList, getAllFormats, getTasks } from 'services/tasks';
 import { TutorRoutes } from 'constants/routes.ts';
 import { Task } from 'types/task.ts';
 import { CircularProgress, SelectChangeEvent } from '@mui/material';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -104,6 +105,22 @@ const CreateTest: FC = memo(() => {
     }
   };
 
+  const [isNameEdit, setIsNameEdit] = useState(false);
+  const [editTaskListName, setEditTaskListName] = useState(taskListName ?? '');
+
+  const editTaskListMutation = useMutation((data: { id: string; name: string }) =>
+    editTaskList(data),
+  );
+
+  const handleSaveTaskListName = () => {
+    editTaskListMutation.mutate({
+      id: taskListId!,
+      name: editTaskListName!,
+    });
+
+    setIsNameEdit(false);
+  };
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={`${DEFAULT_CLASSNAME}_text-container`}>
@@ -114,9 +131,19 @@ const CreateTest: FC = memo(() => {
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>
-            <Typography size={'large'} weight={'bold'}>
-              {taskListName}
-            </Typography>
+            {isNameEdit ? (
+              <ClickAwayListener onClickAway={handleSaveTaskListName}>
+                <input
+                  maxLength={24}
+                  value={editTaskListName}
+                  onChange={(e) => setEditTaskListName(e.currentTarget.value)}
+                />
+              </ClickAwayListener>
+            ) : (
+              <Typography size={'large'} weight={'bold'} onClick={() => setIsNameEdit(true)}>
+                {taskListName}
+              </Typography>
+            )}
           </div>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_text-container_ball`}>
@@ -138,6 +165,7 @@ const CreateTest: FC = memo(() => {
         {!!tasksData?.length &&
           tasksData?.map((task: Task, index: number) => (
             <TaskCard
+              taskFormats={taskFormats}
               isCreateMode={false}
               key={task.task_uuid}
               taskId={task.task_uuid}

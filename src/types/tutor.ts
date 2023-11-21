@@ -6,6 +6,8 @@ export interface Tutor {
   phone_number: string;
   email: string;
   has_access?: boolean;
+  files?: File[];
+  file?: File;
 }
 
 export interface TutorRegister {

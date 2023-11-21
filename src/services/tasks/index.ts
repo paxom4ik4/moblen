@@ -1,6 +1,6 @@
 import API from '../index.ts';
 import { ShareDataType } from '../../types/share.data.type.ts';
-import { GenerateTaskPayload } from '../../types/task.ts';
+import { GenerateTaskPayload, Task } from '../../types/task.ts';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
@@ -14,6 +14,9 @@ const tasklistAPI = {
   },
   deleteTaskList: ({ list_uuid }: { list_uuid: string }) => {
     return API.delete(`${TASK_LIST_URL}/${list_uuid}/`).then((res) => res.data);
+  },
+  editTaskList: ({ id, name }: { id: string; name: string }) => {
+    return API.patch(`${TASK_LIST_URL}/${id}/`, { list_name: name });
   },
   getTaskList: (
     topic_uuid: string | null,
@@ -68,6 +71,9 @@ const tasksAPI = {
       format,
     }).then((res) => res.data);
   },
+  editTask: ({ taskId, data }: { taskId: string; data: Partial<Task> }) => {
+    return API.patch(`${TASK_URL}/${taskId}/`, { ...data }).then((res) => res.data);
+  },
   deleteTask: ({ taskId }: { taskId: string }) => {
     return API.delete(`${TASK_URL}/${taskId}/`).then((res) => res.data);
   },
@@ -82,6 +88,7 @@ const generateAPI = {
   },
 };
 
-export const { getTaskList, deleteTaskList, createTaskList, shareTaskList } = tasklistAPI;
-export const { getTasks, createTask, deleteTask, getAllFormats } = tasksAPI;
+export const { getTaskList, deleteTaskList, createTaskList, shareTaskList, editTaskList } =
+  tasklistAPI;
+export const { getTasks, createTask, deleteTask, getAllFormats, editTask } = tasksAPI;
 export const { generateTask } = generateAPI;

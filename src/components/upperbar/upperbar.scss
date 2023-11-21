@@ -40,6 +40,36 @@
     align-items: center;
     min-width: 230px;
 
+    &_photo {
+      position: relative;
+      transition: 0.3s;
+
+      &:hover {
+        opacity: 0.8;
+      }
+
+      &_upload {
+        position: absolute;
+        z-index: 5;
+        cursor: pointer;
+
+        width: 64px;
+        height: 64px;
+        opacity: 0;
+      }
+
+      svg {
+        z-index: 10;
+      }
+
+      img {
+        width: 64px;
+        height: 64px;
+        position: absolute;
+        z-index: 10;
+      }
+    }
+
     &_name {
       text-align: center;
       display: flex;

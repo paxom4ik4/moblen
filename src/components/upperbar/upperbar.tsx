@@ -14,21 +14,29 @@ import { useNavigate } from 'react-router-dom';
 import { LoginRoutes } from 'constants/routes.ts';
 import { logoutUser } from 'services/login/login.ts';
 import { clearLocalStorage } from 'utils/app.utils.ts';
-import { useMutation } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Notification } from '../../common/notification/notification.tsx';
-import {  ClickAwayListener } from '@mui/material';
+import { ClickAwayListener } from '@mui/material';
+import { editTutorInfo, getTutorInfo } from '../../services/tutor';
+import { AppModes } from '../../constants/appTypes.ts';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
 export const UpperBar: FC = () => {
+  const queryClient = useQueryClient();
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { userData } = useSelector((state: RootState) => state.userData);
-  const { name, surname, email, photo } = userData!;
+  const { uuid, name, surname, email, photo } = userData!;
 
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const { appMode } = useSelector((state: RootState) => state.appMode);
+
+  const { data: tutorData } = useQuery(['tutorData', appMode], () => getTutorInfo(uuid));
 
   const logoutMutation = useMutation((token: string) => logoutUser(token), {
     onSuccess: () => {
@@ -53,50 +61,76 @@ export const UpperBar: FC = () => {
     await logoutMutation.mutate(localStorage.getItem('accessToken')!);
   };
 
+  const uploadTutorPhoto = useMutation((data: FormData) => editTutorInfo(uuid, data), {
+    onSuccess: () => {
+      queryClient.invalidateQueries('tutorData');
+    },
+  });
+
   return (
     <ClickAwayListener onClickAway={() => setMenuOpened(false)}>
-    <div className={DEFAULT_CLASSNAME}>
-      {logoutMutation.isLoading && (
-        <Notification
-          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-          autoHideDuration={3000}
-          message={'Выход из системы'}
-          open={isLoggingOut}
-          onClose={() => setIsLoggingOut(!isLoggingOut)}
-        />
-      )}
+      <div className={DEFAULT_CLASSNAME}>
+        {logoutMutation.isLoading && (
+          <Notification
+            anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            autoHideDuration={3000}
+            message={'Выход из системы'}
+            open={isLoggingOut}
+            onClose={() => setIsLoggingOut(!isLoggingOut)}
+          />
+        )}
 
-      <div className={`${DEFAULT_CLASSNAME}_notifications`}>
-        <NotificationIcon />
-      </div>
-      <div
-        className={`${DEFAULT_CLASSNAME}_profile`}
-        onClick={() => {
-          setMenuOpened(!menuOpened);
-        }}>
-        <ProfileIcon />
-      </div>
-      {menuOpened && (
-        <div className={`${DEFAULT_CLASSNAME}_menu`}>
-          <div className={`${DEFAULT_CLASSNAME}_menu_photo`}>
-            {photo ? <img src={photo} alt={'profile'} /> : <StudentIcon />}
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_menu_name`}>
-            <Typography size={'large'}>
-              {name} {surname}
-            </Typography>
-            <Typography color={'gray'}>{email}</Typography>
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
-            <button onClick={logoutHandler}>
-              <Typography color={'gray'} weight={'bold'}>
-                {'Выход'}
-              </Typography>
-            </button>
-          </div>
+        <div className={`${DEFAULT_CLASSNAME}_notifications`}>
+          <NotificationIcon />
         </div>
-      )}
-    </div>
+        <div
+          className={`${DEFAULT_CLASSNAME}_profile`}
+          onClick={() => {
+            setMenuOpened(!menuOpened);
+          }}>
+          <ProfileIcon />
+        </div>
+        {menuOpened && (
+          <div className={`${DEFAULT_CLASSNAME}_menu`}>
+            <div className={`${DEFAULT_CLASSNAME}_menu_photo`}>
+              <input
+                type={'file'}
+                className={`${DEFAULT_CLASSNAME}_menu_photo_upload`}
+                onChange={(event) => {
+                  const photoData = new FormData();
+
+                  if (event.target.files?.length) {
+                    photoData.append('files', event.target.files[0]);
+                  }
+
+                  uploadTutorPhoto.mutate(photoData);
+                }}
+              />
+              {photo ? (
+                <img
+                  src={appMode === AppModes.tutor ? tutorData?.data?.tutor_photo : photo}
+                  alt={'profile'}
+                />
+              ) : (
+                <StudentIcon />
+              )}
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_menu_name`}>
+              <Typography size={'large'}>
+                {name} {surname}
+              </Typography>
+              <Typography color={'gray'}>{email}</Typography>
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
+              <button onClick={logoutHandler}>
+                <Typography color={'gray'} weight={'bold'}>
+                  {'Выход'}
+                </Typography>
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </ClickAwayListener>
   );
 };

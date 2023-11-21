@@ -6,6 +6,17 @@
   top: -64px;
   flex-direction: column;
 
+  .generate-disabled {
+    opacity: 0.5;
+    user-select: none;
+    pointer-events: none;
+
+
+    &:hover {
+      cursor: not-allowed;
+    }
+  }
+
   &_generate_container {
     display: flex;
     flex-direction: row;

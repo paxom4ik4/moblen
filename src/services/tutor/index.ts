@@ -16,8 +16,8 @@ const tutorAPI = {
       (res) => res.data,
     );
   },
-  editTutorInfo: async (tutorId: string, tutorData: Tutor) => {
-    return await API.patch(`${TUTOR_API_URL}/${tutorId}/`, { tutorData });
+  editTutorInfo: async (tutorId: string, tutorData: FormData | File | Partial<Tutor>) => {
+    return await API.patch(`${TUTOR_API_URL}/${tutorId}/`, { ...tutorData });
   },
   deleteTutor: async (tutorId: string) => {
     return await API.delete(`${TUTOR_API_URL}/${tutorId}/`);

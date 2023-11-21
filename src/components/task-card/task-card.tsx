@@ -7,9 +7,9 @@ import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { Asset } from 'types/task.ts';
+import { Asset, Task } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
-import { deleteTask } from 'services/tasks';
+import { deleteTask, editTask } from 'services/tasks';
 import {
   ListSubheader,
   MenuItem,
@@ -19,6 +19,7 @@ import {
   TextField,
   Tooltip,
 } from '@mui/material';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -64,6 +65,11 @@ export type TaskCardProps =
       taskListId: string;
       taskAssets?: Asset[];
       index?: number;
+
+      taskFormats?: {
+        subject: string;
+        formats: string[];
+      }[];
     };
 
 export const TaskCard: FC<TaskCardProps> = (props) => {
@@ -120,150 +126,239 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     return [<ListSubheader>{group.subject}</ListSubheader>, items];
   };
 
+  const [editTaskText, setEditTaskText] = useState(
+    !props.isCreateMode && props.text ? props.text : '',
+  );
+  const [editTaskCriteria, setEditTaskCriteria] = useState(
+    !props.isCreateMode && props.criteria ? props.criteria : '',
+  );
+  const [editTaskMaxBall, setEditTaskMaxBall] = useState(
+    !props.isCreateMode && props.maxScore ? props.maxScore : 0,
+  );
+  const [editTaskFormat, setEditTaskFormat] = useState(
+    !props.isCreateMode && props.format ? props.format : '',
+  );
+
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const editTaskMutation = useMutation(
+    (data: Partial<Task>) => editTask({ taskId: props.taskId!, data }),
+    {
+      onSuccess: () => {
+        setIsEditMode(false);
+        queryClient.invalidateQueries('tasks');
+      },
+    },
+  );
+
+  const handleSaveEdits = (isEditMode: boolean) => {
+    if (isEditMode) {
+      editTaskMutation.mutate({
+        format: editTaskFormat,
+        task_condition: editTaskText,
+        max_ball: editTaskMaxBall,
+        criteria: editTaskCriteria,
+      });
+    }
+  };
+
+  const handleFormatChange = (event: SelectChangeEvent) => {
+    setEditTaskFormat(event.target.value as string);
+  };
+
   return (
-    <div className={DEFAULT_CLASSNAME}>
-      {addNewAsset && (
-        <div className={`${DEFAULT_CLASSNAME}_new-asset`}>
-          <div className={`${DEFAULT_CLASSNAME}_new-asset_content`}>
-            <div className={`${DEFAULT_CLASSNAME}_new-asset_content_image`}>
-              <input type={'file'} onChange={(e) => setNewAssetImage(e.currentTarget.files![0])} />
-              {!newAssetImage && (
-                <Typography className={`${DEFAULT_CLASSNAME}_new-asset_content_image-title`}>
-                  Загрузить картинку
+    <ClickAwayListener onClickAway={() => handleSaveEdits(isEditMode)}>
+      <div className={`${DEFAULT_CLASSNAME} ${props.editModeDisabled && 'card-disabled'}`}>
+        {addNewAsset && (
+          <div className={`${DEFAULT_CLASSNAME}_new-asset`}>
+            <div className={`${DEFAULT_CLASSNAME}_new-asset_content`}>
+              <div className={`${DEFAULT_CLASSNAME}_new-asset_content_image`}>
+                <input
+                  type={'file'}
+                  onChange={(e) => setNewAssetImage(e.currentTarget.files![0])}
+                />
+                {!newAssetImage && (
+                  <Typography className={`${DEFAULT_CLASSNAME}_new-asset_content_image-title`}>
+                    Загрузить картинку
+                  </Typography>
+                )}
+                {newAssetImage && (
+                  <img src={URL.createObjectURL(newAssetImage)} alt={'New Asset'} />
+                )}
+              </div>
+              <TextareaAutosize
+                value={newAssetText}
+                onChange={(e) => setNewAssetText(e.target.value)}
+                placeholder={'Описание картинки'}
+                className={`${DEFAULT_CLASSNAME}_new-assets_content_text`}
+              />
+              <div className={`${DEFAULT_CLASSNAME}_new-asset_buttons`}>
+                <button onClick={closeNewAssetHandler}>
+                  <CloseIcon />
+                </button>
+                <button onClick={saveNewAssetHandler}>
+                  <CheckIcon />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className={`${DEFAULT_CLASSNAME}_upper`}>
+          <div className={`${DEFAULT_CLASSNAME}_task`}>
+            <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+              <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+                <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+                  Задание {props.isCreateMode ? '' : props.index}
+                </div>
+                <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+                  {props.isCreateMode && (
+                    <TextareaAutosize
+                      placeholder={'Текст задания'}
+                      value={props.newTaskText}
+                      onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
+                    />
+                  )}
+                  {!props.isCreateMode && isEditMode && (
+                    <TextareaAutosize
+                      placeholder={'Текст задания'}
+                      value={editTaskText}
+                      onChange={(e) => setEditTaskText(e.currentTarget.value)}
+                    />
+                  )}
+                  {!isEditMode && !props.isCreateMode && (
+                    <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+              <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
+                <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
+                <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+                  {props.isCreateMode && (
+                    <TextareaAutosize
+                      placeholder={'Критерии задания'}
+                      value={props.newTaskCriteria}
+                      onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
+                    />
+                  )}
+                  {!props.isCreateMode && isEditMode && (
+                    <TextareaAutosize
+                      placeholder={'Критерии задания'}
+                      value={editTaskCriteria}
+                      onChange={(e) => setEditTaskCriteria(e.currentTarget.value)}
+                    />
+                  )}
+                  {!isEditMode && !props.isCreateMode && (
+                    <Typography onClick={() => setIsEditMode(true)}>{props.criteria}</Typography>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={`${DEFAULT_CLASSNAME}_task_score`}>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
+                Максимальный балл за задание
+              </div>
+              {props.isCreateMode && (
+                <TextField
+                  placeholder={'Балл за задание'}
+                  value={props.newTaskMaxScore ?? 0}
+                  type={'text'}
+                  onChange={(e) => props.setNewTaskMaxScore(Number(e.currentTarget.value))}
+                />
+              )}
+              {!props.isCreateMode && isEditMode && (
+                <TextField
+                  placeholder={'Балл за задание'}
+                  value={editTaskMaxBall}
+                  type={'text'}
+                  onChange={(e) => setEditTaskMaxBall(Number(e.currentTarget.value))}
+                />
+              )}
+              {!isEditMode && !props.isCreateMode && (
+                <Typography onClick={() => setIsEditMode(true)}>{props.maxScore}</Typography>
+              )}
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
+              {props.isCreateMode && (
+                <Select
+                  fullWidth
+                  value={props.newTaskFormat || ''}
+                  onChange={props.handleFormatChange}
+                  defaultValue=""
+                  MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
+                  {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
+                </Select>
+              )}
+              {!props.isCreateMode && isEditMode && (
+                <Select
+                  fullWidth
+                  value={editTaskFormat || ''}
+                  onChange={handleFormatChange}
+                  defaultValue=""
+                  MenuProps={{ PaperProps: { sx: { maxHeight: 320 } }, disablePortal: true }}>
+                  {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
+                </Select>
+              )}
+              {!isEditMode && !props.isCreateMode && (
+                <Typography onClick={() => setIsEditMode(true)}>
+                  {props.format.replace(',', ': ')}
                 </Typography>
               )}
-              {newAssetImage && <img src={URL.createObjectURL(newAssetImage)} alt={'New Asset'} />}
-            </div>
-            <TextareaAutosize
-              value={newAssetText}
-              onChange={(e) => setNewAssetText(e.target.value)}
-              placeholder={'Описание картинки'}
-              className={`${DEFAULT_CLASSNAME}_new-assets_content_text`}
-            />
-            <div className={`${DEFAULT_CLASSNAME}_new-asset_buttons`}>
-              <button onClick={closeNewAssetHandler}>
-                <CloseIcon />
-              </button>
-              <button onClick={saveNewAssetHandler}>
-                <CheckIcon />
-              </button>
             </div>
           </div>
         </div>
-      )}
 
-      <div className={`${DEFAULT_CLASSNAME}_upper`}>
-        <div className={`${DEFAULT_CLASSNAME}_task`}>
-          <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-            <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-              <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-                Задание {props.isCreateMode ? '' : props.index}
+        {props.isCreateMode && !!assets.length && (
+          <div className={`${DEFAULT_CLASSNAME}_files`}>
+            {assets.map((asset) => (
+              <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
+                <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
+                <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
+                  {asset.text}
+                </Typography>
               </div>
-              <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                {props.isCreateMode && (
-                  <TextareaAutosize
-                    placeholder={'Текст задания'}
-                    value={props.newTaskText}
-                    onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
-                  />
-                )}
-                {!props.isCreateMode && <Typography>{props.text}</Typography>}
+            ))}
+          </div>
+        )}
+
+        {!!props.taskAssets?.length && (
+          <div className={`${DEFAULT_CLASSNAME}_files`}>
+            {assets.map((asset) => (
+              <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
+                <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
+                <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
+                  {asset.text}
+                </Typography>
               </div>
+            ))}
+          </div>
+        )}
+
+        {!props.editModeDisabled && !props.isCreateMode && (
+          <Tooltip placement={'top'} title={'Удалить'}>
+            <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
+              <TrashIcon />
             </div>
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-            <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
-              <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
-              <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                {props.isCreateMode && (
-                  <TextareaAutosize
-                    placeholder={'Критерии задания'}
-                    value={props.newTaskCriteria}
-                    onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
-                  />
-                )}
-                {!props.isCreateMode && <Typography>{props.criteria}</Typography>}
-              </div>
+          </Tooltip>
+        )}
+        {props.isCreateMode && (
+          <Tooltip placement={'top'} title={'Сохранить'}>
+            <div
+              className={`${DEFAULT_CLASSNAME}_save`}
+              onClick={() => {
+                props.saveNewTaskHandler();
+                props.setIsNewTask!(false);
+              }}>
+              <CheckIcon />
             </div>
-          </div>
-        </div>
-        <div className={`${DEFAULT_CLASSNAME}_task_score`}>
-          <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-              Максимальный балл за задание
-            </div>
-            {props.isCreateMode && (
-              <TextField
-                placeholder={'Балл за задание'}
-                value={props.newTaskMaxScore ?? 0}
-                type={'text'}
-                onChange={(e) => props.setNewTaskMaxScore(Number(e.currentTarget.value))}
-              />
-            )}
-            {!props.isCreateMode && <Typography>{props.maxScore}</Typography>}
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
-            {props.isCreateMode && (
-              <Select
-                fullWidth
-                value={props.newTaskFormat || ''}
-                onChange={props.handleFormatChange}
-                defaultValue=""
-                MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
-                {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
-              </Select>
-            )}
-            {!props.isCreateMode && <Typography>{props.format.replace(',', ': ')}</Typography>}
-          </div>
-        </div>
+          </Tooltip>
+        )}
       </div>
-
-      {props.isCreateMode && !!assets.length && (
-        <div className={`${DEFAULT_CLASSNAME}_files`}>
-          {assets.map((asset) => (
-            <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
-              <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-              <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
-                {asset.text}
-              </Typography>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {!!props.taskAssets?.length && (
-        <div className={`${DEFAULT_CLASSNAME}_files`}>
-          {assets.map((asset) => (
-            <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
-              <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-              <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
-                {asset.text}
-              </Typography>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {!props.editModeDisabled && !props.isCreateMode && (
-        <Tooltip placement={'top'} title={'Удалить'}>
-          <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>
-            <TrashIcon />
-          </div>
-        </Tooltip>
-      )}
-      {props.isCreateMode && (
-        <Tooltip placement={'top'} title={'Сохранить'}>
-          <div
-            className={`${DEFAULT_CLASSNAME}_save`}
-            onClick={() => {
-              props.saveNewTaskHandler();
-              props.setIsNewTask!(false);
-            }}>
-            <CheckIcon />
-          </div>
-        </Tooltip>
-      )}
-    </div>
+    </ClickAwayListener>
   );
 };

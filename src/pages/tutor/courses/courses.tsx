@@ -293,7 +293,9 @@ const Courses: FC = memo(() => {
                 }),
               );
 
-              navigate(`/assignments/generate-test/${isCreatingNewTest.list_uuid}`);
+              navigate(
+                `/assignments/generate-test/${isCreatingNewTest.list_uuid}?editable=${isCreatingNewTest.editable}`,
+              );
             }
           }}>
           Сгенерировать задания

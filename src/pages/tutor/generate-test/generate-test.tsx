@@ -207,7 +207,10 @@ const GenerateTest: FC = memo(() => {
         <div className={`${DEFAULT_CLASSNAME}_tasks-container`}>
           {isLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
 
-          <div className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration`}>
+          <div
+            className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration ${
+              isEditModeDisabled && 'generate-disabled'
+            }`}>
             <Typography
               className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_title`}
               size={'large'}>
@@ -260,6 +263,7 @@ const GenerateTest: FC = memo(() => {
           {!!tasksData?.length &&
             tasksData?.map((task: Task, index: number) => (
               <TaskCard
+                taskFormats={taskFormats}
                 isCreateMode={false}
                 key={task.task_uuid}
                 taskId={task.task_uuid}

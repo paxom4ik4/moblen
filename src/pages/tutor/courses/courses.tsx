@@ -424,7 +424,7 @@ const Courses: FC = memo(() => {
                     {course.course_name}
                   </Typography>
                 )}
-                {course.course_uuid === activeCourse && (
+                {course.course_uuid === activeCourse && courseNameEditing && (
                   <button
                     onClick={() => setIsCourseDeleting(true)}
                     className={`${DEFAULT_CLASSNAME}_list-item_delete`}>
@@ -493,7 +493,7 @@ const Courses: FC = memo(() => {
                     </Typography>
                   )}
 
-                  {topic.topic_uuid === activeTopic && (
+                  {topic.topic_uuid === activeTopic && topicNameEditing && (
                     <button
                       onClick={() => setIsTopicDeleting(true)}
                       className={`${DEFAULT_CLASSNAME}_list-item_delete`}>

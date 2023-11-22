@@ -48,6 +48,8 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     currentScore,
     showCriteria = true,
     showAnswers = true,
+
+    format = 'Текстовый',
   } = props;
 
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
@@ -89,11 +91,18 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
         </div>
 
         <div className={`${DEFAULT_CLASSNAME}_task_score`}>
-          <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-              <Typography weight={'bold'}>
-                {`Баллов: ${currentScore ? `${currentScore} / ${maxScore}` : maxScore}`}
-              </Typography>
+          <div className={`${DEFAULT_CLASSNAME}_task_score_description`}>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
+                <Typography weight={'bold'}>
+                  {`Баллов: ${currentScore ? `${currentScore} / ${maxScore}` : maxScore}`}
+                </Typography>
+              </div>
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore primary-color`}>
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
+                <Typography color={'purple'}>{format}</Typography>
+              </div>
             </div>
           </div>
 

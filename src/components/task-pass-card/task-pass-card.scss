@@ -1,6 +1,6 @@
 .task-pass-card {
   background-color: #e1e2ec;
-  border-radius: 0 0 15px 15px;
+  border-radius: 0 15px 15px 15px;
   padding: 16px;
   position: relative;
   width: 100%;
@@ -67,6 +67,16 @@
       flex-direction: row;
       justify-content: space-between;
 
+      .primary-color {
+        background-color: #D9E2FF;
+      }
+
+      &_description {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
       select {
         border-radius: 8px;
         width: calc(50% - 8px);
@@ -117,7 +127,6 @@
       &-title {
         font-size: 14px;
         font-weight: 500;
-        padding-bottom: 4px;
       }
     }
   }

@@ -9,6 +9,7 @@ import { DraggableTypes } from '../../types/draggable/draggable.types.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { createTaskList } from '../../services/tasks';
 import { TextField } from '@mui/material';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 export interface TestCardProps {
   id: string;
@@ -49,7 +50,7 @@ export const TestCard: FC<TestCardProps> = (props) => {
   return (
     <div
       onClick={onClick}
-      className={`${DEFAULT_CLASSNAME} ${isDragging && 'app-test-card-dragging'}}`}
+      className={`${DEFAULT_CLASSNAME} ${isDragging && 'app-test-card-dragging'}`}
       ref={drag}>
       <div className={`${DEFAULT_CLASSNAME}_content`}>
         <div className={`${DEFAULT_CLASSNAME}_subject-topic`}>
@@ -101,22 +102,24 @@ export const TestCardCreate: FC<TestCardCreateProps> = (props) => {
   };
 
   return (
-    <div className={DEFAULT_CLASSNAME}>
-      <div className={`${DEFAULT_CLASSNAME}_content`}>
-        <div className={`${DEFAULT_CLASSNAME}_subject-topic`}>
-          {subject} - {topic}
+    <ClickAwayListener onClickAway={handleNewTaskListCreate}>
+      <div className={DEFAULT_CLASSNAME}>
+        <div className={`${DEFAULT_CLASSNAME}_content`}>
+          <div className={`${DEFAULT_CLASSNAME}_subject-topic`}>
+            {subject} - {topic}
+          </div>
+          <TextField
+            type={'text'}
+            value={newTaskListName}
+            onChange={(e) => setNewTaskListName(e.currentTarget.value)}
+            placeholder={'Cписок заданий...'}
+            inputProps={{ maxLength: 24 }}
+          />
         </div>
-        <TextField
-          type={'text'}
-          value={newTaskListName}
-          onChange={(e) => setNewTaskListName(e.currentTarget.value)}
-          placeholder={'Cписок заданий...'}
-          inputProps={{ maxLength: 24 }}
-        />
+        <div className={`${DEFAULT_CLASSNAME}_share`} onClick={handleNewTaskListCreate}>
+          <ConfirmIcon />
+        </div>
       </div>
-      <div className={`${DEFAULT_CLASSNAME}_share`} onClick={handleNewTaskListCreate}>
-        <ConfirmIcon />
-      </div>
-    </div>
+    </ClickAwayListener>
   );
 };

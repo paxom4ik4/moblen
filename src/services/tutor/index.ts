@@ -5,8 +5,8 @@ import { Group } from 'types/group.ts';
 const TUTOR_API_URL = '/tutor';
 
 const tutorAPI = {
-  getTutorInfo: async (tutorId: string) => {
-    return await API.get(`${TUTOR_API_URL}/${tutorId}/`);
+  getTutorInfo: (tutorId: string) => {
+    return API.get(`${TUTOR_API_URL}/${tutorId}/`);
   },
   getTutorGroups: (tutorId: string): Promise<Group[]> => {
     return API.get(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`).then((res) => res.data);
@@ -16,14 +16,21 @@ const tutorAPI = {
       (res) => res.data,
     );
   },
-  editTutorInfo: async (tutorId: string, tutorData: FormData | File | Partial<Tutor>) => {
-    return await API.patch(`${TUTOR_API_URL}/${tutorId}/`, { ...tutorData });
+  editTutorInfo: (tutorId: string, tutorData: Partial<Tutor>) => {
+    return API.patch(`${TUTOR_API_URL}/${tutorId}/`, { ...tutorData });
   },
-  deleteTutor: async (tutorId: string) => {
-    return await API.delete(`${TUTOR_API_URL}/${tutorId}/`);
+  editTutorPhoto: (tutorId: string, formData: FormData) => {
+    return API.patch(`${TUTOR_API_URL}/${tutorId}/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   },
-  addStudentToList: async (tutorId: string, studentId: string) => {
-    return await API.post(`${TUTOR_API_URL}/${tutorId}/new-student-to-the-list/`, {
+  deleteTutor: (tutorId: string) => {
+    return API.delete(`${TUTOR_API_URL}/${tutorId}/`);
+  },
+  addStudentToList: (tutorId: string, studentId: string) => {
+    return API.post(`${TUTOR_API_URL}/${tutorId}/new-student-to-the-list/`, {
       data: { student_uuid: studentId },
     });
   },
@@ -36,4 +43,5 @@ export const {
   getTutorGroups,
   addStudentToList,
   createTutorGroup,
+  editTutorPhoto,
 } = tutorAPI;

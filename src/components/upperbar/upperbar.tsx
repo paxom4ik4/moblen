@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { ChangeEvent, FC, useState } from 'react';
 
 import ProfileIcon from 'assets/icons/profile-icon.svg';
 import NotificationIcon from 'assets/icons/notifications-icon.svg';
@@ -17,7 +17,7 @@ import { clearLocalStorage } from 'utils/app.utils.ts';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { Notification } from '../../common/notification/notification.tsx';
 import { ClickAwayListener } from '@mui/material';
-import { editTutorInfo, getTutorInfo } from '../../services/tutor';
+import { editTutorPhoto, getTutorInfo } from '../../services/tutor';
 import { AppModes } from '../../constants/appTypes.ts';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
@@ -61,11 +61,21 @@ export const UpperBar: FC = () => {
     await logoutMutation.mutate(localStorage.getItem('accessToken')!);
   };
 
-  const uploadTutorPhoto = useMutation((data: FormData) => editTutorInfo(uuid, data), {
-    onSuccess: () => {
-      queryClient.invalidateQueries('tutorData');
+  const uploadTutorPhoto = useMutation((data: FormData) => editTutorPhoto(uuid, data), {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries('tutorData');
     },
   });
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('files', file);
+
+      uploadTutorPhoto.mutate(formData);
+    }
+  };
 
   return (
     <ClickAwayListener onClickAway={() => setMenuOpened(false)}>
@@ -90,46 +100,39 @@ export const UpperBar: FC = () => {
           }}>
           <ProfileIcon />
         </div>
-        {menuOpened && (
-          <div className={`${DEFAULT_CLASSNAME}_menu`}>
-            <div className={`${DEFAULT_CLASSNAME}_menu_photo`}>
-              <input
-                type={'file'}
-                className={`${DEFAULT_CLASSNAME}_menu_photo_upload`}
-                onChange={(event) => {
-                  const photoData = new FormData();
-
-                  if (event.target.files?.length) {
-                    photoData.append('files', event.target.files[0]);
-                  }
-
-                  uploadTutorPhoto.mutate(photoData);
-                }}
+        <div
+          className={`${DEFAULT_CLASSNAME}_menu ${
+            menuOpened && `${DEFAULT_CLASSNAME}_menu_opened`
+          }`}>
+          <div className={`${DEFAULT_CLASSNAME}_menu_photo`}>
+            <input
+              type={'file'}
+              className={`${DEFAULT_CLASSNAME}_menu_photo_upload`}
+              onChange={handleFileChange}
+            />
+            {photo ? (
+              <img
+                src={appMode === AppModes.tutor ? tutorData?.data?.tutor_photo : photo}
+                alt={'profile'}
               />
-              {photo ? (
-                <img
-                  src={appMode === AppModes.tutor ? tutorData?.data?.tutor_photo : photo}
-                  alt={'profile'}
-                />
-              ) : (
-                <StudentIcon />
-              )}
-            </div>
-            <div className={`${DEFAULT_CLASSNAME}_menu_name`}>
-              <Typography size={'large'}>
-                {name} {surname}
-              </Typography>
-              <Typography color={'gray'}>{email}</Typography>
-            </div>
-            <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
-              <button onClick={logoutHandler}>
-                <Typography color={'gray'} weight={'bold'}>
-                  {'Выход'}
-                </Typography>
-              </button>
-            </div>
+            ) : (
+              <StudentIcon />
+            )}
           </div>
-        )}
+          <div className={`${DEFAULT_CLASSNAME}_menu_name`}>
+            <Typography size={'large'}>
+              {name} {surname}
+            </Typography>
+            <Typography color={'gray'}>{email}</Typography>
+          </div>
+          <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
+            <button onClick={logoutHandler}>
+              <Typography color={'gray'} weight={'bold'}>
+                {'Выход'}
+              </Typography>
+            </button>
+          </div>
+        </div>
       </div>
     </ClickAwayListener>
   );

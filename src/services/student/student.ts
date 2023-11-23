@@ -48,6 +48,13 @@ const studentAPI = {
       (res) => res.data,
     );
   },
+  editStudentPhoto: (studentId: string, formData: FormData) => {
+    return API.patch(`${STUDENT_URL}/${studentId}/`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
 };
 
 export const {
@@ -56,4 +63,5 @@ export const {
   getStudentTaskLists,
   getCompletedTaskList,
   sendTaskListAnswers,
+  editStudentPhoto,
 } = studentAPI;

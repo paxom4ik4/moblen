@@ -3,9 +3,9 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 
-  padding: 1px 34px;
+  padding: 5px 32px;
   position: absolute;
   right: 20px;
   top: 16px;
@@ -19,6 +19,20 @@
   &_profile {
     cursor: pointer;
     transition: 0.3s;
+    display: flex;
+    align-items: center;
+
+    svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    img {
+      object-fit: contain;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+    }
 
     &:hover {
       cursor: pointer;
@@ -45,6 +59,8 @@
     &_photo {
       position: relative;
       transition: 0.3s;
+      width: 64px;
+      height: 64px;
 
       &:hover {
         opacity: 0.8;
@@ -52,7 +68,7 @@
 
       &_upload {
         position: absolute;
-        z-index: 5;
+        z-index: 15;
         cursor: pointer;
 
         width: 64px;
@@ -65,10 +81,13 @@
       }
 
       img {
+        object-fit: contain;
+        cursor: pointer;
         width: 64px;
         height: 64px;
         position: absolute;
         z-index: 10;
+        border-radius: 50%;
       }
     }
 

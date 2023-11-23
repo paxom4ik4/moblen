@@ -159,6 +159,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
                 key={student.student_uuid}
                 name={student.student_name}
                 surname={student.student_surname}
+                imgUrl={student.student_photo}
               />
             ))}
           {!viewMode && (

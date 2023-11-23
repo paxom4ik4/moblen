@@ -156,7 +156,15 @@ const Tests: FC<TestsProps> = memo((props) => {
                   activeTutor === tutor.tutor_uuid ? 'active-tutor-item' : ''
                 }`}>
                 <div className={`${DEFAULT_CLASSNAME}_tutors_item_image`}>
-                  <TutorIcon />
+                  {tutor?.tutor_photo ? (
+                    <img
+                      color={`${DEFAULT_CLASSNAME}_tutors_item_image_img`}
+                      alt={'tutor-profile'}
+                      src={tutor.tutor_photo}
+                    />
+                  ) : (
+                    <TutorIcon />
+                  )}
                 </div>
                 <Typography
                   size={'small'}

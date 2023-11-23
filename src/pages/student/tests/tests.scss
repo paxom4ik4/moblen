@@ -171,6 +171,13 @@
   .tests_tutors_item_name {
     color: #6750a4;
   }
+
+  img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border-radius: 50%;
+  }
 }
 
 @media (min-width: 1600px) {
@@ -218,6 +225,13 @@
           border-radius: 50%;
           color: #575e71;
           border: 2px solid #e1e2ec;
+
+          &_img {
+            object-fit: contain;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+          }
         }
       }
     }

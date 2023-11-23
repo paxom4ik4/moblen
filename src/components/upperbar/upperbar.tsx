@@ -19,6 +19,7 @@ import { Notification } from '../../common/notification/notification.tsx';
 import { ClickAwayListener } from '@mui/material';
 import { editTutorPhoto, getTutorInfo } from '../../services/tutor';
 import { AppModes } from '../../constants/appTypes.ts';
+import { editStudentPhoto, getStudentInfo } from '../../services/student/student.ts';
 
 const DEFAULT_CLASSNAME = 'app-upper-bar';
 
@@ -29,14 +30,19 @@ export const UpperBar: FC = () => {
   const navigate = useNavigate();
 
   const { userData } = useSelector((state: RootState) => state.userData);
-  const { uuid, name, surname, email, photo } = userData!;
+  const { uuid, name, surname, email } = userData!;
 
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
-  const { data: tutorData } = useQuery(['tutorData', appMode], () => getTutorInfo(uuid));
+  const { data: tutorData } = useQuery(['tutorData', appMode], () =>
+    appMode === AppModes.tutor ? getTutorInfo(uuid) : null,
+  );
+  const { data: studentData } = useQuery(['studentData', appMode], () =>
+    appMode === AppModes.student ? getStudentInfo(uuid) : null,
+  );
 
   const logoutMutation = useMutation((token: string) => logoutUser(token), {
     onSuccess: () => {
@@ -67,13 +73,26 @@ export const UpperBar: FC = () => {
     },
   });
 
+  const uploadStudentPhoto = useMutation((data: FormData) => editStudentPhoto(uuid, data), {
+    onSuccess: async () => {
+      await queryClient.invalidateQueries('studentData');
+    },
+  });
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const formData = new FormData();
-      formData.append('files', file);
 
-      uploadTutorPhoto.mutate(formData);
+      if (appMode === AppModes.tutor) {
+        formData.append('tutor_photo', file);
+
+        uploadTutorPhoto.mutate(formData);
+      } else {
+        formData.append('student_photo', file);
+
+        uploadStudentPhoto.mutate(formData);
+      }
     }
   };
 
@@ -98,7 +117,18 @@ export const UpperBar: FC = () => {
           onClick={() => {
             setMenuOpened(!menuOpened);
           }}>
-          <ProfileIcon />
+          {tutorData?.data?.tutor_photo || studentData?.student_photo ? (
+            <img
+              src={
+                appMode === AppModes.tutor
+                  ? tutorData?.data?.tutor_photo
+                  : studentData?.student_photo
+              }
+              alt={'profile'}
+            />
+          ) : (
+            <ProfileIcon />
+          )}
         </div>
         <div
           className={`${DEFAULT_CLASSNAME}_menu ${
@@ -110,9 +140,13 @@ export const UpperBar: FC = () => {
               className={`${DEFAULT_CLASSNAME}_menu_photo_upload`}
               onChange={handleFileChange}
             />
-            {photo ? (
+            {tutorData?.data?.tutor_photo || studentData?.student_photo ? (
               <img
-                src={appMode === AppModes.tutor ? tutorData?.data?.tutor_photo : photo}
+                src={
+                  appMode === AppModes.tutor
+                    ? tutorData?.data?.tutor_photo
+                    : studentData?.student_photo
+                }
                 alt={'profile'}
               />
             ) : (

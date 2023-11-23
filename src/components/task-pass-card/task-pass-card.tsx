@@ -101,7 +101,7 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
             </div>
             <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore primary-color`}>
               <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-                <Typography color={'purple'}>{format}</Typography>
+                <Typography color={'purple'}>{format.replace(',', ': ')}</Typography>
               </div>
             </div>
           </div>

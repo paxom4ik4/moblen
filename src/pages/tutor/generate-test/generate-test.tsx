@@ -9,11 +9,10 @@ import EditButton from './drive_file_rename_outline.svg';
 import { TaskCard } from 'components/task-card/task-card.tsx';
 import { Typography } from 'common/typography/typography.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from 'store/store.ts';
+import { useDispatch } from 'react-redux';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { createTask, generateTask, getAllFormats, getTasks } from 'services/tasks';
+import { createTask, editTaskList, generateTask, getAllFormats, getTasks } from 'services/tasks';
 import { TutorRoutes } from 'constants/routes.ts';
 import { GenerateTaskPayload, Task } from 'types/task.ts';
 import {
@@ -25,6 +24,7 @@ import {
   TextareaAutosize,
   TextField,
 } from '@mui/material';
+import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 const DEFAULT_CLASSNAME = 'app-generate-test';
 
@@ -39,13 +39,9 @@ const GenerateTest: FC = memo(() => {
 
   const { data: taskFormats } = useQuery('formats', () => getAllFormats());
 
-  const { taskListId, taskListName, courseName, topicName } = useSelector(
-    (store: RootState) => store.generateTask,
-  );
-
   const { data: tasksData, isLoading } = useQuery(
-    'tasks',
-    () => getTasks(taskListId || paramsTaskListId!),
+    ['tasks', paramsTaskListId],
+    () => getTasks(paramsTaskListId!),
     {
       refetchInterval: 5000,
     },
@@ -56,7 +52,7 @@ const GenerateTest: FC = memo(() => {
   useEffect(() => {
     if (tasksData) {
       setMaxScore(
-        tasksData?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
+        tasksData?.tasks?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
       );
     }
   }, [tasksData]);
@@ -112,7 +108,7 @@ const GenerateTest: FC = memo(() => {
   const saveNewTaskHandler = () => {
     if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
       createTaskMutation.mutate({
-        list_uuid: taskListId!,
+        list_uuid: tasksData.list_uuid,
         format: newTaskFormat,
         criteria: newTaskCriteria,
         max_ball: +newTaskMaxScore,
@@ -136,7 +132,7 @@ const GenerateTest: FC = memo(() => {
   const [generateTaskAmount, setGenerateTaskAmount] = useState(0);
 
   const generateTaskMutation = useMutation(
-    (data: GenerateTaskPayload) => generateTask(taskListId ?? paramsTaskListId!, data),
+    (data: GenerateTaskPayload) => generateTask(tasksData.list_uuid, data),
     {
       onSuccess: () => {
         setGenerateTaskFormat('');
@@ -158,19 +154,54 @@ const GenerateTest: FC = memo(() => {
     });
   };
 
+  const [isNameEdit, setIsNameEdit] = useState(false);
+  const [editTaskListName, setEditTaskListName] = useState('');
+
+  const editTaskListMutation = useMutation(
+    (data: { id: string; name: string }) => editTaskList(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('tasks'),
+    },
+  );
+
+  const handleSaveTaskListName = () => {
+    editTaskListMutation.mutate({
+      id: tasksData.list_uuid,
+      name: editTaskListName!,
+    });
+
+    setIsNameEdit(false);
+  };
+
   return (
     <div className={DEFAULT_CLASSNAME}>
       <div className={`${DEFAULT_CLASSNAME}_text-container`}>
         <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-title`}>
             <Typography color={'purple'} weight={'bold'}>
-              {courseName} - {topicName}
+              {tasksData?.course_name} - {tasksData?.topic_name}
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>
-            <Typography size={'large'} weight={'bold'}>
-              {taskListName}
-            </Typography>
+            {isNameEdit ? (
+              <ClickAwayListener onClickAway={handleSaveTaskListName}>
+                <input
+                  maxLength={24}
+                  value={editTaskListName}
+                  onChange={(e) => setEditTaskListName(e.currentTarget.value)}
+                />
+              </ClickAwayListener>
+            ) : (
+              <Typography
+                size={'large'}
+                weight={'bold'}
+                onClick={() => {
+                  setIsNameEdit(true);
+                  setEditTaskListName(tasksData?.list_name ?? '');
+                }}>
+                {tasksData?.list_name}
+              </Typography>
+            )}
           </div>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_text-container_generationMargin`}>
@@ -260,14 +291,14 @@ const GenerateTest: FC = memo(() => {
             </button>
           </div>
 
-          {!!tasksData?.length &&
-            tasksData?.map((task: Task, index: number) => (
+          {!!tasksData?.tasks?.length &&
+            tasksData?.tasks?.map((task: Task, index: number) => (
               <TaskCard
                 taskFormats={taskFormats}
                 isCreateMode={false}
                 key={task.task_uuid}
                 taskId={task.task_uuid}
-                taskListId={taskListId!}
+                taskListId={tasksData.list_uuid}
                 text={task.task_condition}
                 criteria={task.criteria}
                 maxScore={task.max_ball}
@@ -281,7 +312,7 @@ const GenerateTest: FC = memo(() => {
             <TaskCard
               isCreateMode={true}
               taskFormats={taskFormats}
-              taskListId={taskListId!}
+              taskListId={tasksData.list_uuid}
               taskId={''}
               editModeDisabled={false}
               taskAssets={[]}

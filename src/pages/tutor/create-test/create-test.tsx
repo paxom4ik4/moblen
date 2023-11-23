@@ -8,8 +8,7 @@ import AddIcon from 'assets/icons/add-icon.svg';
 import { TaskCard } from 'components/task-card/task-card.tsx';
 import { Typography } from 'common/typography/typography.tsx';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from 'store/store.ts';
+import { useDispatch } from 'react-redux';
 import { clearCreateTask } from 'store/create-task/create-task.slice.ts';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { createTask, editTaskList, getAllFormats, getTasks } from 'services/tasks';
@@ -31,12 +30,8 @@ const CreateTest: FC = memo(() => {
 
   const { data: taskFormats } = useQuery('formats', () => getAllFormats());
 
-  const { taskListId, taskListName, courseName, topicName } = useSelector(
-    (store: RootState) => store.createTask,
-  );
-
-  const { data: tasksData, isLoading } = useQuery('tasks', () =>
-    getTasks(taskListId || paramsTaskListId!),
+  const { data: tasksData, isLoading } = useQuery(['tasks', paramsTaskListId], () =>
+    getTasks(paramsTaskListId!),
   );
 
   const [maxScore, setMaxScore] = useState(0);
@@ -44,7 +39,7 @@ const CreateTest: FC = memo(() => {
   useEffect(() => {
     if (tasksData) {
       setMaxScore(
-        tasksData?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
+        tasksData?.tasks?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
       );
     }
   }, [tasksData]);
@@ -91,7 +86,7 @@ const CreateTest: FC = memo(() => {
   const saveNewTaskHandler = () => {
     if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
       createTaskMutation.mutate({
-        list_uuid: taskListId!,
+        list_uuid: tasksData.list_uuid!,
         format: newTaskFormat,
         criteria: newTaskCriteria,
         max_ball: +newTaskMaxScore,
@@ -106,15 +101,18 @@ const CreateTest: FC = memo(() => {
   };
 
   const [isNameEdit, setIsNameEdit] = useState(false);
-  const [editTaskListName, setEditTaskListName] = useState(taskListName ?? '');
+  const [editTaskListName, setEditTaskListName] = useState('');
 
-  const editTaskListMutation = useMutation((data: { id: string; name: string }) =>
-    editTaskList(data),
+  const editTaskListMutation = useMutation(
+    (data: { id: string; name: string }) => editTaskList(data),
+    {
+      onSuccess: () => queryClient.invalidateQueries('tasks'),
+    },
   );
 
   const handleSaveTaskListName = () => {
     editTaskListMutation.mutate({
-      id: taskListId!,
+      id: tasksData.list_uuid,
       name: editTaskListName!,
     });
 
@@ -127,7 +125,7 @@ const CreateTest: FC = memo(() => {
         <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-title`}>
             <Typography color={'purple'} weight={'bold'}>
-              {courseName} - {topicName}
+              {tasksData?.course_name} - {tasksData?.topic_name}
             </Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-work`}>
@@ -140,8 +138,14 @@ const CreateTest: FC = memo(() => {
                 />
               </ClickAwayListener>
             ) : (
-              <Typography size={'large'} weight={'bold'} onClick={() => setIsNameEdit(true)}>
-                {taskListName}
+              <Typography
+                size={'large'}
+                weight={'bold'}
+                onClick={() => {
+                  setEditTaskListName(tasksData?.list_name ?? '');
+                  setIsNameEdit(true);
+                }}>
+                {tasksData?.list_name}
               </Typography>
             )}
           </div>
@@ -162,14 +166,14 @@ const CreateTest: FC = memo(() => {
       <div className={`${DEFAULT_CLASSNAME}_tasks-container`}>
         {isLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
 
-        {!!tasksData?.length &&
-          tasksData?.map((task: Task, index: number) => (
+        {!!tasksData?.tasks?.length &&
+          tasksData?.tasks?.map((task: Task, index: number) => (
             <TaskCard
               taskFormats={taskFormats}
               isCreateMode={false}
               key={task.task_uuid}
               taskId={task.task_uuid}
-              taskListId={taskListId!}
+              taskListId={tasksData.list_uuid}
               text={task.task_condition}
               criteria={task.criteria}
               maxScore={task.max_ball}
@@ -183,7 +187,7 @@ const CreateTest: FC = memo(() => {
           <TaskCard
             isCreateMode={true}
             taskFormats={taskFormats}
-            taskListId={taskListId!}
+            taskListId={tasksData.list_uuid}
             taskId={''}
             editModeDisabled={false}
             taskAssets={[]}

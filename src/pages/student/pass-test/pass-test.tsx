@@ -33,21 +33,13 @@ const PassTest: FC = memo(() => {
 
   const { id } = useParams();
 
-  const {
-    id: taskListId,
-    name: taskListName,
-    seeCriteria,
-  } = useSelector((state: RootState) => state.student.currentTaskList)!;
+  const { currentTaskList } = useSelector((state: RootState) => state.student);
 
   const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
 
-  const { activeTopic, activeCourse } = useSelector((state: RootState) => state.student);
+  const { data: tasksData, isLoading: isTasksLoading } = useQuery('tasks', () => getTasks(id!));
 
-  const { data: tasksData, isLoading: isTasksLoading } = useQuery('tasks', () =>
-    getTasks(taskListId ?? id),
-  );
-
-  const maxScore = tasksData?.reduce(
+  const maxScore = tasksData?.tasks?.reduce(
     (score: number, task: Task) => score + Number(task.max_ball),
     0,
   );
@@ -65,7 +57,7 @@ const PassTest: FC = memo(() => {
 
     sendTaskListAnswersMutation.mutate({
       student_uuid: uuid,
-      list_uuid: taskListId ?? id,
+      list_uuid: tasksData?.list_uuid ?? id,
       answers: formattedAnswers,
     });
 
@@ -87,10 +79,10 @@ const PassTest: FC = memo(() => {
       <div className={`${DEFAULT_CLASSNAME}_title`}>
         <div className={`${DEFAULT_CLASSNAME}_title_name`}>
           <Typography color={'purple'}>
-            {activeCourse?.name} - {activeTopic?.name}
+            {tasksData?.course_name} - {tasksData?.topic_name}
           </Typography>
           <Typography size={'large'} weight={'bold'}>
-            {taskListName}
+            {tasksData?.list_name}
           </Typography>
         </div>
         <div className={`${DEFAULT_CLASSNAME}_title_maxScore`}>
@@ -98,9 +90,9 @@ const PassTest: FC = memo(() => {
           <Typography weight={'bold'}>{maxScore}</Typography>
         </div>
       </div>
-      {!isTasksLoading && tasksData?.length && (
+      {!isTasksLoading && tasksData?.tasks?.length && (
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>
-          {tasksData?.map((task: Task, index: number) => (
+          {tasksData?.tasks?.map((task: Task, index: number) => (
             <TaskPassCard
               id={task.task_uuid}
               answers={answers}
@@ -111,7 +103,7 @@ const PassTest: FC = memo(() => {
               maxScore={task.max_ball}
               format={task.format}
               index={index}
-              showCriteria={seeCriteria}
+              showCriteria={currentTaskList?.seeCriteria}
             />
           ))}
           <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>

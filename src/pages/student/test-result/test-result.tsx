@@ -14,6 +14,7 @@ import { getCompletedTaskList } from 'services/student/student.ts';
 import { AppModes } from '../../../constants/appTypes.ts';
 import { Pagination } from '@mui/material';
 import { setSelectedStudent } from '../../../store/results/results.slice.ts';
+import { StudentRoutes, TutorRoutes } from '../../../constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
@@ -28,43 +29,45 @@ const TestResult: FC = memo(() => {
   const navigate = useNavigate();
 
   const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
-  const { currentTaskList, activeTopic, activeCourse } = useSelector(
-    (state: RootState) => state.student,
-  )!;
+  const { currentTaskList } = useSelector((state: RootState) => state.student)!;
 
-  const {
-    name,
-    id: taskListId,
-    selectedStudent,
-    replay,
-    seeCriteria,
-    seeAnswers,
-  } = currentTaskList!;
+  useEffect(() => {
+    if (!currentTaskList) {
+      navigate(isTutorMode ? TutorRoutes.GROUPS : StudentRoutes.ASSIGNMENTS);
+    }
+  }, [currentTaskList]);
 
-  const { data: tasksHistory } = useQuery(['completedTasks', selectedStudent, uuid], () =>
-    getCompletedTaskList({
-      list_uuid: taskListId ?? id,
-      student_uuid: selectedStudent?.length ? selectedStudent : uuid,
-    }),
+  const { appMode } = useSelector((state: RootState) => state.appMode);
+  const isTutorMode = appMode === AppModes.tutor;
+
+  const { data: tasksHistory } = useQuery(
+    ['completedTasks', currentTaskList?.selectedStudent, uuid],
+    () =>
+      getCompletedTaskList({
+        list_uuid: id!,
+        student_uuid: currentTaskList?.selectedStudent?.length
+          ? currentTaskList?.selectedStudent
+          : uuid,
+      }),
   );
 
   const [maxScore, setMaxScore] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
 
-  const [currentAttempt, setCurrentAttempt] = useState(tasksHistory?.length - 1 ?? 0);
+  const [currentAttempt, setCurrentAttempt] = useState(tasksHistory?.tasks?.length - 1 ?? 0);
   const [currentTask, setCurrentTask] = useState<ResultTask | null>(() =>
-    tasksHistory ? tasksHistory[currentAttempt] : null,
+    tasksHistory ? tasksHistory.tasks[currentAttempt] : null,
   );
 
   useEffect(() => {
     if (tasksHistory) {
-      setCurrentAttempt(tasksHistory.length - 1);
+      setCurrentAttempt(tasksHistory.tasks.length - 1);
     }
   }, [tasksHistory]);
 
   useEffect(() => {
     if (tasksHistory) {
-      setCurrentTask(tasksHistory[currentAttempt]);
+      setCurrentTask(tasksHistory.tasks[currentAttempt]);
     }
   }, [currentAttempt]);
 
@@ -83,10 +86,6 @@ const TestResult: FC = memo(() => {
       ) ?? 0,
     );
   }, [currentTask]);
-
-  const { appMode } = useSelector((state: RootState) => state.appMode);
-
-  const isTutorMode = appMode === AppModes.tutor;
 
   const handleReplayTest = () => {
     navigate(`/assignments/${id}`);
@@ -121,25 +120,27 @@ const TestResult: FC = memo(() => {
           <div
             className={`${DEFAULT_CLASSNAME}_title_back`}
             onClick={() => {
-              isTutorMode && selectedStudent && dispatch(setSelectedStudent(selectedStudent));
+              isTutorMode &&
+                currentTaskList?.selectedStudent &&
+                dispatch(setSelectedStudent(currentTaskList?.selectedStudent));
               navigate(-1);
             }}>
             Закрыть
           </div>
           <div className={`${DEFAULT_CLASSNAME}_title_name`}>
             <Typography color={'purple'}>
-              {activeCourse?.name} - {activeTopic?.name}
+              {tasksHistory?.course_name} - {tasksHistory?.topic_name}
             </Typography>
             <Typography size={'large'} weight={'bold'}>
-              {name}
+              {tasksHistory?.list_name}
             </Typography>
           </div>
-          {tasksHistory?.length > 1 && (
+          {tasksHistory?.tasks?.length > 1 && (
             <div className={`${DEFAULT_CLASSNAME}_pagination`}>
               <Typography>Номер попытки</Typography>
               <Pagination
                 size={'small'}
-                count={tasksHistory?.length}
+                count={tasksHistory?.tasks?.length}
                 page={currentAttempt + 1}
                 onChange={handleAttemptChange}
               />
@@ -155,7 +156,7 @@ const TestResult: FC = memo(() => {
               {currentScore} / {maxScore}
             </Typography>
           </div>
-          {!isTutorMode && replay && (
+          {!isTutorMode && currentTaskList?.replay && (
             <button onClick={handleReplayTest} className={`${DEFAULT_CLASSNAME}_title_replay`}>
               <Typography color={'purple'}>{'Перепройти'}</Typography>
             </button>
@@ -175,8 +176,8 @@ const TestResult: FC = memo(() => {
                   currentScore={task.score}
                   format={task.task.format}
                   index={index}
-                  showCriteria={seeCriteria || isTutorMode}
-                  showAnswers={seeAnswers || isTutorMode}
+                  showCriteria={currentTaskList?.seeCriteria || isTutorMode}
+                  showAnswers={currentTaskList?.seeAnswers || isTutorMode}
                 />
               </div>
               <div className={`${DEFAULT_CLASSNAME}_tasks_item_analytics`}>

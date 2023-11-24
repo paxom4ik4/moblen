@@ -41,12 +41,12 @@ export type TaskCardProps =
       newTaskCriteria: string;
       newTaskFormat: string;
       newTaskMaxScore: number | null;
-      newTaskAssets: FileList | null;
+      newTaskAssets?: FileList | null;
 
       setNewTaskText: Dispatch<SetStateAction<string>>;
       setNewTaskCriteria: Dispatch<SetStateAction<string>>;
       setNewTaskMaxScore: Dispatch<SetStateAction<number | null>>;
-      setNewTaskAssets: Dispatch<SetStateAction<FileList | null>>;
+      setNewTaskAssets?: Dispatch<SetStateAction<FileList | null>>;
       handleFormatChange: (event: SelectChangeEvent) => void;
 
       saveNewTaskHandler: () => void;
@@ -58,6 +58,8 @@ export type TaskCardProps =
 
       editModeDisabled?: boolean;
       setIsNewTask?: Dispatch<SetStateAction<boolean>>;
+
+      hideAssets?: boolean;
     }
   | {
       isCreateMode: false;
@@ -79,6 +81,8 @@ export type TaskCardProps =
         subject: string;
         formats: string[];
       }[];
+
+      hideAssets?: boolean;
     };
 
 export const TaskCard: FC<TaskCardProps> = (props) => {
@@ -178,7 +182,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const handleAddAttachments = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files!;
 
-    props.isCreateMode && props.setNewTaskAssets(files);
+    props.isCreateMode && props.setNewTaskAssets!(files);
   };
 
   return (
@@ -339,7 +343,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               </div>
             )}
           </div>
-          {props.isCreateMode && (
+          {props.isCreateMode && !props.hideAssets && (
             <div className={`${DEFAULT_CLASSNAME}_assets`}>
               {props.isCreateMode &&
                 props.newTaskAssets &&

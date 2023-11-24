@@ -58,7 +58,7 @@ const tasksAPI = {
       criteria: string;
       format: string;
       max_ball: number;
-      files: unknown;
+      files?: unknown;
     },
   ) => {
     if (data.files) {

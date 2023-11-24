@@ -93,13 +93,8 @@ const GenerateTest: FC = memo(() => {
   };
 
   const createTaskMutation = useMutation(
-    (data: {
-      list_uuid: string;
-      task_condition: string;
-      criteria: string;
-      format: string;
-      max_ball: number;
-    }) => createTask(data),
+    (data: { task_condition: string; criteria: string; format: string; max_ball: number }) =>
+      createTask(paramsTaskListId!, data),
     {
       onSuccess: () => queryClient.invalidateQueries('tasks'),
     },
@@ -108,7 +103,6 @@ const GenerateTest: FC = memo(() => {
   const saveNewTaskHandler = () => {
     if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
       createTaskMutation.mutate({
-        list_uuid: tasksData.list_uuid,
         format: newTaskFormat,
         criteria: newTaskCriteria,
         max_ball: +newTaskMaxScore,
@@ -294,6 +288,7 @@ const GenerateTest: FC = memo(() => {
           {!!tasksData?.tasks?.length &&
             tasksData?.tasks?.map((task: Task, index: number) => (
               <TaskCard
+                files={[]}
                 taskFormats={taskFormats}
                 isCreateMode={false}
                 key={task.task_uuid}
@@ -305,6 +300,7 @@ const GenerateTest: FC = memo(() => {
                 format={task.format}
                 index={index + 1}
                 editModeDisabled={isEditModeDisabled}
+                hideAssets={true}
               />
             ))}
 
@@ -326,6 +322,7 @@ const GenerateTest: FC = memo(() => {
               setNewTaskCriteria={setNewTaskCriteria}
               saveNewTaskHandler={saveNewTaskHandler}
               setIsNewTask={setIsNewTask}
+              hideAssets={true}
             />
           )}
           {!isEditModeDisabled && (

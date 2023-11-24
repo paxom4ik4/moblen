@@ -55,6 +55,8 @@
     align-items: center;
     min-width: 230px;
     transition: 0.5s;
+    user-select: none;
+    pointer-events: none;
 
     &_photo {
       position: relative;
@@ -132,5 +134,7 @@
 
   &_menu_opened {
     opacity: 1;
+    pointer-events: initial;
+    user-select: initial;
   }
 }

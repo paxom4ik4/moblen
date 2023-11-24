@@ -65,6 +65,7 @@ const CreateTest: FC = memo(() => {
   const [newTaskCriteria, setNewTaskCriteria] = useState<string>('');
   const [newTaskFormat, setNewTaskFormat] = useState<string>('');
   const [newTaskMaxScore, setNewTaskMaxScore] = useState<number | null>(null);
+  const [newTaskAssets, setNewTaskAssets] = useState<FileList | null>(null);
 
   const handleFormatChange = (event: SelectChangeEvent) => {
     setNewTaskFormat(event.target.value as string);
@@ -72,31 +73,54 @@ const CreateTest: FC = memo(() => {
 
   const createTaskMutation = useMutation(
     (data: {
-      list_uuid: string;
       task_condition: string;
       criteria: string;
       format: string;
       max_ball: number;
-    }) => createTask(data),
+      files?: unknown;
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+    }) => createTask(tasksData.list_uuid!, data),
     {
-      onSuccess: () => queryClient.invalidateQueries('tasks'),
+      onSuccess: async () => {
+        setNewTaskText('');
+        setNewTaskCriteria('');
+        setNewTaskMaxScore(null);
+        setNewTaskFormat('');
+        setNewTaskAssets(null);
+
+        await queryClient.invalidateQueries('tasks');
+      },
     },
   );
 
   const saveNewTaskHandler = () => {
     if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
-      createTaskMutation.mutate({
-        list_uuid: tasksData.list_uuid!,
-        format: newTaskFormat,
-        criteria: newTaskCriteria,
-        max_ball: +newTaskMaxScore,
-        task_condition: newTaskText,
-      });
+      if (newTaskAssets) {
+        const data = new FormData();
 
-      setNewTaskText('');
-      setNewTaskCriteria('');
-      setNewTaskMaxScore(null);
-      setNewTaskFormat('');
+        data.append('format', newTaskFormat);
+        data.append('criteria', newTaskCriteria);
+        data.append('max_ball', newTaskMaxScore.toString());
+        data.append('task_condition', newTaskText);
+
+        Array.from(newTaskAssets).forEach((item) => {
+          data.append('files', item);
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        createTaskMutation.mutate(data);
+      } else {
+        const data = {
+          format: newTaskFormat,
+          criteria: newTaskCriteria,
+          max_ball: +newTaskMaxScore,
+          task_condition: newTaskText,
+        };
+
+        createTaskMutation.mutate(data);
+      }
     }
   };
 
@@ -179,6 +203,7 @@ const CreateTest: FC = memo(() => {
               maxScore={task.max_ball}
               format={task.format}
               index={index + 1}
+              files={task?.files ?? []}
               editModeDisabled={isEditModeDisabled}
             />
           ))}
@@ -195,12 +220,14 @@ const CreateTest: FC = memo(() => {
             newTaskFormat={newTaskFormat}
             newTaskCriteria={newTaskCriteria}
             newTaskText={newTaskText}
+            newTaskAssets={newTaskAssets}
             handleFormatChange={handleFormatChange}
             setNewTaskMaxScore={setNewTaskMaxScore}
             setNewTaskText={setNewTaskText}
             setNewTaskCriteria={setNewTaskCriteria}
             saveNewTaskHandler={saveNewTaskHandler}
             setIsNewTask={setIsNewTask}
+            setNewTaskAssets={setNewTaskAssets}
           />
         )}
         {!isEditModeDisabled && (

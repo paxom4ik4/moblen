@@ -1,10 +1,15 @@
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
 
 import './task-card.scss';
 
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
+import AttachIcon from 'assets/icons/attach-icon.svg';
+
+import ImageIcon from '@mui/icons-material/Image';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 import { Typography } from 'common/typography/typography.tsx';
 import { Asset, Task } from 'types/task.ts';
@@ -36,10 +41,12 @@ export type TaskCardProps =
       newTaskCriteria: string;
       newTaskFormat: string;
       newTaskMaxScore: number | null;
+      newTaskAssets: FileList | null;
 
       setNewTaskText: Dispatch<SetStateAction<string>>;
       setNewTaskCriteria: Dispatch<SetStateAction<string>>;
       setNewTaskMaxScore: Dispatch<SetStateAction<number | null>>;
+      setNewTaskAssets: Dispatch<SetStateAction<FileList | null>>;
       handleFormatChange: (event: SelectChangeEvent) => void;
 
       saveNewTaskHandler: () => void;
@@ -66,6 +73,8 @@ export type TaskCardProps =
       taskAssets?: Asset[];
       index?: number;
 
+      files: { file_name: string; url: string }[];
+
       taskFormats?: {
         subject: string;
         formats: string[];
@@ -76,7 +85,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const queryClient = useQueryClient();
 
   // assets
-  const [assets, setAssets] = useState<Asset[]>([]);
+
   const [addNewAsset, setAddNewAsset] = useState<boolean>(false);
   const [newAssetImage, setNewAssetImage] = useState<File | null>(null);
   const [newAssetText, setNewAssetText] = useState('');
@@ -103,19 +112,19 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     clearNewAsset();
   };
 
-  const saveNewAssetHandler = () => {
-    if (newAssetText.length && newAssetImage) {
-      setAssets([
-        ...assets,
-        {
-          text: newAssetText,
-          image: newAssetImage!,
-        },
-      ]);
-
-      closeNewAssetHandler();
-    }
-  };
+  // const saveNewAssetHandler = () => {
+  //   if (newAssetText.length && newAssetImage) {
+  //     setAssets([
+  //       ...assets,
+  //       {
+  //         text: newAssetText,
+  //         image: newAssetImage!,
+  //       },
+  //     ]);
+  //
+  //     closeNewAssetHandler();
+  //   }
+  // };
 
   const renderFormatGroup = (group: { subject: string; formats: string[] }) => {
     const items = group.formats.map((format) => (
@@ -166,6 +175,12 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     setEditTaskFormat(event.target.value as string);
   };
 
+  const handleAddAttachments = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files!;
+
+    props.isCreateMode && props.setNewTaskAssets(files);
+  };
+
   return (
     <ClickAwayListener onClickAway={() => handleSaveEdits(isEditMode)}>
       <div className={`${DEFAULT_CLASSNAME} ${props.editModeDisabled && 'card-disabled'}`}>
@@ -196,9 +211,9 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 <button onClick={closeNewAssetHandler}>
                   <CloseIcon />
                 </button>
-                <button onClick={saveNewAssetHandler}>
-                  <CheckIcon />
-                </button>
+                {/*<button onClick={saveNewAssetHandler}>*/}
+                {/*  <CheckIcon />*/}
+                {/*</button>*/}
               </div>
             </div>
           </div>
@@ -257,87 +272,136 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               </div>
             </div>
           </div>
-          <div className={`${DEFAULT_CLASSNAME}_task_score`}>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
-                Максимальный балл за задание
+          <div className={`${DEFAULT_CLASSNAME}_task_score_container`}>
+            <div className={`${DEFAULT_CLASSNAME}_task_score`}>
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+                <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
+                  Максимальный балл за задание
+                </div>
+                {props.isCreateMode && (
+                  <TextField
+                    placeholder={'Балл за задание'}
+                    value={props.newTaskMaxScore ?? 0}
+                    type={'text'}
+                    onChange={(e) => props.setNewTaskMaxScore(Number(e.currentTarget.value))}
+                  />
+                )}
+                {!props.isCreateMode && isEditMode && (
+                  <TextField
+                    placeholder={'Балл за задание'}
+                    value={editTaskMaxBall}
+                    type={'text'}
+                    onChange={(e) => setEditTaskMaxBall(Number(e.currentTarget.value))}
+                  />
+                )}
+                {!isEditMode && !props.isCreateMode && (
+                  <Typography onClick={() => setIsEditMode(true)}>{props.maxScore}</Typography>
+                )}
               </div>
-              {props.isCreateMode && (
-                <TextField
-                  placeholder={'Балл за задание'}
-                  value={props.newTaskMaxScore ?? 0}
-                  type={'text'}
-                  onChange={(e) => props.setNewTaskMaxScore(Number(e.currentTarget.value))}
-                />
-              )}
-              {!props.isCreateMode && isEditMode && (
-                <TextField
-                  placeholder={'Балл за задание'}
-                  value={editTaskMaxBall}
-                  type={'text'}
-                  onChange={(e) => setEditTaskMaxBall(Number(e.currentTarget.value))}
-                />
-              )}
-              {!isEditMode && !props.isCreateMode && (
-                <Typography onClick={() => setIsEditMode(true)}>{props.maxScore}</Typography>
-              )}
+
+              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
+                <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>
+                  Формат задания
+                </div>
+                {props.isCreateMode && (
+                  <Select
+                    fullWidth
+                    value={props.newTaskFormat || ''}
+                    onChange={props.handleFormatChange}
+                    defaultValue=""
+                    MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
+                    {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
+                  </Select>
+                )}
+                {!props.isCreateMode && isEditMode && (
+                  <Select
+                    fullWidth
+                    value={editTaskFormat || ''}
+                    onChange={handleFormatChange}
+                    defaultValue=""
+                    MenuProps={{ PaperProps: { sx: { maxHeight: 320 } }, disablePortal: true }}>
+                    {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
+                  </Select>
+                )}
+                {!isEditMode && !props.isCreateMode && (
+                  <Typography onClick={() => setIsEditMode(true)}>
+                    {props.format.replace(',', ': ')}
+                  </Typography>
+                )}
+              </div>
             </div>
-            <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>
-              <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore-title`}>Формат задания</div>
-              {props.isCreateMode && (
-                <Select
-                  fullWidth
-                  value={props.newTaskFormat || ''}
-                  onChange={props.handleFormatChange}
-                  defaultValue=""
-                  MenuProps={{ PaperProps: { sx: { maxHeight: 320 } } }}>
-                  {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
-                </Select>
-              )}
-              {!props.isCreateMode && isEditMode && (
-                <Select
-                  fullWidth
-                  value={editTaskFormat || ''}
-                  onChange={handleFormatChange}
-                  defaultValue=""
-                  MenuProps={{ PaperProps: { sx: { maxHeight: 320 } }, disablePortal: true }}>
-                  {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
-                </Select>
-              )}
-              {!isEditMode && !props.isCreateMode && (
-                <Typography onClick={() => setIsEditMode(true)}>
-                  {props.format.replace(',', ': ')}
-                </Typography>
-              )}
-            </div>
+            {!props.editModeDisabled && props.isCreateMode && (
+              <div className={`${DEFAULT_CLASSNAME}_attachments`}>
+                <input type={'file'} multiple={true} onChange={handleAddAttachments} />
+                <button>
+                  <AttachIcon />
+                </button>
+              </div>
+            )}
           </div>
+          {props.isCreateMode && (
+            <div className={`${DEFAULT_CLASSNAME}_assets`}>
+              {props.isCreateMode &&
+                props.newTaskAssets &&
+                Array.from(props.newTaskAssets).map((item) => {
+                  if (item.type.includes('image')) {
+                    return (
+                      <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
+                        <ImageIcon /> <Typography>{item.name}</Typography>
+                      </div>
+                    );
+                  }
+                  if (item.type.includes('pdf')) {
+                    return (
+                      <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
+                        <TextSnippetIcon /> <Typography>{item.name}</Typography>
+                      </div>
+                    );
+                  }
+                  if (item.type.includes('doc')) {
+                    return (
+                      <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
+                        <PictureAsPdfIcon /> <Typography>{item.name}</Typography>
+                      </div>
+                    );
+                  }
+                })}
+            </div>
+          )}
+          {!props.isCreateMode && props.files && (
+            <div className={`${DEFAULT_CLASSNAME}_loaded_assets`}>
+              {props.files.map((item) => (
+                <img src={item.url} alt={item.file_name} />
+              ))}
+            </div>
+          )}
         </div>
 
-        {props.isCreateMode && !!assets.length && (
-          <div className={`${DEFAULT_CLASSNAME}_files`}>
-            {assets.map((asset) => (
-              <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
-                <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-                <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
-                  {asset.text}
-                </Typography>
-              </div>
-            ))}
-          </div>
-        )}
+        {/*{props.isCreateMode && !!assets.length && (*/}
+        {/*  <div className={`${DEFAULT_CLASSNAME}_files`}>*/}
+        {/*    {assets.map((asset) => (*/}
+        {/*      <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>*/}
+        {/*        <img src={URL.createObjectURL(asset.image)} alt={asset.text} />*/}
+        {/*        <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>*/}
+        {/*          {asset.text}*/}
+        {/*        </Typography>*/}
+        {/*      </div>*/}
+        {/*    ))}*/}
+        {/*  </div>*/}
+        {/*)}*/}
 
-        {!!props.taskAssets?.length && (
-          <div className={`${DEFAULT_CLASSNAME}_files`}>
-            {assets.map((asset) => (
-              <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>
-                <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-                <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>
-                  {asset.text}
-                </Typography>
-              </div>
-            ))}
-          </div>
-        )}
+        {/*{!!props.taskAssets?.length && (*/}
+        {/*  <div className={`${DEFAULT_CLASSNAME}_files`}>*/}
+        {/*    {assets.map((asset) => (*/}
+        {/*      <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>*/}
+        {/*        <img src={URL.createObjectURL(asset.image)} alt={asset.text} />*/}
+        {/*        <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>*/}
+        {/*          {asset.text}*/}
+        {/*        </Typography>*/}
+        {/*      </div>*/}
+        {/*    ))}*/}
+        {/*  </div>*/}
+        {/*)}*/}
 
         {!props.editModeDisabled && !props.isCreateMode && (
           <Tooltip placement={'top'} title={'Удалить'}>

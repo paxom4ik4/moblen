@@ -51,25 +51,25 @@ const tasksAPI = {
   getTasks: (taskListId: string) => {
     return API.get(`${TASK_URL}/by-tasklist/${taskListId}`).then((res) => res.data);
   },
-  createTask: ({
-    list_uuid,
-    task_condition,
-    criteria,
-    max_ball,
-    format,
-  }: {
-    list_uuid: string;
-    task_condition: string;
-    criteria: string;
-    format: string;
-    max_ball: number;
-  }) => {
-    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, {
-      task_condition,
-      criteria,
-      max_ball,
-      format,
-    }).then((res) => res.data);
+  createTask: (
+    list_uuid: string,
+    data: {
+      task_condition: string;
+      criteria: string;
+      format: string;
+      max_ball: number;
+      files: unknown;
+    },
+  ) => {
+    if (data.files) {
+      return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, data, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }).then((res) => res.data);
+    }
+
+    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, data).then((res) => res.data);
   },
   editTask: ({ taskId, data }: { taskId: string; data: Partial<Task> }) => {
     return API.patch(`${TASK_URL}/${taskId}/`, { ...data }).then((res) => res.data);

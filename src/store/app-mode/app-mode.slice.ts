@@ -6,7 +6,7 @@ export interface AppModeState {
 }
 
 const initialState: AppModeState = {
-  appMode: null,
+  appMode: AppModes.tutor,
 };
 
 export const appModeSlice = createSlice({

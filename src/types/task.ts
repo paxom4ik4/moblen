@@ -10,6 +10,7 @@ export interface Task {
   criteria: string;
   max_ball: number;
   format: string;
+  files?: { file_name: string; url: string }[];
 }
 
 export interface CompletedTask {

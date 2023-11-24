@@ -135,6 +135,7 @@ const App: FC = () => {
 
   const tutorRoutes = (
     <>
+      <Route path="*" element={<Navigate to={TutorRoutes.ASSIGNMENTS} replace />} />
       <Route path={TutorRoutes.RESULTS} element={<Results />} />
       <Route path={TutorRoutes.GROUPS} element={<Groups />} />
       <Route path={TutorRoutes.GROUPS_RESULT} element={<TestResult />} />
@@ -146,6 +147,7 @@ const App: FC = () => {
 
   const studentRoutes = (
     <>
+      <Route path="*" element={<Navigate to={StudentRoutes.ASSIGNMENTS} replace />} />
       <Route path={StudentRoutes.ASSIGNMENTS} element={<Tests />} />
       <Route path={StudentRoutes.PASS_TEST} element={<PassTest />} />
       <Route path={StudentRoutes.TEST_RESULT} element={<TestResult />} />
@@ -173,6 +175,7 @@ const App: FC = () => {
 
   const loginContent = (
     <Routes>
+      <Route path="*" element={<Navigate to={LoginRoutes.LOGIN} replace />} />
       <Route path={LoginRoutes.LOGIN} element={<LoginPage />} />
       <Route path={LoginRoutes.LOGIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />
@@ -189,7 +192,7 @@ const App: FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <LocalizationProvider adapterLocale={'ru'} dateAdapter={AdapterDayjs}>
-        <Suspense fallback={fallbackScreen}>{userData ? appContent : loginContent}</Suspense>
+        <Suspense fallback={fallbackScreen}>{appMode ? appContent : loginContent}</Suspense>
       </LocalizationProvider>
     </DndProvider>
   );

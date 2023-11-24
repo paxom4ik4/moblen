@@ -30,7 +30,6 @@ export const UpperBar: FC = () => {
   const navigate = useNavigate();
 
   const { userData } = useSelector((state: RootState) => state.userData);
-  const { uuid, name, surname, email } = userData!;
 
   const [menuOpened, setMenuOpened] = useState<boolean>(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -38,10 +37,10 @@ export const UpperBar: FC = () => {
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
   const { data: tutorData } = useQuery(['tutorData', appMode], () =>
-    appMode === AppModes.tutor ? getTutorInfo(uuid) : null,
+    appMode === AppModes.tutor ? getTutorInfo(userData?.uuid ?? '') : null,
   );
   const { data: studentData } = useQuery(['studentData', appMode], () =>
-    appMode === AppModes.student ? getStudentInfo(uuid) : null,
+    appMode === AppModes.student ? getStudentInfo(userData?.uuid ?? '') : null,
   );
 
   const logoutMutation = useMutation((token: string) => logoutUser(token), {
@@ -67,17 +66,23 @@ export const UpperBar: FC = () => {
     await logoutMutation.mutate(localStorage.getItem('accessToken')!);
   };
 
-  const uploadTutorPhoto = useMutation((data: FormData) => editTutorPhoto(uuid, data), {
-    onSuccess: async () => {
-      await queryClient.invalidateQueries('tutorData');
+  const uploadTutorPhoto = useMutation(
+    (data: FormData) => editTutorPhoto(userData?.uuid ?? '', data),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries('tutorData');
+      },
     },
-  });
+  );
 
-  const uploadStudentPhoto = useMutation((data: FormData) => editStudentPhoto(uuid, data), {
-    onSuccess: async () => {
-      await queryClient.invalidateQueries('studentData');
+  const uploadStudentPhoto = useMutation(
+    (data: FormData) => editStudentPhoto(userData?.uuid ?? '', data),
+    {
+      onSuccess: async () => {
+        await queryClient.invalidateQueries('studentData');
+      },
     },
-  });
+  );
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -95,6 +100,10 @@ export const UpperBar: FC = () => {
       }
     }
   };
+
+  if (!userData) {
+    return <div>Loading</div>;
+  }
 
   return (
     <ClickAwayListener onClickAway={() => setMenuOpened(false)}>
@@ -155,9 +164,9 @@ export const UpperBar: FC = () => {
           </div>
           <div className={`${DEFAULT_CLASSNAME}_menu_name`}>
             <Typography size={'large'}>
-              {name} {surname}
+              {userData?.name} {userData?.surname}
             </Typography>
-            <Typography color={'gray'}>{email}</Typography>
+            <Typography color={'gray'}>{userData?.email}</Typography>
           </div>
           <div className={`${DEFAULT_CLASSNAME}_menu_buttons`}>
             <button onClick={logoutHandler}>

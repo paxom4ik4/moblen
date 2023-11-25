@@ -186,11 +186,13 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
     if (props.isCreateMode && props.newTaskAssets?.length === MAX_FILES) return;
 
+    const maxAllowedSize = 50 * 1024 * 1024;
+
     if (props.isCreateMode && props.newTaskAssets) {
       for (let i = 0; i < newFiles.length; i++) {
         const isFileUnique = !props.newTaskAssets.some((file) => file.name === newFiles[i].name);
 
-        if (isFileUnique) {
+        if (isFileUnique && newFiles[i].size < maxAllowedSize) {
           props.setNewTaskAssets!((prevFiles) => [...prevFiles, newFiles[i]]);
         } else {
           console.error(`Файл с именем ${newFiles[i].name} уже загружен.`);
@@ -204,8 +206,12 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
     const files = new FormData();
 
+    const maxAllowedSize = 50 * 1024 * 1024;
+
     for (let i = 0; i < newFiles.length; i++) {
-      files.append('files', newFiles[i]);
+      if (newFiles[i].size < maxAllowedSize) {
+        files.append('files', newFiles[i]);
+      }
     }
 
     addFilesToTaskMutation.mutate({ taskId: props.taskId!, files });
@@ -387,35 +393,45 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             {!props.editModeDisabled &&
               props.isCreateMode &&
               props.newTaskAssets?.length !== MAX_FILES && (
+                <>
+                  <div className={`${DEFAULT_CLASSNAME}_attachments`}>
+                    <input
+                      maxLength={
+                        props.newTaskAssets
+                          ? MAX_FILES - Array.from(props.newTaskAssets).length
+                          : MAX_FILES
+                      }
+                      type={'file'}
+                      multiple={true}
+                      onChange={handleAddAttachments}
+                    />
+                    <button>
+                      <AttachIcon />
+                    </button>
+                  </div>
+                  <Typography className={`${DEFAULT_CLASSNAME}_attachments_info`}>
+                    Максимальный размер файла 50 мб
+                  </Typography>
+                </>
+              )}
+
+            {!props.editModeDisabled && !props.isCreateMode && isEditMode && (
+              <>
                 <div className={`${DEFAULT_CLASSNAME}_attachments`}>
                   <input
-                    maxLength={
-                      props.newTaskAssets
-                        ? MAX_FILES - Array.from(props.newTaskAssets).length
-                        : MAX_FILES
-                    }
+                    maxLength={MAX_FILES}
                     type={'file'}
                     multiple={true}
-                    onChange={handleAddAttachments}
+                    onChange={handleAddTaskAttachments}
                   />
                   <button>
                     <AttachIcon />
                   </button>
                 </div>
-              )}
-
-            {!props.editModeDisabled && !props.isCreateMode && isEditMode && (
-              <div className={`${DEFAULT_CLASSNAME}_attachments`}>
-                <input
-                  maxLength={MAX_FILES}
-                  type={'file'}
-                  multiple={true}
-                  onChange={handleAddTaskAttachments}
-                />
-                <button>
-                  <AttachIcon />
-                </button>
-              </div>
+                <Typography className={`${DEFAULT_CLASSNAME}_attachments_info`}>
+                  Максимальный размер файла 50 мб
+                </Typography>
+              </>
             )}
           </div>
           {props.isCreateMode && !props.hideAssets && (

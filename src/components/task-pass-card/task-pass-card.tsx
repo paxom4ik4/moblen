@@ -8,6 +8,9 @@ import { Asset, TaskWithAnswer } from 'types/task.ts';
 import './task-pass-card.scss';
 import { Answers } from 'pages/student/pass-test/pass-test.tsx';
 import { TextareaAutosize } from '@mui/material';
+import TextSnippetIcon from '@mui/icons-material/TextSnippet';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { createPortal } from 'react-dom';
 
 const DEFAULT_CLASSNAME = 'task-pass-card';
 
@@ -31,6 +34,8 @@ interface TaskPassCardProps {
 
   showCriteria?: boolean;
   showAnswers?: boolean;
+
+  files: { file_name: string; url: string }[];
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
@@ -50,6 +55,7 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     showAnswers = true,
 
     format = 'Текстовый',
+    files = [],
   } = props;
 
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
@@ -59,8 +65,44 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     onAnswerChange!(id, newAnswer);
   };
 
+  const filesImages =
+    files.filter(
+      (file) =>
+        file.file_name.includes('.png') ||
+        file.file_name.includes('.svg') ||
+        file.file_name.includes('.jpg') ||
+        file.file_name.includes('.jpeg'),
+    ) ?? [];
+
+  const restFiles =
+    files.filter(
+      (file) =>
+        !(
+          file.file_name.includes('.png') ||
+          file.file_name.includes('.svg') ||
+          file.file_name.includes('.jpg') ||
+          file.file_name.includes('.jpeg')
+        ),
+    ) ?? [];
+
+  const [openedImage, setOpenedImage] = useState<null | string>(null);
+
   return (
     <>
+      {!!openedImage &&
+        createPortal(
+          <div
+            onClick={() => setOpenedImage(null)}
+            className={`${DEFAULT_CLASSNAME}_opened_image_container`}>
+            <img
+              className={`${DEFAULT_CLASSNAME}_opened_image`}
+              alt={openedImage}
+              src={openedImage}
+            />
+          </div>,
+          document.body,
+        )}
+
       <div className={DEFAULT_CLASSNAME}>
         <div className={`${DEFAULT_CLASSNAME}_upper`}>
           <div className={`${DEFAULT_CLASSNAME}_task`}>
@@ -89,6 +131,39 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
             </div>
           </div>
         </div>
+        {!!files.length && (
+          <div className={`${DEFAULT_CLASSNAME}_files`}>
+            <div className={`${DEFAULT_CLASSNAME}_files_images`}>
+              {filesImages.map((item) => {
+                return (
+                  <div
+                    className={`${DEFAULT_CLASSNAME}_files_images_item`}
+                    onClick={() => {
+                      setOpenedImage(item.url);
+                    }}>
+                    <img src={item.url} alt={item.file_name} />
+                  </div>
+                );
+              })}
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_files_assets`}>
+              {restFiles.map((item) => {
+                return (
+                  <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container`}>
+                    <a
+                      href={item.url}
+                      target={'_blank'}
+                      className={`${DEFAULT_CLASSNAME}_files_assets_item`}>
+                      {item.file_name.includes('doc') && <TextSnippetIcon />}
+                      {item.file_name.includes('pdf') && <PictureAsPdfIcon />}
+                      <Typography>{item.file_name}</Typography>
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className={`${DEFAULT_CLASSNAME}_task_score`}>
           <div className={`${DEFAULT_CLASSNAME}_task_score_description`}>

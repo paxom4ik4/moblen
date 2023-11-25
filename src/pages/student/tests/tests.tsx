@@ -38,7 +38,7 @@ const Tests: FC<TestsProps> = memo((props) => {
     isLoading: isStudentDataLoading,
     isLoadingError,
   } = useQuery(['studentData'], () =>
-    getStudentInfo(resultsView ? selectedStudent! : userData!.uuid),
+    getStudentInfo(resultsView ? selectedStudent! : userData?.uuid ?? ''),
   );
 
   const {
@@ -49,8 +49,8 @@ const Tests: FC<TestsProps> = memo((props) => {
     ['taskLists', activeTutor, selectedStudent],
     () =>
       getStudentTaskLists({
-        student_uuid: resultsView ? selectedStudent! : userData!.uuid,
-        tutor_uuid: resultsView ? userData!.uuid : activeTutor,
+        student_uuid: resultsView ? selectedStudent! : userData?.uuid ?? '',
+        tutor_uuid: resultsView ? userData?.uuid ?? '' : activeTutor,
       }),
     { refetchInterval: 5000 },
   );

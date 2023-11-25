@@ -104,6 +104,7 @@ const PassTest: FC = memo(() => {
               format={task.format}
               index={index}
               showCriteria={currentTaskList?.seeCriteria}
+              files={task?.files ?? []}
             />
           ))}
           <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>

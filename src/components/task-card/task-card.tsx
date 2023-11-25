@@ -14,7 +14,7 @@ import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { Typography } from 'common/typography/typography.tsx';
 import { Asset, Task } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
-import { deleteTask, editTask } from 'services/tasks';
+import { addFilesToTask, deleteFile, deleteTask, editTask } from 'services/tasks';
 import {
   ListSubheader,
   MenuItem,
@@ -27,6 +27,8 @@ import {
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 
 const DEFAULT_CLASSNAME = 'task-card';
+
+const MAX_FILES = 5;
 
 export type TaskCardProps =
   | {
@@ -41,12 +43,12 @@ export type TaskCardProps =
       newTaskCriteria: string;
       newTaskFormat: string;
       newTaskMaxScore: number | null;
-      newTaskAssets?: FileList | null;
+      newTaskAssets?: File[];
 
       setNewTaskText: Dispatch<SetStateAction<string>>;
       setNewTaskCriteria: Dispatch<SetStateAction<string>>;
       setNewTaskMaxScore: Dispatch<SetStateAction<number | null>>;
-      setNewTaskAssets?: Dispatch<SetStateAction<FileList | null>>;
+      setNewTaskAssets?: Dispatch<SetStateAction<File[]>>;
       handleFormatChange: (event: SelectChangeEvent) => void;
 
       saveNewTaskHandler: () => void;
@@ -98,6 +100,20 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     onSuccess: () => queryClient.invalidateQueries('tasks'),
   });
 
+  const deleteFileMutation = useMutation(
+    (data: { taskId: string; fileURL: string }) => deleteFile(data.taskId, data.fileURL),
+    {
+      onSuccess: () => queryClient.invalidateQueries('tasks'),
+    },
+  );
+
+  const addFilesToTaskMutation = useMutation(
+    (data: { taskId: string; files: FormData }) => addFilesToTask(data.taskId, data.files),
+    {
+      onSuccess: () => queryClient.invalidateQueries('tasks'),
+    },
+  );
+
   const deleteTaskHandler = () => {
     if (props.taskId && props.taskListId) {
       deleteTaskMutation.mutate({
@@ -115,20 +131,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     setAddNewAsset(false);
     clearNewAsset();
   };
-
-  // const saveNewAssetHandler = () => {
-  //   if (newAssetText.length && newAssetImage) {
-  //     setAssets([
-  //       ...assets,
-  //       {
-  //         text: newAssetText,
-  //         image: newAssetImage!,
-  //       },
-  //     ]);
-  //
-  //     closeNewAssetHandler();
-  //   }
-  // };
 
   const renderFormatGroup = (group: { subject: string; formats: string[] }) => {
     const items = group.formats.map((format) => (
@@ -180,10 +182,61 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   };
 
   const handleAddAttachments = (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files!;
+    const newFiles = event.target.files!;
 
-    props.isCreateMode && props.setNewTaskAssets!(files);
+    if (props.isCreateMode && props.newTaskAssets?.length === MAX_FILES) return;
+
+    if (props.isCreateMode && props.newTaskAssets) {
+      for (let i = 0; i < newFiles.length; i++) {
+        const isFileUnique = !props.newTaskAssets.some((file) => file.name === newFiles[i].name);
+
+        if (isFileUnique) {
+          props.setNewTaskAssets!((prevFiles) => [...prevFiles, newFiles[i]]);
+        } else {
+          console.error(`Файл с именем ${newFiles[i].name} уже загружен.`);
+        }
+      }
+    }
   };
+
+  const handleAddTaskAttachments = async (event: ChangeEvent<HTMLInputElement>) => {
+    const newFiles = await event.target.files!;
+
+    const files = new FormData();
+
+    for (let i = 0; i < newFiles.length; i++) {
+      files.append('files', newFiles[i]);
+    }
+
+    addFilesToTaskMutation.mutate({ taskId: props.taskId!, files });
+  };
+
+  const handleAssetDelete = (name: string) => {
+    props.isCreateMode &&
+      props.setNewTaskAssets!((prevFiles) => prevFiles.filter((file) => file.name !== name));
+  };
+
+  const filesImages = !props.isCreateMode
+    ? props.files.filter(
+        (file) =>
+          file.file_name.includes('.png') ||
+          file.file_name.includes('.svg') ||
+          file.file_name.includes('.jpg') ||
+          file.file_name.includes('.jpeg'),
+      )
+    : [];
+
+  const restFiles = !props.isCreateMode
+    ? props.files.filter(
+        (file) =>
+          !(
+            file.file_name.includes('.png') ||
+            file.file_name.includes('.svg') ||
+            file.file_name.includes('.jpg') ||
+            file.file_name.includes('.jpeg')
+          ),
+      )
+    : [];
 
   return (
     <ClickAwayListener onClickAway={() => handleSaveEdits(isEditMode)}>
@@ -215,9 +268,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 <button onClick={closeNewAssetHandler}>
                   <CloseIcon />
                 </button>
-                {/*<button onClick={saveNewAssetHandler}>*/}
-                {/*  <CheckIcon />*/}
-                {/*</button>*/}
               </div>
             </div>
           </div>
@@ -334,9 +384,34 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 )}
               </div>
             </div>
-            {!props.editModeDisabled && props.isCreateMode && (
+            {!props.editModeDisabled &&
+              props.isCreateMode &&
+              props.newTaskAssets?.length !== MAX_FILES && (
+                <div className={`${DEFAULT_CLASSNAME}_attachments`}>
+                  <input
+                    maxLength={
+                      props.newTaskAssets
+                        ? MAX_FILES - Array.from(props.newTaskAssets).length
+                        : MAX_FILES
+                    }
+                    type={'file'}
+                    multiple={true}
+                    onChange={handleAddAttachments}
+                  />
+                  <button>
+                    <AttachIcon />
+                  </button>
+                </div>
+              )}
+
+            {!props.editModeDisabled && !props.isCreateMode && isEditMode && (
               <div className={`${DEFAULT_CLASSNAME}_attachments`}>
-                <input type={'file'} multiple={true} onChange={handleAddAttachments} />
+                <input
+                  maxLength={MAX_FILES}
+                  type={'file'}
+                  multiple={true}
+                  onChange={handleAddTaskAttachments}
+                />
                 <button>
                   <AttachIcon />
                 </button>
@@ -347,66 +422,75 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             <div className={`${DEFAULT_CLASSNAME}_assets`}>
               {props.isCreateMode &&
                 props.newTaskAssets &&
-                Array.from(props.newTaskAssets).map((item) => {
-                  if (item.type.includes('image')) {
-                    return (
-                      <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
-                        <ImageIcon /> <Typography>{item.name}</Typography>
+                props.newTaskAssets.map((item) => {
+                  return (
+                    <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
+                      {item.type.includes('image') && <ImageIcon />}
+                      {item.type.includes('pdf') && <TextSnippetIcon />}
+                      {item.type.includes('doc') && <PictureAsPdfIcon />}
+                      <Typography>{item.name}</Typography>{' '}
+                      <div
+                        className={`${DEFAULT_CLASSNAME}_assets_item_delete`}
+                        onClick={() => handleAssetDelete(item.name)}>
+                        <TrashIcon />
                       </div>
-                    );
-                  }
-                  if (item.type.includes('pdf')) {
-                    return (
-                      <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
-                        <TextSnippetIcon /> <Typography>{item.name}</Typography>
-                      </div>
-                    );
-                  }
-                  if (item.type.includes('doc')) {
-                    return (
-                      <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
-                        <PictureAsPdfIcon /> <Typography>{item.name}</Typography>
-                      </div>
-                    );
-                  }
+                    </div>
+                  );
                 })}
             </div>
           )}
           {!props.isCreateMode && props.files && (
             <div className={`${DEFAULT_CLASSNAME}_loaded_assets`}>
-              {props.files.map((item) => (
-                <img src={item.url} alt={item.file_name} />
-              ))}
+              <div className={`${DEFAULT_CLASSNAME}_loaded_assets_images`}>
+                {filesImages.map((item) => {
+                  return (
+                    <div
+                      className={`${DEFAULT_CLASSNAME}_loaded_assets_images_item`}
+                      onClick={() => setIsEditMode(true)}>
+                      <img src={item.url} alt={item.file_name} />
+                      {isEditMode && (
+                        <div
+                          className={`${DEFAULT_CLASSNAME}_loaded_assets_images_item_delete`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            deleteFileMutation.mutate({ taskId: props.taskId!, fileURL: item.url });
+                          }}>
+                          <TrashIcon />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              <div className={`${DEFAULT_CLASSNAME}_loaded_assets_files`}>
+                {restFiles.map((item) => {
+                  return (
+                    <div className={`${DEFAULT_CLASSNAME}_loaded_assets_files_item_container`}>
+                      <a
+                        href={item.url}
+                        target={'_blank'}
+                        className={`${DEFAULT_CLASSNAME}_loaded_assets_item`}>
+                        {item.file_name.includes('doc') && <TextSnippetIcon />}
+                        {item.file_name.includes('pdf') && <PictureAsPdfIcon />}
+                        <Typography>{item.file_name}</Typography>
+                      </a>
+                      {isEditMode && (
+                        <div
+                          className={`${DEFAULT_CLASSNAME}_loaded_assets_item_delete`}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            deleteFileMutation.mutate({ taskId: props.taskId!, fileURL: item.url });
+                          }}>
+                          <TrashIcon />
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           )}
         </div>
-
-        {/*{props.isCreateMode && !!assets.length && (*/}
-        {/*  <div className={`${DEFAULT_CLASSNAME}_files`}>*/}
-        {/*    {assets.map((asset) => (*/}
-        {/*      <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>*/}
-        {/*        <img src={URL.createObjectURL(asset.image)} alt={asset.text} />*/}
-        {/*        <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>*/}
-        {/*          {asset.text}*/}
-        {/*        </Typography>*/}
-        {/*      </div>*/}
-        {/*    ))}*/}
-        {/*  </div>*/}
-        {/*)}*/}
-
-        {/*{!!props.taskAssets?.length && (*/}
-        {/*  <div className={`${DEFAULT_CLASSNAME}_files`}>*/}
-        {/*    {assets.map((asset) => (*/}
-        {/*      <div key={asset.text} className={`${DEFAULT_CLASSNAME}_files_item`}>*/}
-        {/*        <img src={URL.createObjectURL(asset.image)} alt={asset.text} />*/}
-        {/*        <Typography className={`${DEFAULT_CLASSNAME}_files_item_text`}>*/}
-        {/*          {asset.text}*/}
-        {/*        </Typography>*/}
-        {/*      </div>*/}
-        {/*    ))}*/}
-        {/*  </div>*/}
-        {/*)}*/}
-
         {!props.editModeDisabled && !props.isCreateMode && (
           <Tooltip placement={'top'} title={'Удалить'}>
             <div className={`${DEFAULT_CLASSNAME}_trash`} onClick={deleteTaskHandler}>

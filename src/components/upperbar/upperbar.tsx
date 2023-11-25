@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useState } from 'react';
+import { ChangeEvent, FC, useEffect, useState } from 'react';
 
 import ProfileIcon from 'assets/icons/profile-icon.svg';
 import NotificationIcon from 'assets/icons/notifications-icon.svg';
@@ -59,6 +59,13 @@ export const UpperBar: FC = () => {
       dispatch(setAppMode(null));
     });
   };
+
+  useEffect(() => {
+    if (!userData) {
+      clearAppStateHandler();
+      navigate(LoginRoutes.LOGIN);
+    }
+  }, [userData]);
 
   const logoutHandler = async () => {
     setIsLoggingOut(true);

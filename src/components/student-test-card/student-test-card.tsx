@@ -121,7 +121,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
             </Typography>
           </div>
         </div>
-        {listStatus === LIST_STATUS.completed && score && maxScore && (
+        {listStatus === LIST_STATUS.completed && !!score && !!maxScore && (
           <div
             className={`${DEFAULT_CLASSNAME}_color ${getCardColor(
               getTaskScorePercentage(score, maxScore)!,

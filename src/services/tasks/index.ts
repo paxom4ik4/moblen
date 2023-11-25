@@ -80,6 +80,16 @@ const tasksAPI = {
   getAllFormats: () => {
     return API.get(`${TASK_URL}/get-all-formats/`).then((res) => res.data);
   },
+  deleteFile: (taskId: string, fileURL: string) => {
+    return API.delete(`${TASK_URL}/${taskId}/files/`, { data: { files: [fileURL] } }).then(
+      (res) => res.data,
+    );
+  },
+  addFilesToTask: (taskId: string, files: FormData) => {
+    return API.patch(`${TASK_URL}/${taskId}/`, files, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }).then((res) => res.data);
+  },
 };
 
 const generateAPI = {
@@ -90,5 +100,13 @@ const generateAPI = {
 
 export const { getTaskList, deleteTaskList, createTaskList, shareTaskList, editTaskList } =
   tasklistAPI;
-export const { getTasks, createTask, deleteTask, getAllFormats, editTask } = tasksAPI;
+export const {
+  getTasks,
+  createTask,
+  deleteTask,
+  getAllFormats,
+  editTask,
+  deleteFile,
+  addFilesToTask,
+} = tasksAPI;
 export const { generateTask } = generateAPI;

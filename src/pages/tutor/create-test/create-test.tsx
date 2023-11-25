@@ -65,7 +65,7 @@ const CreateTest: FC = memo(() => {
   const [newTaskCriteria, setNewTaskCriteria] = useState<string>('');
   const [newTaskFormat, setNewTaskFormat] = useState<string>('');
   const [newTaskMaxScore, setNewTaskMaxScore] = useState<number | null>(null);
-  const [newTaskAssets, setNewTaskAssets] = useState<FileList | null>(null);
+  const [newTaskAssets, setNewTaskAssets] = useState<File[]>([]);
 
   const handleFormatChange = (event: SelectChangeEvent) => {
     setNewTaskFormat(event.target.value as string);
@@ -87,7 +87,7 @@ const CreateTest: FC = memo(() => {
         setNewTaskCriteria('');
         setNewTaskMaxScore(null);
         setNewTaskFormat('');
-        setNewTaskAssets(null);
+        setNewTaskAssets([]);
 
         await queryClient.invalidateQueries('tasks');
       },

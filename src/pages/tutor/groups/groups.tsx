@@ -47,7 +47,9 @@ const Groups: FC<GroupsProps> = memo((props) => {
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
-  const { data: groups, isLoading } = useQuery('groups', () => getTutorGroups(userData!.uuid));
+  const { data: groups, isLoading } = useQuery('groups', () =>
+    getTutorGroups(userData?.uuid ?? ''),
+  );
 
   const { data: selectedGroupData, isLoading: isGroupLoading } = useQuery(
     ['groupData', selectedGroup],

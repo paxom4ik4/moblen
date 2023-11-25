@@ -39,10 +39,12 @@
         padding: 4px;
         min-width: 100%;
         width: 100%;
-        resize: vertical;
         background-color: #FEFBFF;
         border: none;
+        resize: none;
         max-height: 80vh;
+        overflow-y: scroll;
+        min-height: calc(100% - 24px);
       }
     }
   }
@@ -152,7 +154,6 @@
           padding: 6px 12px;
           height: 60px;
           max-width: fit-content;
-          min-width: 200px;
 
           .MuiSelect-select {
             text-overflow: ellipsis !important;
@@ -296,5 +297,9 @@
     position: absolute;
     bottom: 32px;
     right: 20px;
+  }
+
+  .min-width {
+    min-width: 200px;
   }
 }

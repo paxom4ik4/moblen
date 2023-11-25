@@ -61,11 +61,13 @@ export const UpperBar: FC = () => {
   };
 
   useEffect(() => {
-    if (!userData) {
+    const storedUserData = localStorage.getItem('userData');
+
+    if (!storedUserData) {
       clearAppStateHandler();
       navigate(LoginRoutes.LOGIN);
     }
-  }, [userData]);
+  }, []);
 
   const logoutHandler = async () => {
     setIsLoggingOut(true);

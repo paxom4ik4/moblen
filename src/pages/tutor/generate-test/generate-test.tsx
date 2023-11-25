@@ -262,7 +262,7 @@ const GenerateTest: FC = memo(() => {
                 />
               </div>
               <div
-                className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_fields_item`}>
+                className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_fields_item min-width`}>
                 <Typography>Формат задания</Typography>
                 <Select
                   placeholder={'Формат'}

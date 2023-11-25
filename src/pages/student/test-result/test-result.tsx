@@ -178,6 +178,7 @@ const TestResult: FC = memo(() => {
                   index={index}
                   showCriteria={currentTaskList?.seeCriteria || isTutorMode}
                   showAnswers={currentTaskList?.seeAnswers || isTutorMode}
+                  files={task.task?.files ?? []}
                 />
               </div>
               <div className={`${DEFAULT_CLASSNAME}_tasks_item_analytics`}>

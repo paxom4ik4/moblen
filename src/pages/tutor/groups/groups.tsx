@@ -67,7 +67,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
     try {
       deleteStudentMutation.mutate({ studentId: id, groupId: groupId });
     } catch (error) {
-      console.log('Error deleting student from group');
+      console.info('Error deleting student from group');
     }
   };
 

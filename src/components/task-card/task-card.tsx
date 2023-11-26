@@ -15,6 +15,7 @@ import { Asset, Task } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { addFilesToTask, deleteFile, deleteTask, editTask } from 'services/tasks';
 import {
+  CircularProgress,
   ListSubheader,
   MenuItem,
   Select,
@@ -33,6 +34,8 @@ const MAX_SIZE = 30 * 1024 * 1024;
 
 export type TaskCardProps =
   | {
+      disabled?: boolean;
+
       taskId?: string;
       taskListId: string;
       taskAssets?: Asset[];
@@ -65,11 +68,14 @@ export type TaskCardProps =
       }[];
 
       editModeDisabled?: boolean;
-      setIsNewTask?: Dispatch<SetStateAction<boolean>>;
 
       hideAssets?: boolean;
+
+      isNewTaskSaving?: boolean;
     }
   | {
+      disabled?: boolean;
+
       isCreateMode: false;
 
       text: string;
@@ -287,7 +293,10 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   return (
     <ClickAwayListener onClickAway={() => handleSaveEdits(isEditMode)}>
-      <div className={`${DEFAULT_CLASSNAME} ${props.editModeDisabled && 'card-disabled'}`}>
+      <div
+        className={`${DEFAULT_CLASSNAME} ${
+          (props.editModeDisabled || props.disabled) && 'card-disabled'
+        }`}>
         {addNewAsset && (
           <div className={`${DEFAULT_CLASSNAME}_new-asset`}>
             <div className={`${DEFAULT_CLASSNAME}_new-asset_content`}>
@@ -437,10 +446,9 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 <div className={`${DEFAULT_CLASSNAME}_attachments`}>
                   <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : ''}`}>
                     <input {...getInputProps()} />
-                    <Typography className={`${DEFAULT_CLASSNAME}_attachments_text`}>
+                    <Typography size={'small'} className={`${DEFAULT_CLASSNAME}_attachments_text`}>
                       <TextSnippetIcon /> Перетащите файлы сюда или кликните, чтобы выбрать файлы
                     </Typography>
-                    <Typography>Максимальный общий размер загруженных файлов 30 MB</Typography>
                   </div>
                 </div>
               )}
@@ -455,10 +463,11 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                       {...getRootPropsEdit()}
                       className={`dropzone ${isDragActiveEdit ? 'active' : ''}`}>
                       <input {...getInputPropsEdit()} />
-                      <Typography className={`${DEFAULT_CLASSNAME}_attachments_text`}>
+                      <Typography
+                        size={'small'}
+                        className={`${DEFAULT_CLASSNAME}_attachments_text`}>
                         <TextSnippetIcon /> Перетащите файлы сюда или кликните, чтобы выбрать файлы
                       </Typography>
-                      <Typography>Максимальный общий размер загруженных файлов 30 MB</Typography>
                     </div>
                   </div>
                 </>
@@ -560,9 +569,12 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               className={`${DEFAULT_CLASSNAME}_save`}
               onClick={() => {
                 props.saveNewTaskHandler();
-                props.setIsNewTask!(false);
               }}>
-              <CheckIcon />
+              {props.isNewTaskSaving ? (
+                <CircularProgress sx={{ color: '#c8caff' }} />
+              ) : (
+                <CheckIcon />
+              )}
             </div>
           </Tooltip>
         )}

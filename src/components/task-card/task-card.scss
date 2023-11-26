@@ -34,8 +34,8 @@
       }
 
       svg {
-        width: 16px;
-        height: 16px;
+        width: 12px;
+        height: 12px;
       }
     }
   }
@@ -321,22 +321,28 @@
     }
   }
 
-  &_trash svg {
-    width: 28px;
-    height: 28px;
-  }
-
   &_trash,
   &_save {
     display: flex;
     justify-content: center;
     align-items: center;
     position: absolute;
-    right: 12px;
-    bottom: 12px;
+    right: 8px;
+    bottom: 8px;
     transition: 0.3s;
     z-index: 5;
+    width: 20px;
+    height: 20px;
 
+    .MuiCircularProgress-root {
+      width: 20px !important;
+      height: 20px !important;
+    }
+
+    svg {
+      width: 20px;
+      height: 20px;
+    }
 
     &:hover {
       cursor: pointer;

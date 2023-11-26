@@ -97,7 +97,7 @@ export const LoginPage: FC = () => {
         }
       }
     } catch (error) {
-      console.log('Error while authorization');
+      console.info('Error while authorization');
     }
   };
 

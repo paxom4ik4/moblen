@@ -34,7 +34,7 @@ const tasklistAPI = {
     try {
       return API.get(`${TASK_LIST_URL}/by-topic/${topic_uuid}/`).then((res) => res.data);
     } catch (error) {
-      console.log('Error fetching TaskList');
+      console.info('Error fetching TaskList');
       return null;
     }
   },
@@ -53,15 +53,17 @@ const tasksAPI = {
   },
   createTask: (
     list_uuid: string,
-    data: {
-      task_condition: string;
-      criteria: string;
-      format: string;
-      max_ball: number;
-      files?: unknown;
-    },
+    data:
+      | {
+          task_condition: string;
+          criteria: string;
+          format: string;
+          max_ball: number;
+        }
+      | FormData,
+    isFormData?: boolean,
   ) => {
-    if (data.files) {
+    if (isFormData) {
       return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',

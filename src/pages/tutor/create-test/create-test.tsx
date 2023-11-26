@@ -45,6 +45,7 @@ const CreateTest: FC = memo(() => {
   }, [tasksData]);
 
   const [isNewTask, setIsNewTask] = useState(false);
+  const [isNewTaskSaving, setIsNewTaskSaving] = useState(false);
 
   const addNewTaskHandler = () => {
     if (isNewTask) {
@@ -74,15 +75,19 @@ const CreateTest: FC = memo(() => {
   };
 
   const createTaskMutation = useMutation(
-    (data: {
-      task_condition: string;
-      criteria: string;
-      format: string;
-      max_ball: number;
-      files?: unknown;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-    }) => createTask(tasksData.list_uuid!, data),
+    (
+      data:
+        | {
+            payload: {
+              task_condition: string;
+              criteria: string;
+              format: string;
+              max_ball: number;
+            };
+            isFormData: boolean;
+          }
+        | { payload: FormData; isFormData: boolean },
+    ) => createTask(tasksData.list_uuid!, data.payload, data.isFormData),
     {
       onSuccess: async () => {
         setNewTaskText('');
@@ -90,6 +95,8 @@ const CreateTest: FC = memo(() => {
         setNewTaskMaxScore(null);
         setNewTaskFormat('');
         setNewTaskAssets([]);
+        setIsNewTask(false);
+        setIsNewTaskSaving(false);
 
         await queryClient.invalidateQueries('tasks');
       },
@@ -110,9 +117,7 @@ const CreateTest: FC = memo(() => {
           data.append('files', item);
         });
 
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        createTaskMutation.mutate(data);
+        createTaskMutation.mutate({ payload: data, isFormData: true });
       } else {
         const data = {
           format: newTaskFormat,
@@ -121,8 +126,10 @@ const CreateTest: FC = memo(() => {
           task_condition: newTaskText,
         };
 
-        createTaskMutation.mutate(data);
+        createTaskMutation.mutate({ payload: data, isFormData: false });
       }
+
+      setIsNewTaskSaving(true);
     }
   };
 
@@ -212,6 +219,7 @@ const CreateTest: FC = memo(() => {
 
         {isNewTask && (
           <TaskCard
+            disabled={isNewTaskSaving}
             isCreateMode={true}
             taskFormats={taskFormats}
             taskListId={tasksData.list_uuid}
@@ -227,13 +235,13 @@ const CreateTest: FC = memo(() => {
             setNewTaskText={setNewTaskText}
             setNewTaskCriteria={setNewTaskCriteria}
             saveNewTaskHandler={saveNewTaskHandler}
-            setIsNewTask={setIsNewTask}
             newTaskAssets={newTaskAssets}
             setNewTaskAssets={setNewTaskAssets}
             newTaskAssetsTotalSize={newTaskAssetsTotalSize}
             setNewTaskAssetsTotalSize={setNewTaskAssetsTotalSize}
             newTaskAssetsError={newTaskAssetsError}
             setNewTaskAssetsError={setNewTaskAssetsError}
+            isNewTaskSaving={isNewTaskSaving}
           />
         )}
         {!isEditModeDisabled && (

@@ -25,6 +25,7 @@ import {
   TextField,
 } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
+import { Notification } from '../../../common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'app-generate-test';
 
@@ -58,6 +59,7 @@ const GenerateTest: FC = memo(() => {
   }, [tasksData]);
 
   const [isNewTask, setIsNewTask] = useState(false);
+  const [isNewTaskSaving, setIsNewTaskSaving] = useState(false);
 
   const addNewTaskHandler = () => {
     if (isNewTask) {
@@ -73,11 +75,13 @@ const GenerateTest: FC = memo(() => {
   };
 
   // Creating new task
-
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [newTaskCriteria, setNewTaskCriteria] = useState<string>('');
   const [newTaskFormat, setNewTaskFormat] = useState<string>('');
   const [newTaskMaxScore, setNewTaskMaxScore] = useState<number | null>(null);
+  const [newTaskAssets, setNewTaskAssets] = useState<File[]>([]);
+  const [newTaskAssetsTotalSize, setNewTaskAssetsTotalSize] = useState(0);
+  const [newTaskAssetsError, setNewTaskAssetsError] = useState<null | string>(null);
 
   const handleFormatChange = (event: SelectChangeEvent) => {
     setNewTaskFormat(event.target.value as string);
@@ -93,27 +97,62 @@ const GenerateTest: FC = memo(() => {
   };
 
   const createTaskMutation = useMutation(
-    (data: { task_condition: string; criteria: string; format: string; max_ball: number }) =>
-      createTask(paramsTaskListId!, data),
+    (
+      data:
+        | {
+            payload: {
+              task_condition: string;
+              criteria: string;
+              format: string;
+              max_ball: number;
+            };
+            isFormData: boolean;
+          }
+        | { payload: FormData; isFormData: boolean },
+    ) => createTask(tasksData.list_uuid!, data.payload, data.isFormData),
     {
-      onSuccess: () => queryClient.invalidateQueries('tasks'),
+      onSuccess: async () => {
+        setNewTaskText('');
+        setNewTaskCriteria('');
+        setNewTaskMaxScore(null);
+        setNewTaskFormat('');
+        setNewTaskAssets([]);
+        setIsNewTask(false);
+        setIsNewTaskSaving(false);
+
+        await queryClient.invalidateQueries('tasks');
+      },
     },
   );
 
   const saveNewTaskHandler = () => {
     if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
-      createTaskMutation.mutate({
-        format: newTaskFormat,
-        criteria: newTaskCriteria,
-        max_ball: +newTaskMaxScore,
-        task_condition: newTaskText,
-      });
+      if (newTaskAssets) {
+        const data = new FormData();
 
-      setNewTaskText('');
-      setNewTaskCriteria('');
-      setNewTaskMaxScore(null);
-      setNewTaskFormat('');
+        data.append('format', newTaskFormat);
+        data.append('criteria', newTaskCriteria);
+        data.append('max_ball', newTaskMaxScore.toString());
+        data.append('task_condition', newTaskText);
+
+        Array.from(newTaskAssets).forEach((item) => {
+          data.append('files', item);
+        });
+
+        createTaskMutation.mutate({ payload: data, isFormData: true });
+      } else {
+        const data = {
+          format: newTaskFormat,
+          criteria: newTaskCriteria,
+          max_ball: +newTaskMaxScore,
+          task_condition: newTaskText,
+        };
+
+        createTaskMutation.mutate({ payload: data, isFormData: false });
+      }
     }
+
+    setIsNewTaskSaving(true);
   };
 
   const handleGenerateFormatChange = (event: SelectChangeEvent) => {
@@ -125,6 +164,8 @@ const GenerateTest: FC = memo(() => {
   const [generateBallPerTask, setGenerateBallPerTask] = useState(0);
   const [generateTaskAmount, setGenerateTaskAmount] = useState(0);
 
+  const [generateStarted, setGenerateStarted] = useState(false);
+
   const generateTaskMutation = useMutation(
     (data: GenerateTaskPayload) => generateTask(tasksData.list_uuid, data),
     {
@@ -132,6 +173,7 @@ const GenerateTest: FC = memo(() => {
         setGenerateTaskFormat('');
         setGenerateBallPerTask(0);
         setGenerateTaskAmount(0);
+        setGenerateStarted(true);
       },
     },
   );
@@ -169,6 +211,15 @@ const GenerateTest: FC = memo(() => {
 
   return (
     <div className={DEFAULT_CLASSNAME}>
+      {generateStarted && (
+        <Notification
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          autoHideDuration={5000}
+          message={'Началась генерация заданий (может занимать до 3х минут)'}
+          open={generateStarted}
+          onClose={() => setGenerateStarted(false)}
+        />
+      )}
       <div className={`${DEFAULT_CLASSNAME}_text-container`}>
         <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
           <div className={`${DEFAULT_CLASSNAME}_text-container_name-title`}>
@@ -288,7 +339,6 @@ const GenerateTest: FC = memo(() => {
           {!!tasksData?.tasks?.length &&
             tasksData?.tasks?.map((task: Task, index: number) => (
               <TaskCard
-                files={[]}
                 taskFormats={taskFormats}
                 isCreateMode={false}
                 key={task.task_uuid}
@@ -300,12 +350,13 @@ const GenerateTest: FC = memo(() => {
                 format={task.format}
                 index={index + 1}
                 editModeDisabled={isEditModeDisabled}
-                hideAssets={true}
+                files={task?.files ?? []}
               />
             ))}
 
           {isNewTask && (
             <TaskCard
+              disabled={isNewTaskSaving}
               isCreateMode={true}
               taskFormats={taskFormats}
               taskListId={tasksData.list_uuid}
@@ -321,8 +372,13 @@ const GenerateTest: FC = memo(() => {
               setNewTaskText={setNewTaskText}
               setNewTaskCriteria={setNewTaskCriteria}
               saveNewTaskHandler={saveNewTaskHandler}
-              setIsNewTask={setIsNewTask}
-              hideAssets={true}
+              newTaskAssets={newTaskAssets}
+              setNewTaskAssets={setNewTaskAssets}
+              newTaskAssetsTotalSize={newTaskAssetsTotalSize}
+              setNewTaskAssetsTotalSize={setNewTaskAssetsTotalSize}
+              newTaskAssetsError={newTaskAssetsError}
+              setNewTaskAssetsError={setNewTaskAssetsError}
+              isNewTaskSaving={isNewTaskSaving}
             />
           )}
           {!isEditModeDisabled && (

@@ -46,7 +46,7 @@ const topicsAPI = {
     try {
       return API.get(`${TOPICS_API_URL}/by-courses/${courseId}`).then((res) => res.data);
     } catch (error) {
-      console.log('Error fetching Topics');
+      console.info('Error fetching Topics');
       return null;
     }
   },

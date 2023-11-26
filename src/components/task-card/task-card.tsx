@@ -1,11 +1,10 @@
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
 
 import './task-card.scss';
 
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
-import AttachIcon from 'assets/icons/attach-icon.svg';
 
 import ImageIcon from '@mui/icons-material/Image';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
@@ -25,10 +24,12 @@ import {
   Tooltip,
 } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
+import { useDropzone } from 'react-dropzone';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
 const MAX_FILES = 5;
+const MAX_SIZE = 30 * 1024 * 1024;
 
 export type TaskCardProps =
   | {
@@ -50,6 +51,11 @@ export type TaskCardProps =
       setNewTaskMaxScore: Dispatch<SetStateAction<number | null>>;
       setNewTaskAssets?: Dispatch<SetStateAction<File[]>>;
       handleFormatChange: (event: SelectChangeEvent) => void;
+
+      newTaskAssetsTotalSize: number;
+      setNewTaskAssetsTotalSize: Dispatch<SetStateAction<number>>;
+      newTaskAssetsError: null | string;
+      setNewTaskAssetsError: Dispatch<SetStateAction<null | string>>;
 
       saveNewTaskHandler: () => void;
 
@@ -181,46 +187,81 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     setEditTaskFormat(event.target.value as string);
   };
 
-  const handleAddAttachments = (event: ChangeEvent<HTMLInputElement>) => {
-    const newFiles = event.target.files!;
+  const handleAssetDelete = (index: number) => {
+    if (props.isCreateMode && props.newTaskAssets && props.setNewTaskAssets) {
+      const removedFile = props.newTaskAssets[index];
 
-    if (props.isCreateMode && props.newTaskAssets?.length === MAX_FILES) return;
+      props.setNewTaskAssets((prevFiles) => prevFiles.filter((_, idx) => idx !== index));
+      props.setNewTaskAssetsTotalSize((prevSize) => prevSize - removedFile.size);
+    }
+  };
 
-    const maxAllowedSize = 50 * 1024 * 1024;
+  const [editAssetsError, setEditAssetsError] = useState<null | string>(null);
 
-    if (props.isCreateMode && props.newTaskAssets) {
-      for (let i = 0; i < newFiles.length; i++) {
-        const isFileUnique = !props.newTaskAssets.some((file) => file.name === newFiles[i].name);
+  const onDropEdit = useCallback(
+    (acceptedFiles: File[]) => {
+      setEditAssetsError(null);
 
-        if (isFileUnique && newFiles[i].size < maxAllowedSize) {
-          props.setNewTaskAssets!((prevFiles) => [...prevFiles, newFiles[i]]);
-        } else {
-          console.error(`Файл с именем ${newFiles[i].name} уже загружен.`);
+      const filesToServer = new FormData();
+
+      if (!props.isCreateMode) {
+        const newFiles = acceptedFiles.slice(0, MAX_FILES - props.files.length).filter((file) => {
+          if (file.size < MAX_SIZE) {
+            return true;
+          } else {
+            setEditAssetsError(`Файл "${file.name}" превышает максимально допустимый размер.`);
+          }
+        });
+
+        for (let i = 0; i < newFiles.length; i++) {
+          filesToServer.append('files', newFiles[i]);
         }
+
+        addFilesToTaskMutation.mutate({ taskId: props.taskId!, files: filesToServer });
       }
-    }
-  };
+    },
+    [!props.isCreateMode && props.files],
+  );
 
-  const handleAddTaskAttachments = async (event: ChangeEvent<HTMLInputElement>) => {
-    const newFiles = await event.target.files!;
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      props.isCreateMode && props.setNewTaskAssetsError(null);
 
-    const files = new FormData();
+      const maxFiles = 5;
 
-    const maxAllowedSize = 50 * 1024 * 1024;
+      let addedSize = props.isCreateMode ? props.newTaskAssetsTotalSize : 0;
+      const newFiles = acceptedFiles.slice(0, maxFiles).filter((file: File) => {
+        if (addedSize + file.size <= MAX_SIZE) {
+          addedSize += file.size;
+          return true;
+        } else {
+          props.isCreateMode &&
+            props.setNewTaskAssetsError(
+              `Файл "${file.name}" превышает максимально допустимый размер.`,
+            );
+          return false;
+        }
+      });
 
-    for (let i = 0; i < newFiles.length; i++) {
-      if (newFiles[i].size < maxAllowedSize) {
-        files.append('files', newFiles[i]);
-      }
-    }
+      props.isCreateMode && props.setNewTaskAssets!((prevFiles) => [...prevFiles, ...newFiles]);
+      props.isCreateMode && props.setNewTaskAssetsTotalSize(addedSize);
+    },
+    [props.isCreateMode && props.newTaskAssetsTotalSize],
+  );
 
-    addFilesToTaskMutation.mutate({ taskId: props.taskId!, files });
-  };
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    disabled: props.isCreateMode && props.newTaskAssets?.length === MAX_FILES,
+  });
 
-  const handleAssetDelete = (name: string) => {
-    props.isCreateMode &&
-      props.setNewTaskAssets!((prevFiles) => prevFiles.filter((file) => file.name !== name));
-  };
+  const {
+    getRootProps: getRootPropsEdit,
+    getInputProps: getInputPropsEdit,
+    isDragActive: isDragActiveEdit,
+  } = useDropzone({
+    onDrop: onDropEdit,
+    disabled: !props.isCreateMode && props.files?.length === MAX_FILES,
+  });
 
   const filesImages = !props.isCreateMode
     ? props.files.filter(
@@ -393,52 +434,41 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             {!props.editModeDisabled &&
               props.isCreateMode &&
               props.newTaskAssets?.length !== MAX_FILES && (
-                <>
-                  <div className={`${DEFAULT_CLASSNAME}_attachments`}>
-                    <input
-                      maxLength={
-                        props.newTaskAssets
-                          ? MAX_FILES - Array.from(props.newTaskAssets).length
-                          : MAX_FILES
-                      }
-                      type={'file'}
-                      multiple={true}
-                      onChange={handleAddAttachments}
-                    />
-                    <button>
-                      <AttachIcon />
-                    </button>
+                <div className={`${DEFAULT_CLASSNAME}_attachments`}>
+                  <div {...getRootProps()} className={`dropzone ${isDragActive ? 'active' : ''}`}>
+                    <input {...getInputProps()} />
+                    <Typography className={`${DEFAULT_CLASSNAME}_attachments_text`}>
+                      <TextSnippetIcon /> Перетащите файлы сюда или кликните, чтобы выбрать файлы
+                    </Typography>
+                    <Typography>Максимальный общий размер загруженных файлов 30 MB</Typography>
                   </div>
-                  <Typography className={`${DEFAULT_CLASSNAME}_attachments_info`}>
-                    Максимальный размер файла 50 мб
-                  </Typography>
-                </>
+                </div>
               )}
 
-            {!props.editModeDisabled && !props.isCreateMode && isEditMode && (
-              <>
-                <div className={`${DEFAULT_CLASSNAME}_attachments`}>
-                  <input
-                    maxLength={MAX_FILES}
-                    type={'file'}
-                    multiple={true}
-                    onChange={handleAddTaskAttachments}
-                  />
-                  <button>
-                    <AttachIcon />
-                  </button>
-                </div>
-                <Typography className={`${DEFAULT_CLASSNAME}_attachments_info`}>
-                  Максимальный размер файла 50 мб
-                </Typography>
-              </>
-            )}
+            {!props.editModeDisabled &&
+              !props.isCreateMode &&
+              isEditMode &&
+              props.files.length !== MAX_FILES && (
+                <>
+                  <div className={`${DEFAULT_CLASSNAME}_attachments`}>
+                    <div
+                      {...getRootPropsEdit()}
+                      className={`dropzone ${isDragActiveEdit ? 'active' : ''}`}>
+                      <input {...getInputPropsEdit()} />
+                      <Typography className={`${DEFAULT_CLASSNAME}_attachments_text`}>
+                        <TextSnippetIcon /> Перетащите файлы сюда или кликните, чтобы выбрать файлы
+                      </Typography>
+                      <Typography>Максимальный общий размер загруженных файлов 30 MB</Typography>
+                    </div>
+                  </div>
+                </>
+              )}
           </div>
           {props.isCreateMode && !props.hideAssets && (
             <div className={`${DEFAULT_CLASSNAME}_assets`}>
               {props.isCreateMode &&
                 props.newTaskAssets &&
-                props.newTaskAssets.map((item) => {
+                props.newTaskAssets.map((item, index) => {
                   return (
                     <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
                       {item.type.includes('image') && <ImageIcon />}
@@ -447,12 +477,17 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                       <Typography>{item.name}</Typography>{' '}
                       <div
                         className={`${DEFAULT_CLASSNAME}_assets_item_delete`}
-                        onClick={() => handleAssetDelete(item.name)}>
+                        onClick={() => handleAssetDelete(index)}>
                         <TrashIcon />
                       </div>
                     </div>
                   );
                 })}
+              {props.newTaskAssetsError && (
+                <Typography color={'red'} size={'small'}>
+                  {props.newTaskAssetsError}
+                </Typography>
+              )}
             </div>
           )}
           {!props.isCreateMode && props.files && (
@@ -479,6 +514,11 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 })}
               </div>
               <div className={`${DEFAULT_CLASSNAME}_loaded_assets_files`}>
+                {editAssetsError && (
+                  <Typography color={'red'} size={'small'}>
+                    {editAssetsError}
+                  </Typography>
+                )}
                 {restFiles.map((item) => {
                   return (
                     <div className={`${DEFAULT_CLASSNAME}_loaded_assets_files_item_container`}>

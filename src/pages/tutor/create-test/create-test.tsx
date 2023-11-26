@@ -66,6 +66,8 @@ const CreateTest: FC = memo(() => {
   const [newTaskFormat, setNewTaskFormat] = useState<string>('');
   const [newTaskMaxScore, setNewTaskMaxScore] = useState<number | null>(null);
   const [newTaskAssets, setNewTaskAssets] = useState<File[]>([]);
+  const [newTaskAssetsTotalSize, setNewTaskAssetsTotalSize] = useState(0);
+  const [newTaskAssetsError, setNewTaskAssetsError] = useState<null | string>(null);
 
   const handleFormatChange = (event: SelectChangeEvent) => {
     setNewTaskFormat(event.target.value as string);
@@ -220,14 +222,18 @@ const CreateTest: FC = memo(() => {
             newTaskFormat={newTaskFormat}
             newTaskCriteria={newTaskCriteria}
             newTaskText={newTaskText}
-            newTaskAssets={newTaskAssets}
             handleFormatChange={handleFormatChange}
             setNewTaskMaxScore={setNewTaskMaxScore}
             setNewTaskText={setNewTaskText}
             setNewTaskCriteria={setNewTaskCriteria}
             saveNewTaskHandler={saveNewTaskHandler}
             setIsNewTask={setIsNewTask}
+            newTaskAssets={newTaskAssets}
             setNewTaskAssets={setNewTaskAssets}
+            newTaskAssetsTotalSize={newTaskAssetsTotalSize}
+            setNewTaskAssetsTotalSize={setNewTaskAssetsTotalSize}
+            newTaskAssetsError={newTaskAssetsError}
+            setNewTaskAssetsError={setNewTaskAssetsError}
           />
         )}
         {!isEditModeDisabled && (

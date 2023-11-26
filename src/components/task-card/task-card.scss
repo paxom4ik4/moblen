@@ -87,16 +87,16 @@
       &_item {
         background-color: #FFFFFF;
         border-radius: 15px;
-        padding: 4px;
-        width: 90px;
-        height: 90px;
+        padding: 16px;
+        width: 98px;
+        height: 98px;
         box-sizing: border-box;
         position: relative;
 
         &_delete {
           position: absolute;
-          right: 4px;
-          bottom: 4px;
+          right: 2px;
+          bottom: 2px;
 
           cursor: pointer;
         }
@@ -106,6 +106,7 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+        border-radius: 15px;
       }
     }
 
@@ -123,47 +124,55 @@
   }
 
   &_attachments {
-    margin-left: 12px;
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 46px;
-    height: 46px;
-
-    &_info {
-      padding: 4px;
-    }
-
-    input {
-      width: 46px;
-      height: 46px;
+    .dropzone {
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       position: absolute;
-      z-index: 10;
-      opacity: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
       transition: 0.3s;
-      cursor: pointer;
+      padding: 12px;
 
       &:hover {
-        cursor: pointer;
+        opacity: 0.7;
       }
     }
 
-    button {
-      position: absolute;
-      background-color: #FFFFFF;
-      border: 1px solid #c5c6d0;
-      border-radius: 50%;
+    &_text {
       display: flex;
-      justify-content: center;
+      flex-direction: row;
       align-items: center;
-      transition: 0.3s;
-      width: 46px;
-      height: 46px;
-      cursor: pointer;
+      gap: 4px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+        padding-bottom: 2px;
+      }
     }
 
+    .dropzone.active {
+      opacity: 0.7;
+      background-color: #e3e3e3;
+    }
 
+    position: relative;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    background-color: #FFFFFF;
+    height: 67.5px;
+    padding: 8px 12px;
+    border-radius: 15px;
+    border: 1px dashed #44464f;
+    gap: 14px;
+    align-items: center;
+    cursor: pointer;
   }
 
   .MuiSelect-select {
@@ -221,15 +230,17 @@
     height: 100%;
 
     &_score {
-      width: calc(50% - 8px);
+      width: 50%;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      margin-right: 12px;
 
       &_container {
         display: flex;
         width: 100%;
         align-items: flex-end;
+        height: 100%;
       }
 
       select {

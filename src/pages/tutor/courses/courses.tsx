@@ -143,19 +143,19 @@ const Courses: FC = memo(() => {
   const saveNewSubjectHandler = () => {
     if (newSubjectName.length) {
       createNewCourseMutation.mutate({ tutorId: userData!.uuid, courseName: newSubjectName });
-
-      setNewSubjectName('');
-      setAddNewCourse(false);
     }
+
+    setNewSubjectName('');
+    setAddNewCourse(false);
   };
 
   const saveNewTopicHandler = () => {
     if (newTopicName.length && activeCourse) {
       createNewTopicMutation.mutate({ topic_name: newTopicName, course_uuid: activeCourse });
-
-      setNewTopicName('');
-      setAddNewTopic(false);
     }
+
+    setNewTopicName('');
+    setAddNewTopic(false);
   };
 
   const deleteCourseHandler = async () => {

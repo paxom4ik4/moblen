@@ -60,16 +60,20 @@ export const TestCard: FC<TestCardProps> = (props) => {
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>Заданий - {tasks}</div>
       </div>
       <div
-        className={`${DEFAULT_CLASSNAME}_share`}
+        className={`${DEFAULT_CLASSNAME}_share ${
+          tasks <= 0 && `${DEFAULT_CLASSNAME}_share_disabled`
+        }`}
         onClick={(e) => {
           e.stopPropagation();
-          setTestToShare({
-            list_uuid: id,
-            topic,
-            course: subject,
-            name,
-            task_amount: tasks,
-          });
+          if (tasks > 0) {
+            setTestToShare({
+              list_uuid: id,
+              topic,
+              course: subject,
+              name,
+              task_amount: tasks,
+            });
+          }
         }}>
         <ShareIcon />
       </div>

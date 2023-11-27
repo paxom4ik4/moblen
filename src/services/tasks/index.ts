@@ -58,7 +58,7 @@ const tasksAPI = {
           task_condition: string;
           criteria: string;
           format: string;
-          max_ball: number;
+          max_ball: string;
         }
       | FormData,
     isFormData?: boolean,

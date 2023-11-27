@@ -109,6 +109,7 @@ export const TestCardCreate: FC<TestCardCreateProps> = (props) => {
             {subject} - {topic}
           </div>
           <TextField
+            autoFocus={true}
             type={'text'}
             value={newTaskListName}
             onChange={(e) => setNewTaskListName(e.currentTarget.value)}

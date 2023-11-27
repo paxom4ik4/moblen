@@ -15,6 +15,7 @@ import { RootState } from 'store/store.ts';
 import { setCurrentTaskList } from 'store/student/student.slice.ts';
 import { getTasks } from 'services/tasks';
 import { sendTaskListAnswers } from 'services/student/student.ts';
+import { CircularProgress } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'pass-test';
 
@@ -32,8 +33,6 @@ const PassTest: FC = memo(() => {
   const navigate = useNavigate();
 
   const { id } = useParams();
-
-  const { currentTaskList } = useSelector((state: RootState) => state.student);
 
   const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
 
@@ -90,6 +89,7 @@ const PassTest: FC = memo(() => {
           <Typography weight={'bold'}>{maxScore}</Typography>
         </div>
       </div>
+      {isTasksLoading && <CircularProgress sx={{ color: '#c8caff' }} />}
       {!isTasksLoading && tasksData?.tasks?.length && (
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>
           {tasksData?.tasks?.map((task: Task, index: number) => (
@@ -103,7 +103,7 @@ const PassTest: FC = memo(() => {
               maxScore={task.max_ball}
               format={task.format}
               index={index}
-              showCriteria={currentTaskList?.seeCriteria}
+              showCriteria={false}
               files={task?.files ?? []}
             />
           ))}

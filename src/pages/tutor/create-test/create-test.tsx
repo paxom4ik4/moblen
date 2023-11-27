@@ -82,7 +82,7 @@ const CreateTest: FC = memo(() => {
               task_condition: string;
               criteria: string;
               format: string;
-              max_ball: number;
+              max_ball: string;
             };
             isFormData: boolean;
           }
@@ -104,33 +104,38 @@ const CreateTest: FC = memo(() => {
   );
 
   const saveNewTaskHandler = () => {
-    if (newTaskText.length && newTaskCriteria.length && newTaskMaxScore && newTaskMaxScore !== 0) {
-      if (newTaskAssets) {
-        const data = new FormData();
+    if (newTaskAssets) {
+      const data = new FormData();
 
-        data.append('format', newTaskFormat);
-        data.append('criteria', newTaskCriteria);
-        data.append('max_ball', newTaskMaxScore.toString());
-        data.append('task_condition', newTaskText);
+      data.append(
+        'format',
+        newTaskFormat.length
+          ? newTaskFormat
+          : `${taskFormats[0].subject},${taskFormats[0].formats[0]}`,
+      );
+      data.append('criteria', newTaskCriteria.length ? newTaskCriteria : '-');
+      data.append('max_ball', newTaskMaxScore?.toString() ?? '0');
+      data.append('task_condition', newTaskText.length ? newTaskText : '-');
 
-        Array.from(newTaskAssets).forEach((item) => {
-          data.append('files', item);
-        });
+      Array.from(newTaskAssets).forEach((item) => {
+        data.append('files', item);
+      });
 
-        createTaskMutation.mutate({ payload: data, isFormData: true });
-      } else {
-        const data = {
-          format: newTaskFormat,
-          criteria: newTaskCriteria,
-          max_ball: +newTaskMaxScore,
-          task_condition: newTaskText,
-        };
+      createTaskMutation.mutate({ payload: data, isFormData: true });
+    } else {
+      const data = {
+        format: newTaskFormat.length
+          ? newTaskFormat
+          : `${taskFormats[0].subject},${taskFormats[0].formats[0]}`,
+        criteria: newTaskCriteria.length ? newTaskCriteria : '-',
+        max_ball: newTaskMaxScore?.toString() ?? '0',
+        task_condition: newTaskText.length ? newTaskText : '-',
+      };
 
-        createTaskMutation.mutate({ payload: data, isFormData: false });
-      }
-
-      setIsNewTaskSaving(true);
+      createTaskMutation.mutate({ payload: data, isFormData: false });
     }
+
+    setIsNewTaskSaving(true);
   };
 
   const [isNameEdit, setIsNameEdit] = useState(false);

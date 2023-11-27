@@ -16,6 +16,7 @@ import { LoginRoutes } from 'constants/routes.ts';
 import { GROUP_REF_LINK } from 'constants/api.ts';
 import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { CircularProgress } from '@mui/material';
 
 const DEFAULT_CLASSNAME = 'registration';
 
@@ -49,9 +50,9 @@ export const RegistrationPage: FC = () => {
 
       const referralLink = `${GROUP_REF_LINK}${groupId}`;
 
-      createStudentWithRefMutation.mutate({ ...values, referralLink });
+      await createStudentWithRefMutation({ ...values, referralLink });
     } else {
-      createStudentMutation.mutate(values);
+      await createStudentMutation(values);
     }
   };
 
@@ -79,7 +80,7 @@ export const RegistrationPage: FC = () => {
     },
   );
 
-  const createStudentMutation = useMutation(
+  const { isLoading, mutateAsync: createStudentMutation } = useMutation(
     (data: { name: string; surname: string; login: string; password: string }) =>
       createNewStudent(data),
     {
@@ -90,7 +91,7 @@ export const RegistrationPage: FC = () => {
     },
   );
 
-  const createStudentWithRefMutation = useMutation(
+  const { isLoading: isRefLoading, mutateAsync: createStudentWithRefMutation } = useMutation(
     (data: {
       name: string;
       surname: string;
@@ -185,9 +186,14 @@ export const RegistrationPage: FC = () => {
               </Typography>
             )}
           </div>
-          <button className={`${DEFAULT_CLASSNAME}_form_submit`} type={'submit'}>
-            <CheckIcon />
-          </button>
+
+          {isLoading || isRefLoading ? (
+            <CircularProgress sx={{ color: '#c8caff' }} />
+          ) : (
+            <button className={`${DEFAULT_CLASSNAME}_form_submit`} type={'submit'}>
+              <CheckIcon />
+            </button>
+          )}
         </div>
       </form>
     </div>

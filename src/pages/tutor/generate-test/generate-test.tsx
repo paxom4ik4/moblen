@@ -287,6 +287,7 @@ const GenerateTest: FC = memo(() => {
             Текст для генерации
           </Typography>
           <TextareaAutosize
+            placeholder={'Введите текст для генерации...'}
             minRows={3}
             className={`${DEFAULT_CLASSNAME}_generate_container_text_area`}
             value={generateText}

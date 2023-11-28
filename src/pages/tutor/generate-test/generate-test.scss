@@ -48,9 +48,9 @@
         background-color: #FEFBFF;
         border: none;
         resize: none;
-        max-height: 80vh;
+        max-height: calc(100% - 28px);
         overflow-y: scroll;
-        min-height: calc(100% - 24px);
+        min-height: calc(100% - 28px);
       }
     }
   }

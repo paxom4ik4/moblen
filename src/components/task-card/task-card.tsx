@@ -490,7 +490,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 </>
               )}
           </div>
-          {props.isCreateMode && !props.hideAssets && (
+          {props.isCreateMode && !props.hideAssets && !!props.newTaskAssets?.length ? (
             <div className={`${DEFAULT_CLASSNAME}_assets`}>
               {props.isCreateMode &&
                 props.newTaskAssets &&
@@ -541,6 +541,8 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 </Typography>
               )}
             </div>
+          ) : (
+            <div />
           )}
           {!props.isCreateMode && props.files && (
             <div className={`${DEFAULT_CLASSNAME}_loaded_assets`}>

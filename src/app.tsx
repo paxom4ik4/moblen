@@ -1,6 +1,6 @@
 import { FC, useEffect, useState, lazy, Suspense } from 'react';
 import { DndProvider } from 'react-dnd';
-import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -32,6 +32,7 @@ import { axiosAddAuthToken } from './services/tokenHelper.ts';
 import { refreshToken } from './services/login/login.ts';
 import { CircularProgress } from '@mui/material';
 import GenerateTest from './pages/tutor/generate-test/generate-test.tsx';
+import { Feedback } from './components/feedback/feedback.tsx';
 
 const DEFAULT_CLASSNAME = 'app';
 
@@ -48,7 +49,6 @@ const App: FC = () => {
   const Results = lazy(() => import('./pages/tutor/results/results.tsx'));
 
   const location = useLocation();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const [currentTitle, setCurrentTitle] = useState<string | null>('');
@@ -60,11 +60,9 @@ const App: FC = () => {
     clearLocalStorage();
 
     batch(() => {
-      dispatch(setUser(userData));
-      dispatch(setAppMode(getStoredAppMode()));
+      dispatch(setUser(null));
+      dispatch(setAppMode(null));
     });
-
-    navigate(LoginRoutes.LOGIN);
   };
 
   const refreshTokenHandler = (res: {
@@ -95,16 +93,18 @@ const App: FC = () => {
       });
     }
 
-    (async () => {
-      if (accessToken && expiresIn && storedRefreshToken && Date.now() >= +expiresIn) {
-        try {
-          const res = await refreshToken(storedRefreshToken);
-          res.access_token ? refreshTokenHandler(res) : clearAppStateHandler();
-        } catch (error) {
-          clearAppStateHandler();
+    if (storedUserData) {
+      (async () => {
+        if (accessToken && expiresIn && storedRefreshToken && Date.now() >= +expiresIn) {
+          try {
+            const res = await refreshToken(storedRefreshToken);
+            res.access_token ? refreshTokenHandler(res) : clearAppStateHandler();
+          } catch (error) {
+            clearAppStateHandler();
+          }
         }
-      }
-    })();
+      })();
+    }
   }, []);
 
   useEffect(() => {
@@ -157,6 +157,7 @@ const App: FC = () => {
   const appContent = (
     <div className={DEFAULT_CLASSNAME}>
       <Sidebar isSidebarOpened={isSidebarOpened} setIsSidebarOpened={setIsSidebarOpened} />
+      <Feedback />
       <UpperBar />
       <div className={`${DEFAULT_CLASSNAME}_title`}>
         <button
@@ -192,7 +193,10 @@ const App: FC = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <LocalizationProvider adapterLocale={'ru'} dateAdapter={AdapterDayjs}>
-        <Suspense fallback={fallbackScreen}>{appMode ? appContent : loginContent}</Suspense>
+        <Suspense fallback={fallbackScreen}>
+          {userData && appContent}
+          {!userData && loginContent}
+        </Suspense>
       </LocalizationProvider>
     </DndProvider>
   );

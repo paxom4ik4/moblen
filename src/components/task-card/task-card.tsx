@@ -6,12 +6,11 @@ import TrashIcon from 'assets/icons/trash-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
 
-import ImageIcon from '@mui/icons-material/Image';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { Asset, Task } from 'types/task.ts';
+import { Task } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { addFilesToTask, deleteFile, deleteTask, editTask } from 'services/tasks';
 import {
@@ -26,6 +25,7 @@ import {
 } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { useDropzone } from 'react-dropzone';
+import { LibraryMusic, VideoLibrary } from '@mui/icons-material';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -38,7 +38,6 @@ export type TaskCardProps =
 
       taskId?: string;
       taskListId: string;
-      taskAssets?: Asset[];
       index?: number;
 
       isCreateMode: true;
@@ -72,6 +71,8 @@ export type TaskCardProps =
       hideAssets?: boolean;
 
       isNewTaskSaving?: boolean;
+
+      setIsNewTask: Dispatch<SetStateAction<boolean>>;
     }
   | {
       disabled?: boolean;
@@ -86,7 +87,6 @@ export type TaskCardProps =
 
       taskId?: string;
       taskListId: string;
-      taskAssets?: Asset[];
       index?: number;
 
       files: { file_name: string; url: string }[];
@@ -103,7 +103,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const queryClient = useQueryClient();
 
   // assets
-
   const [addNewAsset, setAddNewAsset] = useState<boolean>(false);
   const [newAssetImage, setNewAssetImage] = useState<File | null>(null);
   const [newAssetText, setNewAssetText] = useState('');
@@ -480,14 +479,40 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 props.newTaskAssets.map((item, index) => {
                   return (
                     <div className={`${DEFAULT_CLASSNAME}_assets_item`}>
-                      {item.type.includes('image') && <ImageIcon />}
-                      {item.type.includes('pdf') && <TextSnippetIcon />}
-                      {item.type.includes('doc') && <PictureAsPdfIcon />}
-                      <Typography>{item.name}</Typography>{' '}
-                      <div
-                        className={`${DEFAULT_CLASSNAME}_assets_item_delete`}
-                        onClick={() => handleAssetDelete(index)}>
-                        <TrashIcon />
+                      {item.type.includes('image') && (
+                        <img alt={`${index}_asset`} src={URL.createObjectURL(item)} />
+                      )}
+                      {item.type.includes('doc') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <TextSnippetIcon />
+                        </div>
+                      )}
+                      {item.type.includes('pdf') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <PictureAsPdfIcon />
+                        </div>
+                      )}
+                      {item.type.includes('mp4') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <VideoLibrary />
+                        </div>
+                      )}
+                      {item.type.includes('mp3') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <LibraryMusic />
+                        </div>
+                      )}
+                      <div className={`${DEFAULT_CLASSNAME}_assets_item_footer`}>
+                        <Typography size={'small'}>
+                          {item.name.length > 18
+                            ? `${item.name.slice(0, 12)}...${item.name.slice(-4)}`
+                            : item.name}
+                        </Typography>{' '}
+                        <div
+                          className={`${DEFAULT_CLASSNAME}_assets_item_delete`}
+                          onClick={() => handleAssetDelete(index)}>
+                          <TrashIcon />
+                        </div>
                       </div>
                     </div>
                   );
@@ -530,25 +555,49 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 )}
                 {restFiles.map((item) => {
                   return (
-                    <div className={`${DEFAULT_CLASSNAME}_loaded_assets_files_item_container`}>
-                      <a
-                        href={item.url}
-                        target={'_blank'}
-                        className={`${DEFAULT_CLASSNAME}_loaded_assets_item`}>
-                        {item.file_name.includes('doc') && <TextSnippetIcon />}
-                        {item.file_name.includes('pdf') && <PictureAsPdfIcon />}
-                        <Typography>{item.file_name}</Typography>
-                      </a>
-                      {isEditMode && (
-                        <div
-                          className={`${DEFAULT_CLASSNAME}_loaded_assets_item_delete`}
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            deleteFileMutation.mutate({ taskId: props.taskId!, fileURL: item.url });
-                          }}>
-                          <TrashIcon />
+                    <div
+                      className={`${DEFAULT_CLASSNAME}_assets_item`}
+                      onClick={() => setIsEditMode(true)}>
+                      {item.file_name.includes('doc') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <TextSnippetIcon />
                         </div>
                       )}
+                      {item.file_name.includes('pdf') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <PictureAsPdfIcon />
+                        </div>
+                      )}
+                      {item.file_name.includes('mp4') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <VideoLibrary />
+                        </div>
+                      )}
+                      {item.file_name.includes('mp3') && (
+                        <div className={`${DEFAULT_CLASSNAME}_assets_item_icon`}>
+                          <LibraryMusic />
+                        </div>
+                      )}
+                      <div className={`${DEFAULT_CLASSNAME}_assets_item_footer`}>
+                        <Typography size={'small'}>
+                          {item.file_name.length > 18
+                            ? `${item.file_name.slice(0, 12)}...${item.file_name.slice(-4)}`
+                            : item.file_name}
+                        </Typography>
+                        {isEditMode && (
+                          <div
+                            className={`${DEFAULT_CLASSNAME}_loaded_assets_item_delete`}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              deleteFileMutation.mutate({
+                                taskId: props.taskId!,
+                                fileURL: item.url,
+                              });
+                            }}>
+                            <TrashIcon />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -569,6 +618,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
               className={`${DEFAULT_CLASSNAME}_save`}
               onClick={() => {
                 props.saveNewTaskHandler();
+                props.setIsNewTask(false);
               }}>
               {props.isNewTaskSaving ? (
                 <CircularProgress sx={{ color: '#c8caff' }} />

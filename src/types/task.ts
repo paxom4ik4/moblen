@@ -1,8 +1,3 @@
-export interface Asset {
-  image: File;
-  text: string;
-}
-
 export interface Task {
   task_uuid: string;
   task_condition: string;

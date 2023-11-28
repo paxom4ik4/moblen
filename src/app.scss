@@ -121,3 +121,8 @@ button:disabled, button:disabled:hover {
     }
   }
 }
+
+// Override snackbar background color
+.MuiSnackbarContent-root {
+  background-color: #8d71d9;
+}

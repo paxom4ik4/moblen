@@ -28,7 +28,7 @@
   &_files {
     display: flex;
     flex-direction: row;
-    gap: 20px;
+    gap: 8px;
     width: 100%;
 
     svg {
@@ -43,13 +43,34 @@
 
     &_assets {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      flex-direction: row;
+      gap: 12px;
 
-      &_item {
+      &_item_container {
+        height: 120px;
+        border-radius: 15px;
+        padding: 12px;
+        width: 160px;
+        background-color: #dbdce0;
+        box-sizing: border-box;
+        position: relative;
         display: flex;
-        flex-direction: row;
-        gap: 8px;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+
+        &_icon {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 80px !important;
+
+          svg {
+            width: 70px;
+            height: auto;
+          }
+        }
       }
     }
 
@@ -57,18 +78,20 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      gap: 8px;
+      gap: 12px;
       overflow-x: hidden;
 
       &_item {
-        background-color: #FFFFFF;
+        height: 120px;
         border-radius: 15px;
-        padding: 4px;
-        width: 90px;
-        height: 90px;
+        padding: 12px;
+        width: 160px;
+        background-color: #dbdce0;
         box-sizing: border-box;
         position: relative;
-        transition: 0.3s;
+        display: flex;
+        justify-content: center;
+        align-items: center;
 
         &:hover {
           opacity: 0.8;
@@ -77,8 +100,8 @@
       }
 
       img {
-        width: 100%;
-        height: 100%;
+        width: 90%;
+        height: 90%;
         object-fit: contain;
       }
     }

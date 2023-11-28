@@ -3,7 +3,7 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { Asset, TaskWithAnswer } from 'types/task.ts';
+import { TaskWithAnswer } from 'types/task.ts';
 
 import './task-pass-card.scss';
 import { Answers } from 'pages/student/pass-test/pass-test.tsx';
@@ -11,6 +11,7 @@ import { TextareaAutosize } from '@mui/material';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { createPortal } from 'react-dom';
+import { LibraryMusic, VideoLibrary } from '@mui/icons-material';
 
 const DEFAULT_CLASSNAME = 'task-pass-card';
 
@@ -23,7 +24,6 @@ interface TaskPassCardProps {
   maxScore: number;
   format?: string;
   index: number;
-  taskAssets?: Asset[];
   setTasksWithStudentAnswers?: Dispatch<SetStateAction<TaskWithAnswer[]>>;
   tasksWithStudentAnswers?: TaskWithAnswer[];
 
@@ -48,7 +48,6 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     text,
     maxScore,
     index,
-    taskAssets,
     criteria,
     currentScore,
     showCriteria = true,
@@ -137,6 +136,7 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
               {filesImages.map((item) => {
                 return (
                   <div
+                    key={item.file_name}
                     className={`${DEFAULT_CLASSNAME}_files_images_item`}
                     onClick={() => {
                       setOpenedImage(item.url);
@@ -149,16 +149,39 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
             <div className={`${DEFAULT_CLASSNAME}_files_assets`}>
               {restFiles.map((item) => {
                 return (
-                  <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container`}>
-                    <a
-                      href={item.url}
-                      target={'_blank'}
-                      className={`${DEFAULT_CLASSNAME}_files_assets_item`}>
-                      {item.file_name.includes('doc') && <TextSnippetIcon />}
-                      {item.file_name.includes('pdf') && <PictureAsPdfIcon />}
-                      <Typography>{item.file_name}</Typography>
-                    </a>
-                  </div>
+                  <a
+                    key={item.file_name}
+                    href={item.url}
+                    target={'_blank'}
+                    className={`${DEFAULT_CLASSNAME}_files_assets_item_container`}>
+                    {item.file_name.includes('doc') && (
+                      <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container_icon`}>
+                        <TextSnippetIcon />
+                      </div>
+                    )}
+                    {item.file_name.includes('pdf') && (
+                      <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container_icon`}>
+                        <PictureAsPdfIcon />
+                      </div>
+                    )}
+                    {item.file_name.includes('mp4') && (
+                      <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container_icon`}>
+                        <VideoLibrary />
+                      </div>
+                    )}
+                    {item.file_name.includes('mp3') && (
+                      <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container_icon`}>
+                        <LibraryMusic />
+                      </div>
+                    )}
+                    <div className={`${DEFAULT_CLASSNAME}_files_assets_item_container_footer`}>
+                      <Typography size={'small'}>
+                        {item.file_name.length > 18
+                          ? `${item.file_name.slice(0, 12)}...${item.file_name.slice(-4)}`
+                          : item.file_name}
+                      </Typography>
+                    </div>
+                  </a>
                 );
               })}
             </div>
@@ -197,17 +220,6 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
             </div>
           )}
         </div>
-
-        {!!taskAssets?.length && (
-          <div className={`${DEFAULT_CLASSNAME}_files`}>
-            {taskAssets.map((asset) => (
-              <div className={`${DEFAULT_CLASSNAME}_files_item`}>
-                <img src={URL.createObjectURL(asset.image)} alt={asset.text} />
-                <Typography>{asset.text}</Typography>
-              </div>
-            ))}
-          </div>
-        )}
       </div>
 
       {isCriteriaOpened && (

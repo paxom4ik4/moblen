@@ -6,6 +6,12 @@
   top: -64px;
   flex-direction: column;
 
+  &_in_progress {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
   .generate-disabled {
     opacity: 0.5;
     user-select: none;

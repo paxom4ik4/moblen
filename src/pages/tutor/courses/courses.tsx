@@ -538,6 +538,7 @@ const Courses: FC = memo(() => {
           Array.isArray(taskList) &&
           taskList.map((test) => (
             <TestCard
+              key={test.list_uuid}
               onClick={() =>
                 setIsCreatingNewTest({
                   list_uuid: test.list_uuid,

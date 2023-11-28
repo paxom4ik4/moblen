@@ -95,7 +95,6 @@ const CreateTest: FC = memo(() => {
         setNewTaskMaxScore(null);
         setNewTaskFormat('');
         setNewTaskAssets([]);
-        setIsNewTask(false);
         setIsNewTaskSaving(false);
 
         await queryClient.invalidateQueries('tasks');
@@ -230,7 +229,6 @@ const CreateTest: FC = memo(() => {
             taskListId={tasksData.list_uuid}
             taskId={''}
             editModeDisabled={false}
-            taskAssets={[]}
             newTaskMaxScore={newTaskMaxScore}
             newTaskFormat={newTaskFormat}
             newTaskCriteria={newTaskCriteria}
@@ -247,6 +245,7 @@ const CreateTest: FC = memo(() => {
             newTaskAssetsError={newTaskAssetsError}
             setNewTaskAssetsError={setNewTaskAssetsError}
             isNewTaskSaving={isNewTaskSaving}
+            setIsNewTask={setIsNewTask}
           />
         )}
         {!isEditModeDisabled && (

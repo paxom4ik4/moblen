@@ -40,21 +40,26 @@ const GenerateTest: FC = memo(() => {
 
   const { data: taskFormats } = useQuery('formats', () => getAllFormats());
 
+  const [isGeneratingInProgress, setIsGeneratingInProgress] = useState(false);
+
   const { data: tasksData, isLoading } = useQuery(
     ['tasks', paramsTaskListId],
     () => getTasks(paramsTaskListId!),
     {
-      refetchInterval: 5000,
+      refetchInterval: isGeneratingInProgress ? 3000 : false,
     },
   );
 
   const [maxScore, setMaxScore] = useState(0);
+  const [taskCount, setTaskCount] = useState(tasksData?.tasks?.length ?? 0);
 
   useEffect(() => {
     if (tasksData) {
       setMaxScore(
         tasksData?.tasks?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
       );
+
+      setTaskCount(tasksData?.tasks?.length);
     }
   }, [tasksData]);
 
@@ -117,7 +122,6 @@ const GenerateTest: FC = memo(() => {
         setNewTaskMaxScore(null);
         setNewTaskFormat('');
         setNewTaskAssets([]);
-        setIsNewTask(false);
         setIsNewTaskSaving(false);
 
         await queryClient.invalidateQueries('tasks');
@@ -183,8 +187,12 @@ const GenerateTest: FC = memo(() => {
     },
   );
 
+  useEffect(() => setIsGeneratingInProgress(false), [taskCount]);
+
   const handleTaskGeneration = async () => {
     const format = generateTaskFormat.split(',');
+
+    setIsGeneratingInProgress(true);
 
     await generateTaskMutation.mutate({
       text: generateText,
@@ -347,6 +355,14 @@ const GenerateTest: FC = memo(() => {
             </button>
           </div>
 
+          {isGeneratingInProgress && (
+            <div className={`${DEFAULT_CLASSNAME}_in_progress`}>
+              <CircularProgress size={24} sx={{ color: '#c8caff' }} />
+
+              <Typography color={'purple'}>Генерация заданий</Typography>
+            </div>
+          )}
+
           {!!tasksData?.tasks?.length &&
             tasksData?.tasks?.map((task: Task, index: number) => (
               <TaskCard
@@ -373,7 +389,6 @@ const GenerateTest: FC = memo(() => {
               taskListId={tasksData.list_uuid}
               taskId={''}
               editModeDisabled={false}
-              taskAssets={[]}
               newTaskMaxScore={newTaskMaxScore}
               newTaskFormat={newTaskFormat}
               newTaskCriteria={newTaskCriteria}
@@ -390,9 +405,10 @@ const GenerateTest: FC = memo(() => {
               newTaskAssetsError={newTaskAssetsError}
               setNewTaskAssetsError={setNewTaskAssetsError}
               isNewTaskSaving={isNewTaskSaving}
+              setIsNewTask={setIsNewTask}
             />
           )}
-          {!isEditModeDisabled && (
+          {!isEditModeDisabled && !isGeneratingInProgress && (
             <div
               className={`${DEFAULT_CLASSNAME}_tasks-container_addItem`}
               onClick={() => addNewTaskHandler()}>

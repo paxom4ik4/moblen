@@ -257,6 +257,15 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     disabled: props.isCreateMode && props.newTaskAssets?.length === MAX_FILES,
+    accept: {
+      'image/png': ['.png'],
+      'image/jpg': ['.jpeg', '.jpg'],
+      'text/text': ['.txt', '.docx', '.doc', '.xlsx', '.pdf'],
+      'text/pdf': ['.pdf'],
+      'audio/audio': ['.mp3'],
+      'video/video': ['.mp4'],
+      'text/file': ['.pptx', '.zip', '.csv', '.svg'],
+    },
   });
 
   const {
@@ -266,6 +275,15 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   } = useDropzone({
     onDrop: onDropEdit,
     disabled: !props.isCreateMode && props.files?.length === MAX_FILES,
+    accept: {
+      'image/png': ['.png'],
+      'image/jpg': ['.jpeg', '.jpg'],
+      'text/text': ['.txt', '.docx', '.doc', '.xlsx', '.pdf'],
+      'text/pdf': ['.pdf'],
+      'audio/audio': ['.mp3'],
+      'video/video': ['.mp4'],
+      'text/file': ['.pptx', '.zip', '.csv', '.svg'],
+    },
   });
 
   const filesImages = !props.isCreateMode

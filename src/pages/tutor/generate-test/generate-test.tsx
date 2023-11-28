@@ -309,7 +309,7 @@ const GenerateTest: FC = memo(() => {
             <div className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_fields`}>
               <div
                 className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_fields_item`}>
-                <Typography>Количество заданий</Typography>
+                <Typography size={'small'}>Количество заданий</Typography>
                 <TextField
                   placeholder={'Введите значение'}
                   value={generateTaskAmount}
@@ -318,7 +318,7 @@ const GenerateTest: FC = memo(() => {
               </div>
               <div
                 className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_fields_item`}>
-                <Typography>Балл за задание</Typography>
+                <Typography size={'small'}>Балл за задание</Typography>
                 <TextField
                   placeholder={'Введите значение'}
                   value={generateBallPerTask}
@@ -327,7 +327,7 @@ const GenerateTest: FC = memo(() => {
               </div>
               <div
                 className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_fields_item min-width`}>
-                <Typography>Формат задания</Typography>
+                <Typography size={'small'}>Формат задания</Typography>
                 <Select
                   placeholder={'Формат'}
                   fullWidth
@@ -350,7 +350,9 @@ const GenerateTest: FC = memo(() => {
               }
               onClick={handleTaskGeneration}
               className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_edit`}>
-              <Typography color={'purple'}>Сгенерировать</Typography>
+              <Typography size={'small'} color={'purple'}>
+                Сгенерировать
+              </Typography>
               <EditButton />
             </button>
           </div>

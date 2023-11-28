@@ -1,10 +1,10 @@
-import { FC, MouseEvent, useState } from 'react';
+import { FC, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import { Input } from 'common/input/input.tsx';
 
 import CheckIcon from 'assets/icons/check-icon.svg';
-import VKIcon from 'assets/icons/vk-icon.svg';
+// import VKIcon from 'assets/icons/vk-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
 import { LoginModes } from 'constants/appTypes.ts';
 
@@ -120,9 +120,9 @@ export const LoginPage: FC = () => {
     },
   });
 
-  const handleVKLogin = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-  };
+  // const handleVKLogin = (event: MouseEvent<HTMLButtonElement>) => {
+  //   event.preventDefault();
+  // };
 
   return (
     <div className={DEFAULT_CLASSNAME}>
@@ -173,9 +173,9 @@ export const LoginPage: FC = () => {
             )}
           </div>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
-            <button className={`${DEFAULT_CLASSNAME}_form_vk`} onClick={handleVKLogin}>
-              <VKIcon />
-            </button>
+            {/*<button className={`${DEFAULT_CLASSNAME}_form_vk`} onClick={handleVKLogin}>*/}
+            {/*  <VKIcon />*/}
+            {/*</button>*/}
             {isLoading ? (
               <CircularProgress sx={{ color: '#c8caff' }} />
             ) : (

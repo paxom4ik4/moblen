@@ -158,7 +158,7 @@
           box-shadow: 1px 1px 3px 2px rgba(0, 0, 0, 0.1);
           border-radius: 12px;
           padding: 6px 12px;
-          height: 60px;
+          height: fit-content;
           max-width: fit-content;
 
           .MuiSelect-select {
@@ -192,18 +192,22 @@
       }
 
       &_edit {
-        gap: 8px;
+        width: fit-content;
+        gap: 0;
         background-color: #ffffff;
         display: flex;
         justify-content: center;
         align-items: center;
         border: none;
         padding: 4px 8px;
-        width: fit-content;
         height: 32px;
         box-shadow: 1px 1px 3px 2px rgba(103, 80, 164, 0.1);
         border-radius: 8px;
         transition: 0.3s;
+
+        svg {
+          height: 16px;
+        }
 
         &:hover {
           cursor: pointer;

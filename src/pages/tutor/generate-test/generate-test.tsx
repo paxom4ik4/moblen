@@ -292,7 +292,7 @@ const GenerateTest: FC = memo(() => {
             Текст для генерации
           </Typography>
           <TextareaAutosize
-            placeholder={'Максимальная длинна текста 5000 символов...'}
+            placeholder={'Максимальная длина текста - 5000 символов'}
             minRows={3}
             className={`${DEFAULT_CLASSNAME}_generate_container_text_area`}
             value={generateText}

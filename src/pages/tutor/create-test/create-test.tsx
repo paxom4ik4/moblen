@@ -55,7 +55,11 @@ const CreateTest: FC = memo(() => {
     }
   };
 
-  const saveTestHandler = () => {
+  const saveTestHandler = async () => {
+    if (isNewTask) {
+      await saveNewTaskHandler();
+    }
+
     dispatch(clearCreateTask());
     navigate(TutorRoutes.ASSIGNMENTS);
   };
@@ -102,7 +106,7 @@ const CreateTest: FC = memo(() => {
     },
   );
 
-  const saveNewTaskHandler = () => {
+  const saveNewTaskHandler = async () => {
     if (newTaskAssets) {
       const data = new FormData();
 
@@ -120,7 +124,7 @@ const CreateTest: FC = memo(() => {
         data.append('files', item);
       });
 
-      createTaskMutation.mutate({ payload: data, isFormData: true });
+      await createTaskMutation.mutate({ payload: data, isFormData: true });
     } else {
       const data = {
         format: newTaskFormat.length
@@ -131,7 +135,7 @@ const CreateTest: FC = memo(() => {
         task_condition: newTaskText.length ? newTaskText : '-',
       };
 
-      createTaskMutation.mutate({ payload: data, isFormData: false });
+      await createTaskMutation.mutate({ payload: data, isFormData: false });
     }
 
     setIsNewTaskSaving(true);

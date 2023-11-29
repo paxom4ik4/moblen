@@ -181,10 +181,12 @@ const TestResult: FC = memo(() => {
                   files={task.task?.files ?? []}
                 />
               </div>
-              <div className={`${DEFAULT_CLASSNAME}_tasks_item_analytics`}>
-                <Typography>Аналитика - Задание {index + 1}</Typography>
-                <Typography>{task.response}</Typography>
-              </div>
+              {!!task.response.length && (
+                <div className={`${DEFAULT_CLASSNAME}_tasks_item_analytics`}>
+                  <Typography>Аналитика - Задание {index + 1}</Typography>
+                  <Typography>{task.response}</Typography>
+                </div>
+              )}
             </div>
           ))}
         </div>

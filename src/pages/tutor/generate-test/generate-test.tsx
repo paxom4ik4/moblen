@@ -23,6 +23,7 @@ import {
   SelectChangeEvent,
   TextareaAutosize,
   TextField,
+  Tooltip,
 } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { Notification } from '../../../common/notification/notification.tsx';
@@ -291,11 +292,16 @@ const GenerateTest: FC = memo(() => {
             Текст для генерации
           </Typography>
           <TextareaAutosize
-            placeholder={'Введите текст для генерации...'}
+            placeholder={'Максимальная длинна текста 5000 символов...'}
             minRows={3}
             className={`${DEFAULT_CLASSNAME}_generate_container_text_area`}
             value={generateText}
             onChange={(e) => setGenerateText(e.currentTarget.value)}></TextareaAutosize>
+          <Typography
+            className={`${DEFAULT_CLASSNAME}_generate_container_text_info`}
+            color={generateText.length > 5000 ? 'red' : 'default'}>
+            {generateText.length} / 5000
+          </Typography>
         </div>
 
         <div className={`${DEFAULT_CLASSNAME}_tasks-container`}>
@@ -346,20 +352,24 @@ const GenerateTest: FC = memo(() => {
                 </Select>
               </div>
             </div>
-            <button
-              disabled={
-                !generateText.length ||
-                generateTaskAmount === 0 ||
-                generateBallPerTask === 0 ||
-                generateTaskFormat === ''
-              }
-              onClick={handleTaskGeneration}
-              className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_edit`}>
-              <Typography size={'small'} color={'purple'}>
-                Сгенерировать
-              </Typography>
-              <EditButton />
-            </button>
+            <Tooltip title={generateText.length > 5000 && 'Текст генерации слишком большой!'}>
+              <button
+                disabled={
+                  !generateText.length ||
+                  generateText.length > 5000 ||
+                  generateTaskAmount === 0 ||
+                  generateBallPerTask === 0 ||
+                  generateTaskFormat === ''
+                }
+                onClick={handleTaskGeneration}
+                className={`${DEFAULT_CLASSNAME}_tasks-container_generate-configuration_edit`}>
+                <Typography size={'small'} color={'purple'}>
+                  Сгенерировать
+                </Typography>
+
+                <EditButton />
+              </button>
+            </Tooltip>
           </div>
 
           {isGeneratingInProgress && (

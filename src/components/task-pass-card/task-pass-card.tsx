@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, FC, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
@@ -63,6 +63,10 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     const newAnswer = event.target.value;
     onAnswerChange!(id, newAnswer);
   };
+
+  useEffect(() => {
+    onAnswerChange!(id, '');
+  }, []);
 
   const filesImages =
     files.filter(

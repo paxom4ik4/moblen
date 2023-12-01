@@ -61,11 +61,16 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
 
   const handleInputChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     const newAnswer = event.target.value;
-    onAnswerChange!(id, newAnswer);
+
+    if (onAnswerChange) {
+      onAnswerChange(id, newAnswer);
+    }
   };
 
   useEffect(() => {
-    onAnswerChange!(id, '');
+    if (onAnswerChange) {
+      onAnswerChange(id, '');
+    }
   }, []);
 
   const filesImages =

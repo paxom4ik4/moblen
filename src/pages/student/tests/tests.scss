@@ -7,6 +7,13 @@
   border-top: 16px solid #c5c6d0;
   height: 100%;
 
+  &_empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
   .active-subject {
     background-color: #e1e2ec;
     height: 36px;

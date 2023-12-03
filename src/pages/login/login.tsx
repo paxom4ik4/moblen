@@ -173,9 +173,6 @@ export const LoginPage: FC = () => {
             )}
           </div>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
-            {/*<button className={`${DEFAULT_CLASSNAME}_form_vk`} onClick={handleVKLogin}>*/}
-            {/*  <VKIcon />*/}
-            {/*</button>*/}
             {isLoading ? (
               <CircularProgress sx={{ color: '#c8caff' }} />
             ) : (

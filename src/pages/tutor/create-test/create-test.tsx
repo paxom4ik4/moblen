@@ -26,6 +26,7 @@ import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { TEST_FORMAT, TEST_FORMAT_WITH_INDEX } from 'constants/testTaskFormats.ts';
 import { Notification } from 'common/notification/notification.tsx';
 import { GenerateConfiguration } from './components/generate-configuration/generate-configuration.tsx';
+import { convertTestOptionsToCriteria, convertTestOptionsToOrderedCriteria } from './utils.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -154,10 +155,12 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
 
       if (newTaskFormat.includes(TEST_FORMAT)) {
         data.append('variants', JSON.stringify(options));
+        data.append('criteria', convertTestOptionsToCriteria(options));
       }
 
       if (newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
         data.append('variants', JSON.stringify(indexOptions));
+        data.append('criteria', convertTestOptionsToOrderedCriteria(indexOptions));
       }
 
       Array.from(newTaskAssets).forEach((item) => {
@@ -180,10 +183,12 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
 
       if (newTaskFormat.includes(TEST_FORMAT)) {
         data['variants'] = options;
+        data['criteria'] = convertTestOptionsToCriteria(options);
       }
 
       if (newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
         data['variants'] = options;
+        data['criteria'] = convertTestOptionsToOrderedCriteria(indexOptions);
       }
 
       await createTaskMutation.mutate({ payload: data, isFormData: false });
@@ -381,6 +386,14 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
                 index={index + 1}
                 files={task?.files ?? []}
                 editModeDisabled={isEditModeDisabled}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options={task?.variants}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                indexOptions={task?.variants}
+                setOptions={setOptions}
+                setIndexOptions={setIndexOptions}
               />
             ))}
 

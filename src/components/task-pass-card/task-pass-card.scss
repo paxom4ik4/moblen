@@ -5,6 +5,19 @@
   position: relative;
   width: 100%;
 
+  textarea {
+    resize: none !important;
+    background: transparent;
+  }
+
+  &_test_content {
+    padding: 0 16px;
+
+    &_task {
+      padding: 8px 0 4px;
+    }
+  }
+
   &_opened_image {
     object-fit: contain;
     width: 90%;

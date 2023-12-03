@@ -9,7 +9,7 @@ import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
 import './test-result.scss';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { getCompletedTaskList } from 'services/student/student.ts';
 import { AppModes } from '../../../constants/appTypes.ts';
 import { Pagination } from '@mui/material';
@@ -24,6 +24,8 @@ interface ResultTask {
 }
 
 const TestResult: FC = memo(() => {
+  const queryClient = useQueryClient();
+
   const { id } = useParams();
 
   const navigate = useNavigate();
@@ -50,6 +52,10 @@ const TestResult: FC = memo(() => {
           : uuid,
       }),
   );
+
+  useEffect(() => {
+    (async () => queryClient.invalidateQueries('completedTasks'))();
+  }, [uuid]);
 
   const [maxScore, setMaxScore] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);
@@ -103,7 +109,7 @@ const TestResult: FC = memo(() => {
     return (score / maxScore) * 100;
   };
 
-  const getScoreColor = (taskScore: number) => {
+  const getScoreColor = (taskScore: number = 0) => {
     if (taskScore <= 15) return 'red';
     if (taskScore > 15 && taskScore <= 30) return 'orange';
     if (taskScore > 30 && taskScore <= 50) return 'yellow';
@@ -179,6 +185,7 @@ const TestResult: FC = memo(() => {
                   showCriteria={currentTaskList?.seeCriteria || isTutorMode}
                   showAnswers={currentTaskList?.seeAnswers || isTutorMode}
                   files={task.task?.files ?? []}
+                  options={task.task.variants}
                 />
               </div>
               {!!task.response.length && (

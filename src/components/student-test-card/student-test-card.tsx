@@ -80,8 +80,8 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     }
   };
 
-  const getTaskScorePercentage = (score?: number, maxScore?: number) => {
-    if (!score || !maxScore) return;
+  const getTaskScorePercentage = (score: number = 0, maxScore?: number) => {
+    if (!maxScore) return;
 
     return (score / maxScore) * 100;
   };
@@ -121,7 +121,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
             </Typography>
           </div>
         </div>
-        {listStatus === LIST_STATUS.completed && !!score && !!maxScore && (
+        {listStatus === LIST_STATUS.completed && (
           <div
             className={`${DEFAULT_CLASSNAME}_color ${getCardColor(
               getTaskScorePercentage(score, maxScore)!,

@@ -37,6 +37,10 @@ import {
   TEST_FORMAT,
   TEST_FORMAT_WITH_INDEX,
 } from 'constants/testTaskFormats.ts';
+import {
+  convertTestOptionsToCriteria,
+  convertTestOptionsToOrderedCriteria,
+} from '../../pages/tutor/create-test/utils.ts';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -114,6 +118,12 @@ export type TaskCardProps =
       }[];
 
       hideAssets?: boolean;
+
+      options?: TestOption[];
+      indexOptions?: TestIndexOption[];
+
+      setOptions: Dispatch<SetStateAction<TestOption[]>>;
+      setIndexOptions: Dispatch<SetStateAction<TestIndexOption[]>>;
     };
 
 export const TaskCard: FC<TaskCardProps> = (props) => {
@@ -194,13 +204,28 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     },
   );
 
-  const handleSaveEdits = (isEditMode: boolean) => {
-    if (isEditMode) {
-      editTaskMutation.mutate({
+  const handleSaveEdits = async (isEditMode: boolean) => {
+    if (isEditMode && !props.isCreateMode) {
+      let criteria = '';
+
+      if (!props.format.includes(TEST_FORMAT) && !props.format.includes(TEST_FORMAT_WITH_INDEX)) {
+        criteria = editTaskCriteria.length ? editTaskCriteria : '-';
+      }
+
+      if (props.format.includes(TEST_FORMAT)) {
+        criteria = convertTestOptionsToCriteria(currentOptions);
+      }
+
+      if (props.format.includes(TEST_FORMAT_WITH_INDEX)) {
+        criteria = convertTestOptionsToOrderedCriteria(currentIndexOptions);
+      }
+
+      await editTaskMutation.mutate({
         format: editTaskFormat,
         task_condition: editTaskText,
         max_ball: editTaskMaxBall,
-        criteria: editTaskCriteria,
+        criteria,
+        variants: currentOptions,
       });
     }
   };
@@ -382,52 +407,64 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   // Test card
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
-    if (props.isCreateMode) {
-      const newOptions: { text: string; isCorrect: boolean }[] = [...props.options];
+    const newOptions: TestOption[] = props.isCreateMode ? [...props.options] : [...currentOptions];
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      newOptions[index][field] = value;
-      props.setOptions(newOptions);
-    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    newOptions[index][field] = value;
+    props.isCreateMode ? props.setOptions(newOptions) : setCurrentOptions(newOptions);
   };
 
   const handleAddOption = () => {
     props.isCreateMode && props.setOptions([...props.options, { text: '', isCorrect: false }]);
+
+    !props.isCreateMode && setCurrentOptions([...currentOptions, { text: '', isCorrect: false }]);
   };
 
   const handleRemoveOption = (index: number) => {
-    if (props.isCreateMode) {
-      const newOptions = [...props.options];
-      newOptions.splice(index, 1);
-      props.setOptions(newOptions);
-    }
+    const newOptions = props.isCreateMode ? [...props.options] : [...currentOptions];
+    newOptions.splice(index, 1);
+    props.isCreateMode ? props.setOptions(newOptions) : setCurrentOptions(newOptions);
   };
+
+  // Test card EDIT MODE
+
+  const [currentOptions, setCurrentOptions] = useState(props?.options ?? []);
 
   // Test index card
   const handleIndexOptionChange = (index: number, field: string, value: string) => {
-    if (props.isCreateMode) {
-      const newOptions: { text: string; correctIndex: string }[] = [...props.indexOptions];
+    const newOptions: TestIndexOption[] = props.isCreateMode
+      ? [...props.indexOptions]
+      : [...currentIndexOptions];
 
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      newOptions[index][field] = value;
-      props.setIndexOptions(newOptions);
-    }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    newOptions[index][field] = value;
+    props.isCreateMode ? props.setIndexOptions(newOptions) : setCurrentIndexOptions(newOptions);
   };
 
   const handleIndexAddOption = () => {
     props.isCreateMode &&
       props.setIndexOptions([...props.indexOptions, { text: '', correctIndex: '' }]);
+
+    !props.isCreateMode &&
+      setCurrentIndexOptions([...currentIndexOptions, { text: '', correctIndex: '' }]);
   };
 
   const handleIndexRemoveOption = (index: number) => {
-    if (props.isCreateMode) {
-      const newOptions = [...props.indexOptions];
-      newOptions.splice(index, 1);
-      props.setIndexOptions(newOptions);
-    }
+    const newOptions = props.isCreateMode ? [...props.indexOptions] : [...currentIndexOptions];
+    newOptions.splice(index, 1);
+    props.isCreateMode ? props.setIndexOptions(newOptions) : setCurrentIndexOptions(newOptions);
   };
+
+  // Test Index card EDIT MODE
+
+  const [currentIndexOptions, setCurrentIndexOptions] = useState(props?.indexOptions ?? []);
+
+  const formItemDisabled = !isEditMode && !props.isCreateMode;
+
+  const optionsToUse = props.isCreateMode ? props.options : currentOptions;
+  const indexOptionsToUse = props.isCreateMode ? props.indexOptions : currentIndexOptions;
 
   const testTask = (
     <div className={`${DEFAULT_CLASSNAME}_test`}>
@@ -457,41 +494,44 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
           </div>
 
           <div className={`${DEFAULT_CLASSNAME}_test_content`}>
-            <FormGroup>
-              {props.isCreateMode &&
-                props.options.map((option, index) => (
-                  <Box
-                    width={'100%'}
-                    key={index}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}>
-                    <FormControlLabel
-                      label={''}
-                      control={
-                        <Checkbox
-                          style={{ color: '#6750a4' }}
-                          checked={option.isCorrect}
-                          onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                        />
-                      }
-                    />
-                    <TextareaAutosize
-                      placeholder={'Введите вариант ответа'}
-                      value={option.text}
-                      onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
-                    />
+            <FormGroup onClick={() => !props.isCreateMode && setIsEditMode(true)}>
+              {optionsToUse?.map((option, index) => (
+                <Box
+                  width={'100%'}
+                  key={index}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mt={1}>
+                  <FormControlLabel
+                    label={''}
+                    control={
+                      <Checkbox
+                        disabled={formItemDisabled}
+                        style={{ color: '#6750a4' }}
+                        checked={option.isCorrect}
+                        onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
+                      />
+                    }
+                  />
+                  <TextareaAutosize
+                    disabled={formItemDisabled}
+                    placeholder={'Введите вариант ответа'}
+                    value={option.text}
+                    onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
+                  />
 
-                    <Button onClick={() => handleRemoveOption(index)}>
-                      <RemoveIcon />
-                    </Button>
-                  </Box>
-                ))}
+                  <Button disabled={formItemDisabled} onClick={() => handleRemoveOption(index)}>
+                    <RemoveIcon />
+                  </Button>
+                </Box>
+              ))}
             </FormGroup>
-            <Button className={`${DEFAULT_CLASSNAME}_test_content_add`} onClick={handleAddOption}>
-              + Добавить вариант
-            </Button>
+            {(props.isCreateMode || isEditMode) && (
+              <Button className={`${DEFAULT_CLASSNAME}_test_content_add`} onClick={handleAddOption}>
+                + Добавить вариант
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -527,39 +567,43 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
           <div className={`${DEFAULT_CLASSNAME}_test_content`}>
             <FormGroup>
-              {props.isCreateMode &&
-                props.indexOptions.map((option, index) => (
-                  <Box
-                    width={'100%'}
-                    key={index}
-                    display="flex"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    mt={1}>
-                    <FormControlLabel
-                      label={''}
-                      control={
-                        <TextField
-                          placeholder={'Введите индекс'}
-                          style={{ color: '#6750a4' }}
-                          value={option.correctIndex}
-                          onChange={(e) =>
-                            handleIndexOptionChange(index, 'correctIndex', e.target.value)
-                          }
-                        />
-                      }
-                    />
-                    <TextareaAutosize
-                      placeholder={'Введите вариант ответа'}
-                      value={option.text}
-                      onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
-                    />
+              {indexOptionsToUse.map((option, index) => (
+                <Box
+                  width={'100%'}
+                  key={index}
+                  display="flex"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  mt={1}>
+                  <FormControlLabel
+                    disabled={formItemDisabled}
+                    label={''}
+                    control={
+                      <TextField
+                        disabled={formItemDisabled}
+                        placeholder={'Введите индекс'}
+                        style={{ color: '#6750a4' }}
+                        value={option.correctIndex}
+                        onChange={(e) =>
+                          handleIndexOptionChange(index, 'correctIndex', e.target.value)
+                        }
+                      />
+                    }
+                  />
+                  <TextareaAutosize
+                    disabled={formItemDisabled}
+                    placeholder={'Введите вариант ответа'}
+                    value={option.text}
+                    onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
+                  />
 
-                    <Button onClick={() => handleIndexRemoveOption(index)}>
-                      <RemoveIcon />
-                    </Button>
-                  </Box>
-                ))}
+                  <Button
+                    disabled={formItemDisabled}
+                    onClick={() => handleIndexRemoveOption(index)}>
+                    <RemoveIcon />
+                  </Button>
+                </Box>
+              ))}
             </FormGroup>
             <Button
               className={`${DEFAULT_CLASSNAME}_test_content_add`}
@@ -581,6 +625,16 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       if (format.includes(TEST_FORMAT_WITH_INDEX)) return testTaskIndex;
 
       if (format.includes(COMPARE_TEST_FORMAT)) return testTask;
+
+      return defaultTask;
+    }
+
+    if (!props.isCreateMode && props.format) {
+      if (props.format.includes(TEST_FORMAT)) return testTask;
+
+      if (props.format.includes(TEST_FORMAT_WITH_INDEX)) return testTaskIndex;
+
+      if (props.format.includes(COMPARE_TEST_FORMAT)) return testTask;
 
       return defaultTask;
     }

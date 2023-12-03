@@ -59,6 +59,13 @@ const Tests: FC<TestsProps> = memo((props) => {
   const [taskLists, setTaskLists] = useState([]);
 
   useEffect(() => {
+    if (!studentTaskLists?.length) {
+      batch(() => {
+        dispatch(setActiveCourse(null));
+        dispatch(setActiveTopic(null));
+      });
+    }
+
     batch(() => {
       if (activeTutor && studentTaskLists?.length) {
         batch(() => {
@@ -107,6 +114,8 @@ const Tests: FC<TestsProps> = memo((props) => {
       )?.tasklists;
 
       setTaskLists(currentTaskLists ?? []);
+    } else {
+      setTaskLists([]);
     }
   }, [activeTopic]);
 
@@ -177,7 +186,7 @@ const Tests: FC<TestsProps> = memo((props) => {
         </div>
       )}
       <div className={DEFAULT_CLASSNAME}>
-        {activeTutor && (
+        {activeTutor && studentTaskLists?.length ? (
           <>
             <div className={`${DEFAULT_CLASSNAME}_subjects`}>
               <div className={`${DEFAULT_CLASSNAME}_subjects_list`}>
@@ -257,6 +266,10 @@ const Tests: FC<TestsProps> = memo((props) => {
                 ))}
             </div>
           </>
+        ) : (
+          <div className={`${DEFAULT_CLASSNAME}_empty`}>
+            <Typography color={'purple'}>Нет заданий</Typography>
+          </div>
         )}
       </div>
     </>

@@ -105,6 +105,7 @@ const PassTest: FC = memo(() => {
               index={index}
               showCriteria={false}
               files={task?.files ?? []}
+              options={task?.variants?.length ? task?.variants : []}
             />
           ))}
           <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>

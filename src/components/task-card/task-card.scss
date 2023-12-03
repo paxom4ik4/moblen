@@ -9,6 +9,37 @@
   padding: 16px 24px 16px 12px;
   position: relative;
 
+  &_test {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .task-card_criteria {
+      width: 100%;
+    }
+
+
+    &_content {
+      display: flex;
+      flex-direction: column;
+      padding-left: 16px;
+
+      textarea {
+        resize: none !important;
+        //border: 1px solid #44464f !important;
+      }
+
+      &_add {
+        width: fit-content;
+        margin-top: 8px;
+        display: flex;
+        justify-content: flex-start;
+        text-align: left;
+        color: #6750a4;
+      }
+    }
+  }
+
   &_assets {
     display: flex;
     flex-direction: row;

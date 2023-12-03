@@ -40,3 +40,13 @@ export interface GenerateTaskPayload {
   max_score: number;
   task_count: number;
 }
+
+export interface TestOption {
+  text: string;
+  isCorrect: boolean;
+}
+
+export interface TestIndexOption {
+  text: string;
+  correctIndex: string;
+}

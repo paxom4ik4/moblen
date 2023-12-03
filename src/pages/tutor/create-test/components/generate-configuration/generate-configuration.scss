@@ -1,0 +1,94 @@
+.generate-config {
+  &_tasks-container {
+    &_generate-configuration {
+      width: 100%;
+      background-color: #FEFBFF;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      position: relative;
+      padding: 48px 16px 24px;
+      box-shadow: 1px 1px 3px 2px rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      align-items: flex-end;
+
+      &_fields {
+        display: flex;
+        flex-direction: row;
+        height: 60px;
+        gap: 16px;
+
+        &_item {
+          box-shadow: 1px 1px 3px 2px rgba(0, 0, 0, 0.1);
+          border-radius: 12px;
+          padding: 6px 12px;
+          height: fit-content;
+          max-width: fit-content;
+
+          .MuiSelect-select {
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+            white-space: nowrap !important;
+            max-width: 150px !important;
+          }
+
+          .MuiOutlinedInput-notchedOutline {
+            border: none !important;
+          }
+        }
+
+        div {
+          p {
+            padding-bottom: 2px;
+          }
+        }
+
+        .MuiInputBase-input {
+          outline: none;
+          border: none !important;
+          padding: 0 !important;
+          height: 24px !important;
+
+          input {
+            border: none !important;
+          }
+        }
+      }
+
+      &_edit {
+        width: fit-content;
+        gap: 0;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        padding: 4px 8px;
+        height: 32px;
+        box-shadow: 1px 1px 3px 2px rgba(103, 80, 164, 0.1);
+        border-radius: 8px;
+        transition: 0.3s;
+
+        svg {
+          height: 16px;
+        }
+
+        &:hover {
+          cursor: pointer;
+          opacity: 0.8;
+        }
+      }
+
+      &_title {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+      }
+    }
+
+    textarea {
+      width: 100%;
+      padding: 4px;
+    }
+  }
+}

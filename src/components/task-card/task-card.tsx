@@ -5,16 +5,22 @@ import './task-card.scss';
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
+import RemoveIcon from './close_icon.svg';
 
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { Task } from 'types/task.ts';
+import { Task, TestIndexOption, TestOption } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { addFilesToTask, deleteFile, deleteTask, editTask } from 'services/tasks';
 import {
+  Box,
+  Button,
+  Checkbox,
   CircularProgress,
+  FormControlLabel,
+  FormGroup,
   ListSubheader,
   MenuItem,
   Select,
@@ -26,6 +32,11 @@ import {
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { useDropzone } from 'react-dropzone';
 import { LibraryMusic, VideoLibrary } from '@mui/icons-material';
+import {
+  COMPARE_TEST_FORMAT,
+  TEST_FORMAT,
+  TEST_FORMAT_WITH_INDEX,
+} from 'constants/testTaskFormats.ts';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -73,6 +84,12 @@ export type TaskCardProps =
       isNewTaskSaving?: boolean;
 
       setIsNewTask: Dispatch<SetStateAction<boolean>>;
+
+      options: TestOption[];
+      indexOptions: TestIndexOption[];
+
+      setOptions: Dispatch<SetStateAction<TestOption[]>>;
+      setIndexOptions: Dispatch<SetStateAction<TestIndexOption[]>>;
     }
   | {
       disabled?: boolean;
@@ -308,6 +325,267 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       )
     : [];
 
+  const defaultTask = (
+    <div className={`${DEFAULT_CLASSNAME}_task`}>
+      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+        <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+            Задание {props.isCreateMode ? '' : props.index}
+          </div>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+            {props.isCreateMode && (
+              <TextareaAutosize
+                placeholder={'Текст задания'}
+                value={props.newTaskText}
+                onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
+              />
+            )}
+            {!props.isCreateMode && isEditMode && (
+              <TextareaAutosize
+                placeholder={'Текст задания'}
+                value={editTaskText}
+                onChange={(e) => setEditTaskText(e.currentTarget.value)}
+              />
+            )}
+            {!isEditMode && !props.isCreateMode && (
+              <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+        <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
+          <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+            {props.isCreateMode && (
+              <TextareaAutosize
+                placeholder={'Критерии задания'}
+                value={props.newTaskCriteria}
+                onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
+              />
+            )}
+            {!props.isCreateMode && isEditMode && (
+              <TextareaAutosize
+                placeholder={'Критерии задания'}
+                value={editTaskCriteria}
+                onChange={(e) => setEditTaskCriteria(e.currentTarget.value)}
+              />
+            )}
+            {!isEditMode && !props.isCreateMode && (
+              <Typography onClick={() => setIsEditMode(true)}>{props.criteria}</Typography>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Test card
+  const handleOptionChange = (index: number, field: string, value: boolean | string) => {
+    if (props.isCreateMode) {
+      const newOptions: { text: string; isCorrect: boolean }[] = [...props.options];
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      newOptions[index][field] = value;
+      props.setOptions(newOptions);
+    }
+  };
+
+  const handleAddOption = () => {
+    props.isCreateMode && props.setOptions([...props.options, { text: '', isCorrect: false }]);
+  };
+
+  const handleRemoveOption = (index: number) => {
+    if (props.isCreateMode) {
+      const newOptions = [...props.options];
+      newOptions.splice(index, 1);
+      props.setOptions(newOptions);
+    }
+  };
+
+  // Test index card
+  const handleIndexOptionChange = (index: number, field: string, value: string) => {
+    if (props.isCreateMode) {
+      const newOptions: { text: string; correctIndex: string }[] = [...props.indexOptions];
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      newOptions[index][field] = value;
+      props.setIndexOptions(newOptions);
+    }
+  };
+
+  const handleIndexAddOption = () => {
+    props.isCreateMode &&
+      props.setIndexOptions([...props.indexOptions, { text: '', correctIndex: '' }]);
+  };
+
+  const handleIndexRemoveOption = (index: number) => {
+    if (props.isCreateMode) {
+      const newOptions = [...props.indexOptions];
+      newOptions.splice(index, 1);
+      props.setIndexOptions(newOptions);
+    }
+  };
+
+  const testTask = (
+    <div className={`${DEFAULT_CLASSNAME}_test`}>
+      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+        <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+            Задание {props.isCreateMode ? '' : props.index}
+          </div>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+            {props.isCreateMode && (
+              <TextareaAutosize
+                placeholder={'Текст задания'}
+                value={props.newTaskText}
+                onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
+              />
+            )}
+            {!props.isCreateMode && isEditMode && (
+              <TextareaAutosize
+                placeholder={'Текст задания'}
+                value={editTaskText}
+                onChange={(e) => setEditTaskText(e.currentTarget.value)}
+              />
+            )}
+            {!isEditMode && !props.isCreateMode && (
+              <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
+            )}
+          </div>
+
+          <div className={`${DEFAULT_CLASSNAME}_test_content`}>
+            <FormGroup>
+              {props.isCreateMode &&
+                props.options.map((option, index) => (
+                  <Box
+                    width={'100%'}
+                    key={index}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={1}>
+                    <FormControlLabel
+                      label={''}
+                      control={
+                        <Checkbox
+                          style={{ color: '#6750a4' }}
+                          checked={option.isCorrect}
+                          onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
+                        />
+                      }
+                    />
+                    <TextareaAutosize
+                      placeholder={'Введите вариант ответа'}
+                      value={option.text}
+                      onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
+                    />
+
+                    <Button onClick={() => handleRemoveOption(index)}>
+                      <RemoveIcon />
+                    </Button>
+                  </Box>
+                ))}
+            </FormGroup>
+            <Button className={`${DEFAULT_CLASSNAME}_test_content_add`} onClick={handleAddOption}>
+              + Добавить вариант
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const testTaskIndex = (
+    <div className={`${DEFAULT_CLASSNAME}_test`}>
+      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+        <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+            Задание {props.isCreateMode ? '' : props.index}
+          </div>
+          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+            {props.isCreateMode && (
+              <TextareaAutosize
+                placeholder={'Текст задания'}
+                value={props.newTaskText}
+                onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
+              />
+            )}
+            {!props.isCreateMode && isEditMode && (
+              <TextareaAutosize
+                placeholder={'Текст задания'}
+                value={editTaskText}
+                onChange={(e) => setEditTaskText(e.currentTarget.value)}
+              />
+            )}
+            {!isEditMode && !props.isCreateMode && (
+              <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
+            )}
+          </div>
+
+          <div className={`${DEFAULT_CLASSNAME}_test_content`}>
+            <FormGroup>
+              {props.isCreateMode &&
+                props.indexOptions.map((option, index) => (
+                  <Box
+                    width={'100%'}
+                    key={index}
+                    display="flex"
+                    justifyContent="space-between"
+                    alignItems="center"
+                    mt={1}>
+                    <FormControlLabel
+                      label={''}
+                      control={
+                        <TextField
+                          placeholder={'Введите индекс'}
+                          style={{ color: '#6750a4' }}
+                          value={option.correctIndex}
+                          onChange={(e) =>
+                            handleIndexOptionChange(index, 'correctIndex', e.target.value)
+                          }
+                        />
+                      }
+                    />
+                    <TextareaAutosize
+                      placeholder={'Введите вариант ответа'}
+                      value={option.text}
+                      onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
+                    />
+
+                    <Button onClick={() => handleIndexRemoveOption(index)}>
+                      <RemoveIcon />
+                    </Button>
+                  </Box>
+                ))}
+            </FormGroup>
+            <Button
+              className={`${DEFAULT_CLASSNAME}_test_content_add`}
+              onClick={handleIndexAddOption}>
+              + Добавить вариант
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const getTaskFormat = () => {
+    if (props.isCreateMode && props.newTaskFormat) {
+      const format = props.newTaskFormat;
+
+      if (format.includes(TEST_FORMAT)) return testTask;
+
+      if (format.includes(TEST_FORMAT_WITH_INDEX)) return testTaskIndex;
+
+      if (format.includes(COMPARE_TEST_FORMAT)) return testTask;
+
+      return defaultTask;
+    }
+  };
+
   return (
     <ClickAwayListener onClickAway={() => handleSaveEdits(isEditMode)}>
       <div
@@ -347,58 +625,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         )}
 
         <div className={`${DEFAULT_CLASSNAME}_upper`}>
-          <div className={`${DEFAULT_CLASSNAME}_task`}>
-            <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-              <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-                <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-                  Задание {props.isCreateMode ? '' : props.index}
-                </div>
-                <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                  {props.isCreateMode && (
-                    <TextareaAutosize
-                      placeholder={'Текст задания'}
-                      value={props.newTaskText}
-                      onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
-                    />
-                  )}
-                  {!props.isCreateMode && isEditMode && (
-                    <TextareaAutosize
-                      placeholder={'Текст задания'}
-                      value={editTaskText}
-                      onChange={(e) => setEditTaskText(e.currentTarget.value)}
-                    />
-                  )}
-                  {!isEditMode && !props.isCreateMode && (
-                    <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
-                  )}
-                </div>
-              </div>
-            </div>
-            <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-              <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
-                <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
-                <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-                  {props.isCreateMode && (
-                    <TextareaAutosize
-                      placeholder={'Критерии задания'}
-                      value={props.newTaskCriteria}
-                      onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
-                    />
-                  )}
-                  {!props.isCreateMode && isEditMode && (
-                    <TextareaAutosize
-                      placeholder={'Критерии задания'}
-                      value={editTaskCriteria}
-                      onChange={(e) => setEditTaskCriteria(e.currentTarget.value)}
-                    />
-                  )}
-                  {!isEditMode && !props.isCreateMode && (
-                    <Typography onClick={() => setIsEditMode(true)}>{props.criteria}</Typography>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          {getTaskFormat()}
           <div className={`${DEFAULT_CLASSNAME}_task_score_container`}>
             <div className={`${DEFAULT_CLASSNAME}_task_score`}>
               <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>

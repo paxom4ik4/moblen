@@ -31,7 +31,6 @@ import MenuIcon from 'assets/icons/menu-item.svg';
 import { axiosAddAuthToken } from './services/tokenHelper.ts';
 import { refreshToken } from './services/login/login.ts';
 import { CircularProgress } from '@mui/material';
-import GenerateTest from './pages/tutor/generate-test/generate-test.tsx';
 import { Feedback } from './components/feedback/feedback.tsx';
 
 const DEFAULT_CLASSNAME = 'app';
@@ -140,7 +139,7 @@ const App: FC = () => {
       <Route path={TutorRoutes.GROUPS} element={<Groups />} />
       <Route path={TutorRoutes.GROUPS_RESULT} element={<TestResult />} />
       <Route path={TutorRoutes.CREATE_TEST} element={<CreateTest />} />
-      <Route path={TutorRoutes.GENERATE_TEST} element={<GenerateTest />} />
+      <Route path={TutorRoutes.GENERATE_TEST} element={<CreateTest isGenerateMode />} />
       <Route path={TutorRoutes.ASSIGNMENTS} element={<Courses />} />
     </>
   );

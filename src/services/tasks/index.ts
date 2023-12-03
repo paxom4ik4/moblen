@@ -1,10 +1,18 @@
 import API from '../index.ts';
 import { ShareDataType } from '../../types/share.data.type.ts';
-import { GenerateTaskPayload, Task } from '../../types/task.ts';
+import { GenerateTaskPayload, Task, TestIndexOption, TestOption } from '../../types/task.ts';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
 const GENERATE_URL = '/generate-task';
+
+export interface TaskCreatePayload {
+  task_condition: string;
+  criteria?: string;
+  format: string;
+  max_ball: string;
+  variants?: TestOption[] | TestIndexOption[];
+}
 
 const tasklistAPI = {
   createTaskList: ({ list_name, topic_uuid }: { list_name: string; topic_uuid: string }) => {
@@ -51,27 +59,18 @@ const tasksAPI = {
   getTasks: (taskListId: string) => {
     return API.get(`${TASK_URL}/by-tasklist/${taskListId}`).then((res) => res.data);
   },
-  createTask: (
-    list_uuid: string,
-    data:
-      | {
-          task_condition: string;
-          criteria: string;
-          format: string;
-          max_ball: string;
-        }
-      | FormData,
-    isFormData?: boolean,
-  ) => {
+  createTask: (list_uuid: string, data: TaskCreatePayload | FormData, isFormData?: boolean) => {
     if (isFormData) {
       return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, data, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       }).then((res) => res.data);
+    } else {
+      return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, data, {
+        headers: { 'Content-Type': 'application/json' },
+      }).then((res) => res.data);
     }
-
-    return API.post(`${TASK_URL}/by-tasklist/${list_uuid}/`, data).then((res) => res.data);
   },
   editTask: ({ taskId, data }: { taskId: string; data: Partial<Task> }) => {
     return API.patch(`${TASK_URL}/${taskId}/`, { ...data }).then((res) => res.data);

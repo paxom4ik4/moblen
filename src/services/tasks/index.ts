@@ -1,6 +1,7 @@
 import API from '../index.ts';
 import { ShareDataType } from '../../types/share.data.type.ts';
 import { GenerateTaskPayload, Task, TestIndexOption, TestOption } from '../../types/task.ts';
+import { CompareOption } from '../../components/task-card/task-card.tsx';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
@@ -11,7 +12,7 @@ export interface TaskCreatePayload {
   criteria?: string;
   format: string;
   max_ball: string;
-  variants?: TestOption[] | TestIndexOption[];
+  variants?: TestOption[] | TestIndexOption[] | CompareOption[];
 }
 
 const tasklistAPI = {

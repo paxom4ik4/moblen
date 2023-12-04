@@ -9,6 +9,13 @@
   padding: 16px 24px 16px 12px;
   position: relative;
 
+  &_compareItem {
+    padding: 8px 0 8px 16px;
+    margin: 12px 0;
+    box-shadow: 1px 1px 3px 1px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+  }
+
   &_test {
     display: flex;
     flex-direction: column;

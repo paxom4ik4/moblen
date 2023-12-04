@@ -1,4 +1,5 @@
 import { TaskWithAnswer } from './task.ts';
+import { CompareOption } from '../components/task-card/task-card.tsx';
 
 export interface Test {
   id: string;
@@ -7,4 +8,9 @@ export interface Test {
   topic: string;
   status: 'pending' | 'done';
   tasks: TaskWithAnswer[];
+}
+
+export interface CompareState {
+  leftOptions: CompareOption[];
+  rightOptions: CompareOption[];
 }

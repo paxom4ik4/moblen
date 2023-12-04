@@ -23,10 +23,20 @@ import { TutorRoutes } from 'constants/routes.ts';
 import { GenerateTaskPayload, Task, TestIndexOption, TestOption } from 'types/task.ts';
 import { CircularProgress, SelectChangeEvent, TextareaAutosize } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
-import { TEST_FORMAT, TEST_FORMAT_WITH_INDEX } from 'constants/testTaskFormats.ts';
+import {
+  COMPARE_TEST_FORMAT,
+  TEST_FORMAT,
+  TEST_FORMAT_WITH_INDEX,
+} from 'constants/testTaskFormats.ts';
 import { Notification } from 'common/notification/notification.tsx';
 import { GenerateConfiguration } from './components/generate-configuration/generate-configuration.tsx';
-import { convertTestOptionsToCriteria, convertTestOptionsToOrderedCriteria } from './utils.ts';
+import {
+  convertCompareOptions,
+  convertTestOptionsToCompareCriteria,
+  convertTestOptionsToCriteria,
+  convertTestOptionsToOrderedCriteria,
+} from './utils.ts';
+import { CompareState } from '../../../types/test.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
 
@@ -100,6 +110,13 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
   // Ordered test options
   const [indexOptions, setIndexOptions] = useState<TestIndexOption[]>([]);
 
+  // Compare Test state
+
+  const [compareTestState, setCompareTestState] = useState<CompareState>({
+    leftOptions: [],
+    rightOptions: [],
+  });
+
   const clearNewTaskState = () => {
     setNewTaskText('');
     setNewTaskCriteria('');
@@ -146,7 +163,11 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
       data.append('max_ball', newTaskMaxScore?.toString() ?? '0');
       data.append('task_condition', newTaskText.length ? newTaskText : '-');
 
-      if (!newTaskFormat.includes(TEST_FORMAT) && !newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
+      if (
+        !newTaskFormat.includes(TEST_FORMAT) &&
+        !newTaskFormat.includes(TEST_FORMAT_WITH_INDEX) &&
+        !newTaskFormat.includes(COMPARE_TEST_FORMAT)
+      ) {
         data.append('criteria', newTaskCriteria.length ? newTaskCriteria : '-');
       }
 
@@ -158,6 +179,16 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
       if (newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
         data.append('variants', JSON.stringify(indexOptions));
         data.append('criteria', convertTestOptionsToOrderedCriteria(indexOptions));
+      }
+
+      if (newTaskFormat.includes(COMPARE_TEST_FORMAT)) {
+        data.append(
+          'variants',
+          JSON.stringify(
+            convertCompareOptions(compareTestState.leftOptions, compareTestState.rightOptions),
+          ),
+        );
+        data.append('criteria', convertTestOptionsToCompareCriteria(compareTestState.rightOptions));
       }
 
       Array.from(newTaskAssets).forEach((item) => {
@@ -174,7 +205,11 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
         task_condition: newTaskText.length ? newTaskText : '-',
       };
 
-      if (!newTaskFormat.includes(TEST_FORMAT) && !newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
+      if (
+        !newTaskFormat.includes(TEST_FORMAT) &&
+        !newTaskFormat.includes(TEST_FORMAT_WITH_INDEX) &&
+        !newTaskFormat.includes(COMPARE_TEST_FORMAT)
+      ) {
         data['criteria'] = newTaskCriteria.length ? newTaskCriteria : '-';
       }
 
@@ -184,8 +219,18 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
       }
 
       if (newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
-        data['variants'] = options;
+        data['variants'] = indexOptions;
         data['criteria'] = convertTestOptionsToOrderedCriteria(indexOptions);
+      }
+
+      if (newTaskFormat.includes(COMPARE_TEST_FORMAT)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        data['variants'] = convertCompareOptions(
+          compareTestState.leftOptions,
+          compareTestState.rightOptions,
+        );
+        data['criteria'] = convertTestOptionsToCompareCriteria(compareTestState.rightOptions);
       }
 
       await createTaskMutation.mutate({ payload: data, isFormData: false });
@@ -386,11 +431,14 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 options={task?.variants}
+                setOptions={setOptions}
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 indexOptions={task?.variants}
-                setOptions={setOptions}
                 setIndexOptions={setIndexOptions}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                compareOptions={task?.variants}
               />
             ))}
 
@@ -424,6 +472,8 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
               setOptions={setOptions}
               indexOptions={indexOptions}
               setIndexOptions={setIndexOptions}
+              compareTestState={compareTestState}
+              setCompareTestState={setCompareTestState}
             />
           )}
           {!isEditModeDisabled && (

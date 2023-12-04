@@ -41,6 +41,7 @@ import {
   convertTestOptionsToCriteria,
   convertTestOptionsToOrderedCriteria,
 } from '../../pages/tutor/create-test/utils.ts';
+import { CompareState } from '../../types/test.ts';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -94,6 +95,9 @@ export type TaskCardProps =
 
       setOptions: Dispatch<SetStateAction<TestOption[]>>;
       setIndexOptions: Dispatch<SetStateAction<TestIndexOption[]>>;
+
+      compareTestState: CompareState;
+      setCompareTestState: Dispatch<SetStateAction<CompareState>>;
     }
   | {
       disabled?: boolean;
@@ -121,10 +125,17 @@ export type TaskCardProps =
 
       options?: TestOption[];
       indexOptions?: TestIndexOption[];
+      compareOptions?: CompareOption[];
 
       setOptions: Dispatch<SetStateAction<TestOption[]>>;
       setIndexOptions: Dispatch<SetStateAction<TestIndexOption[]>>;
     };
+
+export interface CompareOption {
+  index: number;
+  text: string;
+  connected?: number[];
+}
 
 export const TaskCard: FC<TaskCardProps> = (props) => {
   const queryClient = useQueryClient();
@@ -350,60 +361,62 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       )
     : [];
 
-  const defaultTask = (
-    <div className={`${DEFAULT_CLASSNAME}_task`}>
-      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-        <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-            Задание {props.isCreateMode ? '' : props.index}
+  const DefaultTask = () => {
+    return (
+      <div className={`${DEFAULT_CLASSNAME}_task`}>
+        <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+          <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+            <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+              Задание {props.isCreateMode ? '' : props.index}
+            </div>
+            <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+              {props.isCreateMode && (
+                <TextareaAutosize
+                  placeholder={'Текст задания'}
+                  value={props.newTaskText}
+                  onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
+                />
+              )}
+              {!props.isCreateMode && isEditMode && (
+                <TextareaAutosize
+                  placeholder={'Текст задания'}
+                  value={editTaskText}
+                  onChange={(e) => setEditTaskText(e.currentTarget.value)}
+                />
+              )}
+              {!isEditMode && !props.isCreateMode && (
+                <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
+              )}
+            </div>
           </div>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-            {props.isCreateMode && (
-              <TextareaAutosize
-                placeholder={'Текст задания'}
-                value={props.newTaskText}
-                onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
-              />
-            )}
-            {!props.isCreateMode && isEditMode && (
-              <TextareaAutosize
-                placeholder={'Текст задания'}
-                value={editTaskText}
-                onChange={(e) => setEditTaskText(e.currentTarget.value)}
-              />
-            )}
-            {!isEditMode && !props.isCreateMode && (
-              <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
-            )}
+        </div>
+        <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+          <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
+            <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
+            <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+              {props.isCreateMode && (
+                <TextareaAutosize
+                  placeholder={'Критерии задания'}
+                  value={props.newTaskCriteria}
+                  onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
+                />
+              )}
+              {!props.isCreateMode && isEditMode && (
+                <TextareaAutosize
+                  placeholder={'Критерии задания'}
+                  value={editTaskCriteria}
+                  onChange={(e) => setEditTaskCriteria(e.currentTarget.value)}
+                />
+              )}
+              {!isEditMode && !props.isCreateMode && (
+                <Typography onClick={() => setIsEditMode(true)}>{props.criteria}</Typography>
+              )}
+            </div>
           </div>
         </div>
       </div>
-      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-        <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
-          <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-            {props.isCreateMode && (
-              <TextareaAutosize
-                placeholder={'Критерии задания'}
-                value={props.newTaskCriteria}
-                onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
-              />
-            )}
-            {!props.isCreateMode && isEditMode && (
-              <TextareaAutosize
-                placeholder={'Критерии задания'}
-                value={editTaskCriteria}
-                onChange={(e) => setEditTaskCriteria(e.currentTarget.value)}
-              />
-            )}
-            {!isEditMode && !props.isCreateMode && (
-              <Typography onClick={() => setIsEditMode(true)}>{props.criteria}</Typography>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   // Test card
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
@@ -466,180 +479,289 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   const optionsToUse = props.isCreateMode ? props.options : currentOptions;
   const indexOptionsToUse = props.isCreateMode ? props.indexOptions : currentIndexOptions;
 
-  const testTask = (
-    <div className={`${DEFAULT_CLASSNAME}_test`}>
-      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-        <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-            Задание {props.isCreateMode ? '' : props.index}
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-            {props.isCreateMode && (
-              <TextareaAutosize
-                placeholder={'Текст задания'}
-                value={props.newTaskText}
-                onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
-              />
-            )}
-            {!props.isCreateMode && isEditMode && (
-              <TextareaAutosize
-                placeholder={'Текст задания'}
-                value={editTaskText}
-                onChange={(e) => setEditTaskText(e.currentTarget.value)}
-              />
-            )}
-            {!isEditMode && !props.isCreateMode && (
-              <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
-            )}
-          </div>
+  const handleAddCompareOption = (side: 'left' | 'right') => {
+    if (props.isCreateMode) {
+      const newIndex =
+        side === 'left'
+          ? props.compareTestState.leftOptions.length + 1
+          : props.compareTestState.rightOptions.length + 1;
+      const newOptions =
+        side === 'left'
+          ? [...props.compareTestState.leftOptions]
+          : [...props.compareTestState.rightOptions];
+      newOptions.push({ index: newIndex, text: '', connected: [] });
+      side === 'left'
+        ? props.setCompareTestState({ ...props.compareTestState, leftOptions: newOptions })
+        : props.setCompareTestState({ ...props.compareTestState, rightOptions: newOptions });
+    }
+  };
 
-          <div className={`${DEFAULT_CLASSNAME}_test_content`}>
-            <FormGroup onClick={() => !props.isCreateMode && setIsEditMode(true)}>
-              {optionsToUse?.map((option, index) => (
-                <Box
-                  width={'100%'}
-                  key={index}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={1}>
-                  <FormControlLabel
-                    disabled={formItemDisabled}
-                    label={''}
-                    control={
-                      <Checkbox
-                        disabled={formItemDisabled}
-                        style={{ color: '#6750a4' }}
-                        checked={option.isCorrect}
-                        onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                      />
-                    }
-                  />
-                  <TextareaAutosize
-                    disabled={formItemDisabled}
-                    placeholder={'Введите вариант ответа'}
-                    value={option.text}
-                    onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
-                  />
+  const handleRemoveCompareOption = (index: number, side: 'left' | 'right') => {
+    if (props.isCreateMode) {
+      const newOptions =
+        side === 'left'
+          ? [...props.compareTestState.leftOptions]
+          : [...props.compareTestState.rightOptions];
+      newOptions.splice(index, 1);
+      side === 'left'
+        ? props.setCompareTestState({ ...props.compareTestState, leftOptions: newOptions })
+        : props.setCompareTestState({ ...props.compareTestState, rightOptions: newOptions });
+    }
+  };
 
-                  <Button disabled={formItemDisabled} onClick={() => handleRemoveOption(index)}>
-                    <RemoveIcon />
-                  </Button>
-                </Box>
-              ))}
-            </FormGroup>
-            {(props.isCreateMode || isEditMode) && (
-              <Button className={`${DEFAULT_CLASSNAME}_test_content_add`} onClick={handleAddOption}>
-                + Добавить вариант
+  const handleLinkChange = (index: number, linkedTo: number[], side: 'left' | 'right') => {
+    if (props.isCreateMode) {
+      const newOptions =
+        side === 'left'
+          ? [...props.compareTestState.leftOptions]
+          : [...props.compareTestState.rightOptions];
+      newOptions[index].connected = linkedTo;
+      side === 'left'
+        ? props.setCompareTestState({ ...props.compareTestState, leftOptions: newOptions })
+        : props.setCompareTestState({ ...props.compareTestState, rightOptions: newOptions });
+    }
+  };
+
+  const TestTask = () => {
+    return (
+      <div className={`${DEFAULT_CLASSNAME}_test_content`}>
+        <FormGroup onClick={() => !props.isCreateMode && setIsEditMode(true)}>
+          {optionsToUse?.map((option, index) => (
+            <Box
+              width={'100%'}
+              key={index}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mt={1}>
+              <FormControlLabel
+                disabled={formItemDisabled}
+                label={''}
+                control={
+                  <Checkbox
+                    disabled={formItemDisabled}
+                    style={{ color: '#6750a4' }}
+                    checked={option.isCorrect}
+                    onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
+                  />
+                }
+              />
+              <TextareaAutosize
+                disabled={formItemDisabled}
+                placeholder={'Введите вариант ответа'}
+                value={option.text}
+                onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
+              />
+
+              <Button disabled={formItemDisabled} onClick={() => handleRemoveOption(index)}>
+                <RemoveIcon />
               </Button>
-            )}
-          </div>
-        </div>
+            </Box>
+          ))}
+        </FormGroup>
+        {(props.isCreateMode || isEditMode) && (
+          <Button className={`${DEFAULT_CLASSNAME}_test_content_add`} onClick={handleAddOption}>
+            + Добавить вариант
+          </Button>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
 
-  const testTaskIndex = (
-    <div className={`${DEFAULT_CLASSNAME}_test`}>
-      <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-        <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-            Задание {props.isCreateMode ? '' : props.index}
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-            {props.isCreateMode && (
-              <TextareaAutosize
-                placeholder={'Текст задания'}
-                value={props.newTaskText}
-                onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
-              />
-            )}
-            {!props.isCreateMode && isEditMode && (
-              <TextareaAutosize
-                placeholder={'Текст задания'}
-                value={editTaskText}
-                onChange={(e) => setEditTaskText(e.currentTarget.value)}
-              />
-            )}
-            {!isEditMode && !props.isCreateMode && (
-              <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
-            )}
-          </div>
-
-          <div className={`${DEFAULT_CLASSNAME}_test_content`} onClick={() => setIsEditMode(true)}>
-            <FormGroup>
-              {indexOptionsToUse.map((option, index) => (
-                <Box
-                  width={'100%'}
-                  key={index}
-                  display="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                  mt={1}>
-                  <FormControlLabel
+  const TestTaskIndex = () => {
+    return (
+      <div className={`${DEFAULT_CLASSNAME}_test_content`} onClick={() => setIsEditMode(true)}>
+        <FormGroup>
+          {indexOptionsToUse.map((option, index) => (
+            <Box
+              width={'100%'}
+              key={index}
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mt={1}>
+              <FormControlLabel
+                disabled={formItemDisabled}
+                label={''}
+                control={
+                  <TextField
                     disabled={formItemDisabled}
-                    label={''}
-                    control={
-                      <TextField
-                        disabled={formItemDisabled}
-                        placeholder={'Введите значение'}
-                        style={{ color: '#6750a4' }}
-                        value={option.correctIndex}
-                        onChange={(e) =>
-                          handleIndexOptionChange(index, 'correctIndex', e.target.value)
-                        }
-                      />
-                    }
+                    placeholder={'Введите значение'}
+                    style={{ color: '#6750a4' }}
+                    value={option.correctIndex}
+                    onChange={(e) => handleIndexOptionChange(index, 'correctIndex', e.target.value)}
                   />
-                  <TextareaAutosize
-                    disabled={formItemDisabled}
-                    placeholder={'Введите вариант ответа'}
-                    value={option.text}
-                    onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
-                  />
+                }
+              />
+              <TextareaAutosize
+                disabled={formItemDisabled}
+                placeholder={'Введите вариант ответа'}
+                value={option.text}
+                onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
+              />
 
-                  <Button
-                    disabled={formItemDisabled}
-                    onClick={() => handleIndexRemoveOption(index)}>
-                    <RemoveIcon />
-                  </Button>
-                </Box>
-              ))}
-            </FormGroup>
-            {!formItemDisabled && (
-              <Button
-                className={`${DEFAULT_CLASSNAME}_test_content_add`}
-                onClick={handleIndexAddOption}>
-                + Добавить вариант
+              <Button disabled={formItemDisabled} onClick={() => handleIndexRemoveOption(index)}>
+                <RemoveIcon />
               </Button>
-            )}
-          </div>
-        </div>
+            </Box>
+          ))}
+        </FormGroup>
+        {!formItemDisabled && (
+          <Button
+            className={`${DEFAULT_CLASSNAME}_test_content_add`}
+            onClick={handleIndexAddOption}>
+            + Добавить вариант
+          </Button>
+        )}
       </div>
-    </div>
-  );
+    );
+  };
+
+  const CompareTask = () => {
+    return (
+      <div
+        onClick={() => setIsEditMode(true)}
+        className={`${DEFAULT_CLASSNAME}_test_content`}
+        style={{ padding: '0 8px' }}>
+        <FormGroup onClick={() => !props.isCreateMode && setIsEditMode(true)}>
+          <Box display="flex" justifyContent="space-between" gap={2}>
+            <div style={{ width: '50%' }}>
+              {props.isCreateMode &&
+                props.compareTestState.leftOptions.map((option, index) => (
+                  <Box
+                    className={`${DEFAULT_CLASSNAME}_compareItem`}
+                    key={index}
+                    display="flex"
+                    alignItems="center"
+                    mt={1}>
+                    <span
+                      style={{
+                        marginRight: '12px',
+                        backgroundColor: '#6750a4',
+                        color: '#fff',
+                        borderRadius: '50%',
+                        width: '28px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      {index + 1}
+                    </span>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      value={option.text}
+                      onChange={(e) => {
+                        const newLeftOptions = [...props.compareTestState.leftOptions];
+                        newLeftOptions[index].text = e.target.value;
+                        props.setCompareTestState({
+                          ...props.compareTestState,
+                          leftOptions: newLeftOptions,
+                        });
+                      }}
+                    />
+                    <Button onClick={() => handleRemoveCompareOption(index, 'left')}>
+                      <RemoveIcon />
+                    </Button>
+                  </Box>
+                ))}
+              {!formItemDisabled && (
+                <Button style={{ color: '#6750a4' }} onClick={() => handleAddCompareOption('left')}>
+                  + Добавить опцию
+                </Button>
+              )}
+            </div>
+            <div style={{ width: '50%' }}>
+              {props.isCreateMode &&
+                props.compareTestState.rightOptions.map((option, index) => (
+                  <Box
+                    className={`${DEFAULT_CLASSNAME}_compareItem`}
+                    key={index}
+                    display="flex"
+                    alignItems="center"
+                    mt={1}>
+                    <span
+                      style={{
+                        marginRight: '12px',
+                        backgroundColor: '#6750a4',
+                        color: '#fff',
+                        borderRadius: '50%',
+                        width: '32px',
+                        height: '24px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}>
+                      {`${String.fromCharCode(65 + index)}`}
+                    </span>
+                    <Select
+                      variant="outlined"
+                      style={{ width: '120px', marginRight: '12px' }}
+                      multiple
+                      value={option.connected}
+                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                      // @ts-ignore
+                      onChange={(e) => handleLinkChange(index, e.target.value, 'right')}>
+                      {props.compareTestState.leftOptions.map((leftOption, leftIndex) => (
+                        <MenuItem key={leftOption.index} value={leftOption.index}>
+                          {leftIndex + 1}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      value={option.text}
+                      onChange={(e) => {
+                        const newRightOptions = [...props.compareTestState.rightOptions];
+                        newRightOptions[index].text = e.target.value;
+                        props.setCompareTestState({
+                          ...props.compareTestState,
+                          rightOptions: newRightOptions,
+                        });
+                      }}
+                    />
+                    <Button onClick={() => handleRemoveCompareOption(index, 'right')}>
+                      <RemoveIcon />
+                    </Button>
+                  </Box>
+                ))}
+              {!formItemDisabled && (
+                <Button
+                  style={{ color: '#6750a4' }}
+                  onClick={() => handleAddCompareOption('right')}>
+                  + Добавить опцию
+                </Button>
+              )}
+            </div>
+          </Box>
+        </FormGroup>
+      </div>
+    );
+  };
 
   const getTaskFormat = () => {
     if (props.isCreateMode && props.newTaskFormat) {
       const format = props.newTaskFormat;
 
-      if (format.includes(TEST_FORMAT)) return testTask;
+      if (format.includes(TEST_FORMAT)) return <TestTask />;
 
-      if (format.includes(TEST_FORMAT_WITH_INDEX)) return testTaskIndex;
+      if (format.includes(TEST_FORMAT_WITH_INDEX)) return <TestTaskIndex />;
 
-      if (format.includes(COMPARE_TEST_FORMAT)) return testTask;
+      if (format.includes(COMPARE_TEST_FORMAT)) return <CompareTask />;
 
-      return defaultTask;
+      return <DefaultTask />;
     }
 
     if (!props.isCreateMode && props.format) {
-      if (props.format.includes(TEST_FORMAT)) return testTask;
+      if (props.format.includes(TEST_FORMAT)) return <TestTask />;
 
-      if (props.format.includes(TEST_FORMAT_WITH_INDEX)) return testTaskIndex;
+      if (props.format.includes(TEST_FORMAT_WITH_INDEX)) return <TestTaskIndex />;
 
-      if (props.format.includes(COMPARE_TEST_FORMAT)) return testTask;
+      if (props.format.includes(COMPARE_TEST_FORMAT)) return <CompareTask />;
 
-      return defaultTask;
+      return <DefaultTask />;
     }
   };
 
@@ -682,7 +804,37 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         )}
 
         <div className={`${DEFAULT_CLASSNAME}_upper`}>
-          {getTaskFormat()}
+          <div className={`${DEFAULT_CLASSNAME}_test`}>
+            <div className={`${DEFAULT_CLASSNAME}_criteria`}>
+              <div className={`${DEFAULT_CLASSNAME}_task-container`}>
+                <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
+                  Задание {props.isCreateMode ? '' : props.index}
+                </div>
+                <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
+                  {props.isCreateMode && (
+                    <TextareaAutosize
+                      placeholder={'Текст задания'}
+                      value={props.newTaskText}
+                      onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
+                    />
+                  )}
+                  {!props.isCreateMode && isEditMode && (
+                    <TextareaAutosize
+                      placeholder={'Текст задания'}
+                      value={editTaskText}
+                      onChange={(e) => setEditTaskText(e.currentTarget.value)}
+                    />
+                  )}
+                  {!isEditMode && !props.isCreateMode && (
+                    <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
+                  )}
+                </div>
+
+                {getTaskFormat()}
+              </div>
+            </div>
+          </div>
+
           <div className={`${DEFAULT_CLASSNAME}_task_score_container`}>
             <div className={`${DEFAULT_CLASSNAME}_task_score`}>
               <div className={`${DEFAULT_CLASSNAME}_task_score_maxScore`}>

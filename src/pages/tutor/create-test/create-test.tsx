@@ -94,6 +94,12 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
   const [newTaskAssetsTotalSize, setNewTaskAssetsTotalSize] = useState(0);
   const [newTaskAssetsError, setNewTaskAssetsError] = useState<null | string>(null);
 
+  // Unordered test options
+  const [options, setOptions] = useState<TestOption[]>([]);
+
+  // Ordered test options
+  const [indexOptions, setIndexOptions] = useState<TestIndexOption[]>([]);
+
   const clearNewTaskState = () => {
     setNewTaskText('');
     setNewTaskCriteria('');
@@ -101,18 +107,9 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
     setNewTaskFormat('');
     setNewTaskAssets([]);
     setIsNewTaskSaving(false);
+    setOptions([]);
+    setIndexOptions([]);
   };
-
-  // Unordered test options
-  const [options, setOptions] = useState<TestOption[]>([{ text: '', isCorrect: false }]);
-
-  // Ordered test options
-  const [indexOptions, setIndexOptions] = useState<TestIndexOption[]>([
-    {
-      text: '',
-      correctIndex: '',
-    },
-  ]);
 
   const handleFormatChange = (event: SelectChangeEvent) => {
     setNewTaskFormat(event.target.value as string);

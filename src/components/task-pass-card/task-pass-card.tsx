@@ -280,7 +280,7 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
                 disabled={isViewMode}
                 control={
                   <TextField
-                    placeholder={'Введите индекс'}
+                    placeholder={'Введите значение'}
                     style={{ color: '#6750a4' }}
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore

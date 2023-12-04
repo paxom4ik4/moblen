@@ -504,6 +504,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                   alignItems="center"
                   mt={1}>
                   <FormControlLabel
+                    disabled={formItemDisabled}
                     label={''}
                     control={
                       <Checkbox
@@ -565,7 +566,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
             )}
           </div>
 
-          <div className={`${DEFAULT_CLASSNAME}_test_content`}>
+          <div className={`${DEFAULT_CLASSNAME}_test_content`} onClick={() => setIsEditMode(true)}>
             <FormGroup>
               {indexOptionsToUse.map((option, index) => (
                 <Box
@@ -581,7 +582,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                     control={
                       <TextField
                         disabled={formItemDisabled}
-                        placeholder={'Введите индекс'}
+                        placeholder={'Введите значение'}
                         style={{ color: '#6750a4' }}
                         value={option.correctIndex}
                         onChange={(e) =>
@@ -605,11 +606,13 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
                 </Box>
               ))}
             </FormGroup>
-            <Button
-              className={`${DEFAULT_CLASSNAME}_test_content_add`}
-              onClick={handleIndexAddOption}>
-              + Добавить вариант
-            </Button>
+            {!formItemDisabled && (
+              <Button
+                className={`${DEFAULT_CLASSNAME}_test_content_add`}
+                onClick={handleIndexAddOption}>
+                + Добавить вариант
+              </Button>
+            )}
           </div>
         </div>
       </div>

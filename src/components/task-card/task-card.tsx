@@ -40,8 +40,9 @@ import {
 import {
   convertTestOptionsToCriteria,
   convertTestOptionsToOrderedCriteria,
-} from '../../pages/tutor/create-test/utils.ts';
-import { CompareState } from '../../types/test.ts';
+} from 'pages/tutor/create-test/utils.ts';
+import { CompareState } from 'types/test.ts';
+import { DefaultTask } from 'pages/tutor/create-test/tests/default/default-test.tsx';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -360,63 +361,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
           ),
       )
     : [];
-
-  const DefaultTask = () => {
-    return (
-      <div className={`${DEFAULT_CLASSNAME}_task`}>
-        <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-          <div className={`${DEFAULT_CLASSNAME}_task-container`}>
-            <div className={`${DEFAULT_CLASSNAME}_task-container_title`}>
-              Задание {props.isCreateMode ? '' : props.index}
-            </div>
-            <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-              {props.isCreateMode && (
-                <TextareaAutosize
-                  placeholder={'Текст задания'}
-                  value={props.newTaskText}
-                  onChange={(e) => props.setNewTaskText(e.currentTarget.value)}
-                />
-              )}
-              {!props.isCreateMode && isEditMode && (
-                <TextareaAutosize
-                  placeholder={'Текст задания'}
-                  value={editTaskText}
-                  onChange={(e) => setEditTaskText(e.currentTarget.value)}
-                />
-              )}
-              {!isEditMode && !props.isCreateMode && (
-                <Typography onClick={() => setIsEditMode(true)}>{props.text}</Typography>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-          <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
-            <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
-            <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
-              {props.isCreateMode && (
-                <TextareaAutosize
-                  placeholder={'Критерии задания'}
-                  value={props.newTaskCriteria}
-                  onChange={(e) => props.setNewTaskCriteria(e.currentTarget.value)}
-                />
-              )}
-              {!props.isCreateMode && isEditMode && (
-                <TextareaAutosize
-                  placeholder={'Критерии задания'}
-                  value={editTaskCriteria}
-                  onChange={(e) => setEditTaskCriteria(e.currentTarget.value)}
-                />
-              )}
-              {!isEditMode && !props.isCreateMode && (
-                <Typography onClick={() => setIsEditMode(true)}>{props.criteria}</Typography>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   // Test card
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
@@ -751,7 +695,15 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
       if (format.includes(COMPARE_TEST_FORMAT)) return <CompareTask />;
 
-      return <DefaultTask />;
+      return (
+        <DefaultTask
+          newTaskCriteria={props.newTaskCriteria}
+          setNewTaskCriteria={props.setNewTaskCriteria}
+          index={props.index ?? 0}
+          isCreateMode
+          setIsEditMode={setIsEditMode}
+        />
+      );
     }
 
     if (!props.isCreateMode && props.format) {
@@ -761,7 +713,16 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
       if (props.format.includes(COMPARE_TEST_FORMAT)) return <CompareTask />;
 
-      return <DefaultTask />;
+      return (
+        <DefaultTask
+          index={props.index ?? 0}
+          criteria={props.criteria}
+          isEditMode={isEditMode}
+          editTaskCriteria={editTaskCriteria}
+          setEditTaskCriteria={setEditTaskCriteria}
+          setIsEditMode={setIsEditMode}
+        />
+      );
     }
   };
 

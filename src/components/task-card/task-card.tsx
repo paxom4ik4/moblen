@@ -5,7 +5,6 @@ import './task-card.scss';
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import CheckIcon from 'assets/icons/check-icon.svg';
 import CloseIcon from 'assets/icons/cancel-icon.svg';
-import RemoveIcon from './close_icon.svg';
 
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
@@ -15,12 +14,7 @@ import { Task, TestIndexOption, TestOption } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { addFilesToTask, deleteFile, deleteTask, editTask } from 'services/tasks';
 import {
-  Box,
-  Button,
-  Checkbox,
   CircularProgress,
-  FormControlLabel,
-  FormGroup,
   ListSubheader,
   MenuItem,
   Select,
@@ -38,11 +32,16 @@ import {
   TEST_FORMAT_WITH_INDEX,
 } from 'constants/testTaskFormats.ts';
 import {
+  convertCompareOptions,
+  convertTestOptionsToCompareCriteria,
   convertTestOptionsToCriteria,
   convertTestOptionsToOrderedCriteria,
 } from 'pages/tutor/create-test/utils.ts';
 import { CompareState } from 'types/test.ts';
 import { DefaultTask } from 'pages/tutor/create-test/tests/default/default-test.tsx';
+import { CompareTask } from 'pages/tutor/create-test/tests/compare/compare.tsx';
+import { UnorderedTest } from 'pages/tutor/create-test/tests/unordered-test/unordered-test.tsx';
+import { OrderedTest } from 'pages/tutor/create-test/tests/ordered-test/ordered-test.tsx';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -218,18 +217,34 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   const handleSaveEdits = async (isEditMode: boolean) => {
     if (isEditMode && !props.isCreateMode) {
-      let criteria = '';
+      const isDefaultTest =
+        !props.format.includes(TEST_FORMAT) &&
+        !props.format.includes(TEST_FORMAT_WITH_INDEX) &&
+        !props.format.includes(COMPARE_TEST_FORMAT);
 
-      if (!props.format.includes(TEST_FORMAT) && !props.format.includes(TEST_FORMAT_WITH_INDEX)) {
+      let criteria = '';
+      let variants = null;
+
+      if (isDefaultTest) {
         criteria = editTaskCriteria.length ? editTaskCriteria : '-';
       }
 
       if (props.format.includes(TEST_FORMAT)) {
         criteria = convertTestOptionsToCriteria(currentOptions);
+        variants = currentOptions;
       }
 
       if (props.format.includes(TEST_FORMAT_WITH_INDEX)) {
         criteria = convertTestOptionsToOrderedCriteria(currentIndexOptions);
+        variants = currentIndexOptions;
+      }
+
+      if (props.format.includes(COMPARE_TEST_FORMAT)) {
+        criteria = convertTestOptionsToCompareCriteria(compareTestState.rightOptions);
+        variants = convertCompareOptions(
+          compareTestState.leftOptions,
+          compareTestState.rightOptions,
+        );
       }
 
       await editTaskMutation.mutate({
@@ -237,7 +252,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
         task_condition: editTaskText,
         max_ball: editTaskMaxBall,
         criteria,
-        variants: currentOptions,
+        variants,
       });
     }
   };
@@ -362,7 +377,6 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
       )
     : [];
 
-  // Test card
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
     const newOptions: TestOption[] = props.isCreateMode ? [...props.options] : [...currentOptions];
 
@@ -384,11 +398,8 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     props.isCreateMode ? props.setOptions(newOptions) : setCurrentOptions(newOptions);
   };
 
-  // Test card EDIT MODE
-
   const [currentOptions, setCurrentOptions] = useState(props?.options ?? []);
 
-  // Test index card
   const handleIndexOptionChange = (index: number, field: string, value: string) => {
     const newOptions: TestIndexOption[] = props.isCreateMode
       ? [...props.indexOptions]
@@ -414,286 +425,114 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     props.isCreateMode ? props.setIndexOptions(newOptions) : setCurrentIndexOptions(newOptions);
   };
 
-  // Test Index card EDIT MODE
-
   const [currentIndexOptions, setCurrentIndexOptions] = useState(props?.indexOptions ?? []);
 
-  const formItemDisabled = !isEditMode && !props.isCreateMode;
-
-  const optionsToUse = props.isCreateMode ? props.options : currentOptions;
-  const indexOptionsToUse = props.isCreateMode ? props.indexOptions : currentIndexOptions;
+  const [compareTestState, setCompareTestState] = useState<CompareState>({
+    leftOptions: [],
+    rightOptions: [],
+  });
 
   const handleAddCompareOption = (side: 'left' | 'right') => {
-    if (props.isCreateMode) {
-      const newIndex =
-        side === 'left'
-          ? props.compareTestState.leftOptions.length + 1
-          : props.compareTestState.rightOptions.length + 1;
-      const newOptions =
-        side === 'left'
-          ? [...props.compareTestState.leftOptions]
-          : [...props.compareTestState.rightOptions];
-      newOptions.push({ index: newIndex, text: '', connected: [] });
-      side === 'left'
-        ? props.setCompareTestState({ ...props.compareTestState, leftOptions: newOptions })
-        : props.setCompareTestState({ ...props.compareTestState, rightOptions: newOptions });
-    }
+    const optionsKey = side === 'left' ? 'leftOptions' : 'rightOptions';
+    const currentOptions = props.isCreateMode
+      ? props.compareTestState[optionsKey]
+      : compareTestState[optionsKey];
+
+    const newIndex = currentOptions.length + 1;
+    const newOptions = [...currentOptions, { index: newIndex, text: '', connected: [] }];
+
+    const updatedState = props.isCreateMode
+      ? { ...props.compareTestState, [optionsKey]: newOptions }
+      : { ...compareTestState, [optionsKey]: newOptions };
+
+    side === 'left'
+      ? props.isCreateMode && props.setCompareTestState(updatedState)
+      : setCompareTestState(updatedState);
   };
 
   const handleRemoveCompareOption = (index: number, side: 'left' | 'right') => {
-    if (props.isCreateMode) {
-      const newOptions =
-        side === 'left'
-          ? [...props.compareTestState.leftOptions]
-          : [...props.compareTestState.rightOptions];
+    const isCreateMode = props.isCreateMode;
+    const optionsKey = side === 'left' ? 'leftOptions' : 'rightOptions';
+
+    if (isCreateMode) {
+      const currentOptions = props.compareTestState[optionsKey];
+      const newOptions = [...currentOptions];
       newOptions.splice(index, 1);
-      side === 'left'
-        ? props.setCompareTestState({ ...props.compareTestState, leftOptions: newOptions })
-        : props.setCompareTestState({ ...props.compareTestState, rightOptions: newOptions });
+
+      const updatedState = { ...props.compareTestState, [optionsKey]: newOptions };
+
+      props.setCompareTestState(updatedState);
+    } else {
+      const currentOptions = compareTestState[optionsKey];
+      const newOptions = [...currentOptions];
+      newOptions.splice(index, 1);
+
+      setCompareTestState({ ...compareTestState, [optionsKey]: newOptions });
     }
   };
 
   const handleLinkChange = (index: number, linkedTo: number[], side: 'left' | 'right') => {
-    if (props.isCreateMode) {
-      const newOptions =
-        side === 'left'
-          ? [...props.compareTestState.leftOptions]
-          : [...props.compareTestState.rightOptions];
-      newOptions[index].connected = linkedTo;
-      side === 'left'
-        ? props.setCompareTestState({ ...props.compareTestState, leftOptions: newOptions })
-        : props.setCompareTestState({ ...props.compareTestState, rightOptions: newOptions });
-    }
-  };
+    const isCreateMode = props.isCreateMode;
+    const optionsKey = side === 'left' ? 'leftOptions' : 'rightOptions';
 
-  const TestTask = () => {
-    return (
-      <div className={`${DEFAULT_CLASSNAME}_test_content`}>
-        <FormGroup onClick={() => !props.isCreateMode && setIsEditMode(true)}>
-          {optionsToUse?.map((option, index) => (
-            <Box
-              width={'100%'}
-              key={index}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mt={1}>
-              <FormControlLabel
-                disabled={formItemDisabled}
-                label={''}
-                control={
-                  <Checkbox
-                    disabled={formItemDisabled}
-                    style={{ color: '#6750a4' }}
-                    checked={option.isCorrect}
-                    onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                  />
-                }
-              />
-              <TextareaAutosize
-                disabled={formItemDisabled}
-                placeholder={'Введите вариант ответа'}
-                value={option.text}
-                onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
-              />
+    const currentOptions = isCreateMode
+      ? props.compareTestState[optionsKey]
+      : compareTestState[optionsKey];
+    const newOptions = [...currentOptions];
 
-              <Button disabled={formItemDisabled} onClick={() => handleRemoveOption(index)}>
-                <RemoveIcon />
-              </Button>
-            </Box>
-          ))}
-        </FormGroup>
-        {(props.isCreateMode || isEditMode) && (
-          <Button className={`${DEFAULT_CLASSNAME}_test_content_add`} onClick={handleAddOption}>
-            + Добавить вариант
-          </Button>
-        )}
-      </div>
-    );
-  };
+    newOptions[index].connected = linkedTo;
 
-  const TestTaskIndex = () => {
-    return (
-      <div className={`${DEFAULT_CLASSNAME}_test_content`} onClick={() => setIsEditMode(true)}>
-        <FormGroup>
-          {indexOptionsToUse.map((option, index) => (
-            <Box
-              width={'100%'}
-              key={index}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mt={1}>
-              <FormControlLabel
-                disabled={formItemDisabled}
-                label={''}
-                control={
-                  <TextField
-                    disabled={formItemDisabled}
-                    placeholder={'Введите значение'}
-                    style={{ color: '#6750a4' }}
-                    value={option.correctIndex}
-                    onChange={(e) => handleIndexOptionChange(index, 'correctIndex', e.target.value)}
-                  />
-                }
-              />
-              <TextareaAutosize
-                disabled={formItemDisabled}
-                placeholder={'Введите вариант ответа'}
-                value={option.text}
-                onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
-              />
+    const updatedState = {
+      ...(isCreateMode ? props.compareTestState : compareTestState),
+      [optionsKey]: newOptions,
+    };
 
-              <Button disabled={formItemDisabled} onClick={() => handleIndexRemoveOption(index)}>
-                <RemoveIcon />
-              </Button>
-            </Box>
-          ))}
-        </FormGroup>
-        {!formItemDisabled && (
-          <Button
-            className={`${DEFAULT_CLASSNAME}_test_content_add`}
-            onClick={handleIndexAddOption}>
-            + Добавить вариант
-          </Button>
-        )}
-      </div>
-    );
-  };
-
-  const CompareTask = () => {
-    return (
-      <div
-        onClick={() => setIsEditMode(true)}
-        className={`${DEFAULT_CLASSNAME}_test_content`}
-        style={{ padding: '0 8px' }}>
-        <FormGroup onClick={() => !props.isCreateMode && setIsEditMode(true)}>
-          <Box display="flex" justifyContent="space-between" gap={2}>
-            <div style={{ width: '50%' }}>
-              {props.isCreateMode &&
-                props.compareTestState.leftOptions.map((option, index) => (
-                  <Box
-                    className={`${DEFAULT_CLASSNAME}_compareItem`}
-                    key={index}
-                    display="flex"
-                    alignItems="center"
-                    mt={1}>
-                    <span
-                      style={{
-                        marginRight: '12px',
-                        backgroundColor: '#6750a4',
-                        color: '#fff',
-                        borderRadius: '50%',
-                        width: '28px',
-                        height: '24px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      {index + 1}
-                    </span>
-                    <TextField
-                      variant="outlined"
-                      fullWidth
-                      value={option.text}
-                      onChange={(e) => {
-                        const newLeftOptions = [...props.compareTestState.leftOptions];
-                        newLeftOptions[index].text = e.target.value;
-                        props.setCompareTestState({
-                          ...props.compareTestState,
-                          leftOptions: newLeftOptions,
-                        });
-                      }}
-                    />
-                    <Button onClick={() => handleRemoveCompareOption(index, 'left')}>
-                      <RemoveIcon />
-                    </Button>
-                  </Box>
-                ))}
-              {!formItemDisabled && (
-                <Button style={{ color: '#6750a4' }} onClick={() => handleAddCompareOption('left')}>
-                  + Добавить опцию
-                </Button>
-              )}
-            </div>
-            <div style={{ width: '50%' }}>
-              {props.isCreateMode &&
-                props.compareTestState.rightOptions.map((option, index) => (
-                  <Box
-                    className={`${DEFAULT_CLASSNAME}_compareItem`}
-                    key={index}
-                    display="flex"
-                    alignItems="center"
-                    mt={1}>
-                    <span
-                      style={{
-                        marginRight: '12px',
-                        backgroundColor: '#6750a4',
-                        color: '#fff',
-                        borderRadius: '50%',
-                        width: '32px',
-                        height: '24px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                      {`${String.fromCharCode(65 + index)}`}
-                    </span>
-                    <Select
-                      variant="outlined"
-                      style={{ width: '120px', marginRight: '12px' }}
-                      multiple
-                      value={option.connected}
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
-                      onChange={(e) => handleLinkChange(index, e.target.value, 'right')}>
-                      {props.compareTestState.leftOptions.map((leftOption, leftIndex) => (
-                        <MenuItem key={leftOption.index} value={leftOption.index}>
-                          {leftIndex + 1}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    <TextField
-                      variant="outlined"
-                      fullWidth
-                      value={option.text}
-                      onChange={(e) => {
-                        const newRightOptions = [...props.compareTestState.rightOptions];
-                        newRightOptions[index].text = e.target.value;
-                        props.setCompareTestState({
-                          ...props.compareTestState,
-                          rightOptions: newRightOptions,
-                        });
-                      }}
-                    />
-                    <Button onClick={() => handleRemoveCompareOption(index, 'right')}>
-                      <RemoveIcon />
-                    </Button>
-                  </Box>
-                ))}
-              {!formItemDisabled && (
-                <Button
-                  style={{ color: '#6750a4' }}
-                  onClick={() => handleAddCompareOption('right')}>
-                  + Добавить опцию
-                </Button>
-              )}
-            </div>
-          </Box>
-        </FormGroup>
-      </div>
-    );
+    isCreateMode ? props.setCompareTestState(updatedState) : setCompareTestState(updatedState);
   };
 
   const getTaskFormat = () => {
     if (props.isCreateMode && props.newTaskFormat) {
       const format = props.newTaskFormat;
 
-      if (format.includes(TEST_FORMAT)) return <TestTask />;
+      if (format.includes(TEST_FORMAT))
+        return (
+          <UnorderedTest
+            options={props.options}
+            isCreateMode={props.isCreateMode}
+            isEditMode={isEditMode}
+            setIsEditMode={setIsEditMode}
+            handleOptionChange={handleOptionChange}
+            handleAddOption={handleAddOption}
+            handleRemoveOption={handleRemoveOption}
+          />
+        );
 
-      if (format.includes(TEST_FORMAT_WITH_INDEX)) return <TestTaskIndex />;
+      if (format.includes(TEST_FORMAT_WITH_INDEX))
+        return (
+          <OrderedTest
+            setIsEditMode={setIsEditMode}
+            isEditMode={isEditMode}
+            isCreateMode={props.isCreateMode}
+            indexOptions={props.indexOptions}
+            handleIndexOptionChange={handleIndexOptionChange}
+            handleIndexAddOption={handleIndexAddOption}
+            handleIndexRemoveOption={handleIndexRemoveOption}
+          />
+        );
 
-      if (format.includes(COMPARE_TEST_FORMAT)) return <CompareTask />;
+      if (format.includes(COMPARE_TEST_FORMAT))
+        return (
+          <CompareTask
+            compareTestState={props.compareTestState}
+            setCompareTestState={props.setCompareTestState}
+            setIsEditMode={setIsEditMode}
+            isEditMode={isEditMode}
+            isCreateMode={props.isCreateMode}
+            handleAddCompareOption={handleAddCompareOption}
+            handleRemoveCompareOption={handleRemoveCompareOption}
+            handleLinkChange={handleLinkChange}
+          />
+        );
 
       return (
         <DefaultTask
@@ -707,11 +546,45 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     }
 
     if (!props.isCreateMode && props.format) {
-      if (props.format.includes(TEST_FORMAT)) return <TestTask />;
+      if (props.format.includes(TEST_FORMAT))
+        return (
+          <UnorderedTest
+            options={currentOptions}
+            isCreateMode={props.isCreateMode}
+            isEditMode={isEditMode}
+            setIsEditMode={setIsEditMode}
+            handleOptionChange={handleOptionChange}
+            handleAddOption={handleAddOption}
+            handleRemoveOption={handleRemoveOption}
+          />
+        );
 
-      if (props.format.includes(TEST_FORMAT_WITH_INDEX)) return <TestTaskIndex />;
+      if (props.format.includes(TEST_FORMAT_WITH_INDEX))
+        return (
+          <OrderedTest
+            setIsEditMode={setIsEditMode}
+            isEditMode={isEditMode}
+            isCreateMode={props.isCreateMode}
+            indexOptions={currentIndexOptions}
+            handleIndexOptionChange={handleIndexOptionChange}
+            handleIndexAddOption={handleIndexAddOption}
+            handleIndexRemoveOption={handleIndexRemoveOption}
+          />
+        );
 
-      if (props.format.includes(COMPARE_TEST_FORMAT)) return <CompareTask />;
+      if (props.format.includes(COMPARE_TEST_FORMAT))
+        return (
+          <CompareTask
+            compareTestState={compareTestState}
+            setCompareTestState={setCompareTestState}
+            setIsEditMode={setIsEditMode}
+            isEditMode={isEditMode}
+            isCreateMode={props.isCreateMode}
+            handleAddCompareOption={handleAddCompareOption}
+            handleRemoveCompareOption={handleRemoveCompareOption}
+            handleLinkChange={handleLinkChange}
+          />
+        );
 
       return (
         <DefaultTask

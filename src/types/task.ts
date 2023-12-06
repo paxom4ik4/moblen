@@ -6,7 +6,7 @@ export interface Task {
   max_ball: number;
   format: string;
   files?: { file_name: string; url: string }[];
-  variants?: TestOption[] | TestIndexOption[];
+  variants?: null | TestOption[] | TestIndexOption[] | ConvertedCompareOption[];
 }
 
 export interface CompletedTask {
@@ -50,4 +50,10 @@ export interface TestOption {
 export interface TestIndexOption {
   text: string;
   correctIndex: string;
+}
+
+export interface ConvertedCompareOption {
+  text: string;
+  index: string;
+  connected?: string;
 }

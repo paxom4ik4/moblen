@@ -1,5 +1,5 @@
-import { TestIndexOption, TestOption } from 'types/task.ts';
-import { CompareOption } from '../../../components/task-card/task-card.tsx';
+import { ConvertedCompareOption, TestIndexOption, TestOption } from 'types/task.ts';
+import { CompareOption } from 'components/task-card/task-card.tsx';
 
 export const convertTestOptionsToCriteria = (options: TestOption[]): string => {
   const correctOptions = options
@@ -14,12 +14,6 @@ export const convertTestOptionsToOrderedCriteria = (options: TestIndexOption[]):
 
   return correctOptions.join(' ');
 };
-
-export interface ConvertedCompareOption {
-  text: string;
-  index: string;
-  connected?: string;
-}
 
 export const convertCompareOptions = (
   leftOptions: CompareOption[],

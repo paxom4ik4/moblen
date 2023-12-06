@@ -3,18 +3,11 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useEffect, useState } from '
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { TaskWithAnswer, TestIndexOption, TestOption } from 'types/task.ts';
+import { ConvertedCompareOption, TaskWithAnswer, TestIndexOption, TestOption } from 'types/task.ts';
 
 import './task-pass-card.scss';
 import { Answers } from 'pages/student/pass-test/pass-test.tsx';
-import {
-  Box,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  TextareaAutosize,
-  TextField,
-} from '@mui/material';
+import { TextareaAutosize } from '@mui/material';
 import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { createPortal } from 'react-dom';
@@ -23,7 +16,9 @@ import { TEST_FORMAT, TEST_FORMAT_WITH_INDEX } from '../../constants/testTaskFor
 import {
   convertTestOptionsToCriteria,
   convertTestOptionsToOrderedCriteria,
-} from '../../pages/tutor/create-test/utils.ts';
+} from 'pages/tutor/create-test/utils.ts';
+import { OrderedTest } from '../../pages/student/pass-test/tests/ordered-test/ordered-test.tsx';
+import { UnorderedTest } from '../../pages/student/pass-test/tests/unordered-test/unordered-test.tsx';
 
 const DEFAULT_CLASSNAME = 'task-pass-card';
 
@@ -52,7 +47,7 @@ interface TaskPassCardProps {
 
   files: { file_name: string; url: string }[];
 
-  options?: TestOption[] | TestIndexOption[];
+  options?: TestOption[] | TestIndexOption[] | ConvertedCompareOption[];
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
@@ -174,14 +169,10 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     });
   };
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const [optionsToUse, setOptionsToUse] = useState<TestOption[]>(
     options?.map((item) => ({ ...item, isCorrect: false })) ?? [],
   );
 
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
   const [indexOptionsToUse, setIndexOptionsToUse] = useState<TestIndexOption[]>(
     options?.map((item) => ({ ...item, correctIndex: '' })) ?? [],
   );
@@ -206,8 +197,6 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
 
   useEffect(() => {
     if (onAnswerChange) {
-      console.log(convertTestOptionsToCriteria(optionsToUse));
-
       onAnswerChange(id, convertTestOptionsToCriteria(optionsToUse));
     }
   }, [optionsToUse]);
@@ -225,38 +214,12 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
       const renderOptions = isViewMode ? options : optionsToUse;
 
       return (
-        <FormGroup className={`${DEFAULT_CLASSNAME}_test_content`}>
-          <Typography className={`${DEFAULT_CLASSNAME}_test_content_task`}>{text}</Typography>
-
-          {renderOptions?.map((option, index) => (
-            <Box
-              width={'100%'}
-              key={index}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mt={1}>
-              <FormControlLabel
-                label={''}
-                disabled={isViewMode}
-                control={
-                  <Checkbox
-                    style={{ color: '#6750a4' }}
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    checked={option.isCorrect}
-                    onChange={(e) => handleOptionChange(index, 'isCorrect', e.target.checked)}
-                  />
-                }
-              />
-              <TextareaAutosize
-                disabled
-                placeholder={'Введите вариант ответа'}
-                value={option.text}
-              />
-            </Box>
-          ))}
-        </FormGroup>
+        <UnorderedTest
+          options={renderOptions}
+          text={text}
+          isViewMode={isViewMode}
+          handleOptionChange={handleOptionChange}
+        />
       );
     }
 
@@ -264,39 +227,12 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
       const renderOptions = isViewMode ? options : indexOptionsToUse;
 
       return (
-        <FormGroup className={`${DEFAULT_CLASSNAME}_test_content`}>
-          <Typography className={`${DEFAULT_CLASSNAME}_test_content_task`}>{text}</Typography>
-
-          {renderOptions?.map((option, index) => (
-            <Box
-              width={'100%'}
-              key={index}
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              mt={1}>
-              <FormControlLabel
-                label={''}
-                disabled={isViewMode}
-                control={
-                  <TextField
-                    placeholder={'Введите значение'}
-                    style={{ color: '#6750a4' }}
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                    // @ts-ignore
-                    value={option.correctIndex}
-                    onChange={(e) => handleIndexOptionChange(index, 'correctIndex', e.target.value)}
-                  />
-                }
-              />
-              <TextareaAutosize
-                disabled
-                placeholder={'Введите вариант ответа'}
-                value={option.text}
-              />
-            </Box>
-          ))}
-        </FormGroup>
+        <OrderedTest
+          handleIndexOptionChange={handleIndexOptionChange}
+          options={renderOptions}
+          text={text}
+          isViewMode={isViewMode}
+        />
       );
     }
 

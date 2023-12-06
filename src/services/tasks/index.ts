@@ -1,7 +1,12 @@
 import API from '../index.ts';
 import { ShareDataType } from '../../types/share.data.type.ts';
-import { GenerateTaskPayload, Task, TestIndexOption, TestOption } from '../../types/task.ts';
-import { CompareOption } from '../../components/task-card/task-card.tsx';
+import {
+  ConvertedCompareOption,
+  GenerateTaskPayload,
+  Task,
+  TestIndexOption,
+  TestOption,
+} from '../../types/task.ts';
 
 const TASK_LIST_URL = '/tasklist';
 const TASK_URL = '/task';
@@ -12,7 +17,7 @@ export interface TaskCreatePayload {
   criteria?: string;
   format: string;
   max_ball: string;
-  variants?: TestOption[] | TestIndexOption[] | CompareOption[];
+  variants?: TestOption[] | TestIndexOption[] | ConvertedCompareOption[];
 }
 
 const tasklistAPI = {
@@ -73,7 +78,7 @@ const tasksAPI = {
       }).then((res) => res.data);
     }
   },
-  editTask: ({ taskId, data }: { taskId: string; data: Partial<Task> }) => {
+  editTask: ({ taskId, data }: { taskId: string; data?: Partial<Task> }) => {
     return API.patch(`${TASK_URL}/${taskId}/`, { ...data }).then((res) => res.data);
   },
   deleteTask: ({ taskId }: { taskId: string }) => {

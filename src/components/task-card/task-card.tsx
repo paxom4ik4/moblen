@@ -1,4 +1,4 @@
-import { Dispatch, FC, SetStateAction, useCallback, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 
 import './task-card.scss';
 
@@ -42,102 +42,14 @@ import { DefaultTask } from 'pages/tutor/create-test/tests/default/default-test.
 import { CompareTask } from 'pages/tutor/create-test/tests/compare/compare.tsx';
 import { UnorderedTest } from 'pages/tutor/create-test/tests/unordered-test/unordered-test.tsx';
 import { OrderedTest } from 'pages/tutor/create-test/tests/ordered-test/ordered-test.tsx';
+import { CreateModeTaskCardProps, TaskCardProps } from './task-card.types.ts';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
 const MAX_FILES = 5;
-const MAX_SIZE = 30 * 1024 * 1024;
+const MAX_SIZE = 31457280;
 
-export type TaskCardProps =
-  | {
-      disabled?: boolean;
-
-      taskId?: string;
-      taskListId: string;
-      index?: number;
-
-      isCreateMode: true;
-
-      newTaskText: string;
-      newTaskCriteria: string;
-      newTaskFormat: string;
-      newTaskMaxScore: number | null;
-      newTaskAssets?: File[];
-
-      setNewTaskText: Dispatch<SetStateAction<string>>;
-      setNewTaskCriteria: Dispatch<SetStateAction<string>>;
-      setNewTaskMaxScore: Dispatch<SetStateAction<number | null>>;
-      setNewTaskAssets?: Dispatch<SetStateAction<File[]>>;
-      handleFormatChange: (event: SelectChangeEvent) => void;
-
-      newTaskAssetsTotalSize: number;
-      setNewTaskAssetsTotalSize: Dispatch<SetStateAction<number>>;
-      newTaskAssetsError: null | string;
-      setNewTaskAssetsError: Dispatch<SetStateAction<null | string>>;
-
-      saveNewTaskHandler: () => void;
-
-      taskFormats?: {
-        subject: string;
-        formats: string[];
-      }[];
-
-      editModeDisabled?: boolean;
-
-      hideAssets?: boolean;
-
-      isNewTaskSaving?: boolean;
-
-      setIsNewTask: Dispatch<SetStateAction<boolean>>;
-
-      options: TestOption[];
-      indexOptions: TestIndexOption[];
-
-      setOptions: Dispatch<SetStateAction<TestOption[]>>;
-      setIndexOptions: Dispatch<SetStateAction<TestIndexOption[]>>;
-
-      compareTestState: CompareState;
-      setCompareTestState: Dispatch<SetStateAction<CompareState>>;
-    }
-  | {
-      disabled?: boolean;
-
-      isCreateMode: false;
-
-      text: string;
-      criteria: string;
-      maxScore: number | null;
-      format: string;
-      editModeDisabled?: boolean;
-
-      taskId?: string;
-      taskListId: string;
-      index?: number;
-
-      files: { file_name: string; url: string }[];
-
-      taskFormats?: {
-        subject: string;
-        formats: string[];
-      }[];
-
-      hideAssets?: boolean;
-
-      options?: TestOption[];
-      indexOptions?: TestIndexOption[];
-      compareOptions?: CompareOption[];
-
-      setOptions: Dispatch<SetStateAction<TestOption[]>>;
-      setIndexOptions: Dispatch<SetStateAction<TestIndexOption[]>>;
-    };
-
-export interface CompareOption {
-  index: number;
-  text: string;
-  connected?: number[];
-}
-
-export const TaskCard: FC<TaskCardProps> = (props) => {
+export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => {
   const queryClient = useQueryClient();
 
   // assets
@@ -378,7 +290,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
     : [];
 
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
-    const newOptions: TestOption[] = props.isCreateMode ? [...props.options] : [...currentOptions];
+    const newOptions: TestOption[] = props.isCreateMode ? [...props.options!] : [...currentOptions];
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -387,13 +299,13 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
   };
 
   const handleAddOption = () => {
-    props.isCreateMode && props.setOptions([...props.options, { text: '', isCorrect: false }]);
+    props.isCreateMode && props.setOptions([...props.options!, { text: '', isCorrect: false }]);
 
     !props.isCreateMode && setCurrentOptions([...currentOptions, { text: '', isCorrect: false }]);
   };
 
   const handleRemoveOption = (index: number) => {
-    const newOptions = props.isCreateMode ? [...props.options] : [...currentOptions];
+    const newOptions = props.isCreateMode ? [...props.options!] : [...currentOptions];
     newOptions.splice(index, 1);
     props.isCreateMode ? props.setOptions(newOptions) : setCurrentOptions(newOptions);
   };
@@ -402,7 +314,7 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   const handleIndexOptionChange = (index: number, field: string, value: string) => {
     const newOptions: TestIndexOption[] = props.isCreateMode
-      ? [...props.indexOptions]
+      ? [...props.indexOptions!]
       : [...currentIndexOptions];
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -413,24 +325,19 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
   const handleIndexAddOption = () => {
     props.isCreateMode &&
-      props.setIndexOptions([...props.indexOptions, { text: '', correctIndex: '' }]);
+      props.setIndexOptions([...props.indexOptions!, { text: '', correctIndex: '' }]);
 
     !props.isCreateMode &&
       setCurrentIndexOptions([...currentIndexOptions, { text: '', correctIndex: '' }]);
   };
 
   const handleIndexRemoveOption = (index: number) => {
-    const newOptions = props.isCreateMode ? [...props.indexOptions] : [...currentIndexOptions];
+    const newOptions = props.isCreateMode ? [...props.indexOptions!] : [...currentIndexOptions];
     newOptions.splice(index, 1);
     props.isCreateMode ? props.setIndexOptions(newOptions) : setCurrentIndexOptions(newOptions);
   };
 
   const [currentIndexOptions, setCurrentIndexOptions] = useState(props?.indexOptions ?? []);
-
-  const [compareTestState, setCompareTestState] = useState<CompareState>({
-    leftOptions: [],
-    rightOptions: [],
-  });
 
   const handleAddCompareOption = (side: 'left' | 'right') => {
     const optionsKey = side === 'left' ? 'leftOptions' : 'rightOptions';
@@ -489,6 +396,11 @@ export const TaskCard: FC<TaskCardProps> = (props) => {
 
     isCreateMode ? props.setCompareTestState(updatedState) : setCompareTestState(updatedState);
   };
+
+  const [compareTestState, setCompareTestState] = useState<CompareState>({
+    leftOptions: props.compareOptions?.filter((option) => !option.connected) ?? [],
+    rightOptions: props.compareOptions?.filter((option) => option.connected) ?? [],
+  });
 
   const getTaskFormat = () => {
     if (props.isCreateMode && props.newTaskFormat) {

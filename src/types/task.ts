@@ -52,6 +52,12 @@ export interface TestIndexOption {
   correctIndex: string;
 }
 
+export interface CompareOption {
+  index: number;
+  text: string;
+  connected?: number[];
+}
+
 export interface ConvertedCompareOption {
   text: string;
   index: string;

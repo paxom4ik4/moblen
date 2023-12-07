@@ -23,22 +23,14 @@ import { TutorRoutes } from 'constants/routes.ts';
 import { GenerateTaskPayload, Task, TestIndexOption, TestOption } from 'types/task.ts';
 import { CircularProgress, SelectChangeEvent, TextareaAutosize } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
-import {
-  COMPARE_TEST_FORMAT,
-  TEST_FORMAT,
-  TEST_FORMAT_WITH_INDEX,
-} from 'constants/testTaskFormats.ts';
 import { Notification } from 'common/notification/notification.tsx';
 import { GenerateConfiguration } from './components/generate-configuration/generate-configuration.tsx';
-import {
-  convertCompareOptions,
-  convertTestOptionsToCompareCriteria,
-  convertTestOptionsToCriteria,
-  convertTestOptionsToOrderedCriteria,
-} from './utils.ts';
-import { CompareState } from '../../../types/test.ts';
+import { CompareState } from 'types/test.ts';
+import { createFormDataTaskPayload, createTaskPayload } from './utils/create-test.utils.ts';
 
 const DEFAULT_CLASSNAME = 'app-create-test';
+
+const DEFAULT_COMPARE_TEST_STATE = { leftOptions: [], rightOptions: [] };
 
 const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = false }) => {
   const queryClient = useQueryClient();
@@ -95,37 +87,32 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
     navigate(TutorRoutes.ASSIGNMENTS);
   };
 
-  // Creating new task
   const [newTaskText, setNewTaskText] = useState<string>('');
   const [newTaskCriteria, setNewTaskCriteria] = useState<string>('');
   const [newTaskFormat, setNewTaskFormat] = useState<string>('');
-  const [newTaskMaxScore, setNewTaskMaxScore] = useState<number | null>(null);
+  const [newTaskMaxScore, setNewTaskMaxScore] = useState<number>(0);
   const [newTaskAssets, setNewTaskAssets] = useState<File[]>([]);
   const [newTaskAssetsTotalSize, setNewTaskAssetsTotalSize] = useState(0);
   const [newTaskAssetsError, setNewTaskAssetsError] = useState<null | string>(null);
 
-  // Unordered test options
   const [options, setOptions] = useState<TestOption[]>([]);
 
-  // Ordered test options
   const [indexOptions, setIndexOptions] = useState<TestIndexOption[]>([]);
 
-  // Compare Test state
-
-  const [compareTestState, setCompareTestState] = useState<CompareState>({
-    leftOptions: [],
-    rightOptions: [],
-  });
+  const [compareTestState, setCompareTestState] = useState<CompareState>(
+    DEFAULT_COMPARE_TEST_STATE,
+  );
 
   const clearNewTaskState = () => {
     setNewTaskText('');
     setNewTaskCriteria('');
-    setNewTaskMaxScore(null);
+    setNewTaskMaxScore(0);
     setNewTaskFormat('');
     setNewTaskAssets([]);
     setIsNewTaskSaving(false);
     setOptions([]);
     setIndexOptions([]);
+    setCompareTestState(DEFAULT_COMPARE_TEST_STATE);
   };
 
   const handleFormatChange = (event: SelectChangeEvent) => {
@@ -151,89 +138,34 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
 
   const saveNewTaskHandler = async () => {
     if (newTaskAssets) {
-      const data = new FormData();
-
-      data.append(
-        'format',
-        newTaskFormat.length
-          ? newTaskFormat
-          : `${taskFormats[0].subject},${taskFormats[0].formats[0]}`,
-      );
-
-      data.append('max_ball', newTaskMaxScore?.toString() ?? '0');
-      data.append('task_condition', newTaskText.length ? newTaskText : '-');
-
-      if (
-        !newTaskFormat.includes(TEST_FORMAT) &&
-        !newTaskFormat.includes(TEST_FORMAT_WITH_INDEX) &&
-        !newTaskFormat.includes(COMPARE_TEST_FORMAT)
-      ) {
-        data.append('criteria', newTaskCriteria.length ? newTaskCriteria : '-');
-      }
-
-      if (newTaskFormat.includes(TEST_FORMAT)) {
-        data.append('variants', JSON.stringify(options));
-        data.append('criteria', convertTestOptionsToCriteria(options));
-      }
-
-      if (newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
-        data.append('variants', JSON.stringify(indexOptions));
-        data.append('criteria', convertTestOptionsToOrderedCriteria(indexOptions));
-      }
-
-      if (newTaskFormat.includes(COMPARE_TEST_FORMAT)) {
-        data.append(
-          'variants',
-          JSON.stringify(
-            convertCompareOptions(compareTestState.leftOptions, compareTestState.rightOptions),
-          ),
-        );
-        data.append('criteria', convertTestOptionsToCompareCriteria(compareTestState.rightOptions));
-      }
-
-      Array.from(newTaskAssets).forEach((item) => {
-        data.append('files', item);
+      await createTaskMutation.mutate({
+        payload: createFormDataTaskPayload(
+          newTaskFormat,
+          taskFormats,
+          newTaskText,
+          newTaskMaxScore,
+          newTaskCriteria,
+          options,
+          indexOptions,
+          compareTestState,
+          newTaskAssets,
+        ),
+        isFormData: true,
       });
-
-      await createTaskMutation.mutate({ payload: data, isFormData: true });
     } else {
-      const data: TaskCreatePayload = {
-        format: newTaskFormat.length
-          ? newTaskFormat
-          : `${taskFormats[0].subject},${taskFormats[0].formats[0]}`,
-        max_ball: newTaskMaxScore?.toString() ?? '0',
-        task_condition: newTaskText.length ? newTaskText : '-',
-      };
-
-      if (
-        !newTaskFormat.includes(TEST_FORMAT) &&
-        !newTaskFormat.includes(TEST_FORMAT_WITH_INDEX) &&
-        !newTaskFormat.includes(COMPARE_TEST_FORMAT)
-      ) {
-        data['criteria'] = newTaskCriteria.length ? newTaskCriteria : '-';
-      }
-
-      if (newTaskFormat.includes(TEST_FORMAT)) {
-        data['variants'] = options;
-        data['criteria'] = convertTestOptionsToCriteria(options);
-      }
-
-      if (newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
-        data['variants'] = indexOptions;
-        data['criteria'] = convertTestOptionsToOrderedCriteria(indexOptions);
-      }
-
-      if (newTaskFormat.includes(COMPARE_TEST_FORMAT)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        data['variants'] = convertCompareOptions(
-          compareTestState.leftOptions,
-          compareTestState.rightOptions,
-        );
-        data['criteria'] = convertTestOptionsToCompareCriteria(compareTestState.rightOptions);
-      }
-
-      await createTaskMutation.mutate({ payload: data, isFormData: false });
+      await createTaskMutation.mutate({
+        payload: createTaskPayload(
+          newTaskFormat,
+          taskFormats,
+          newTaskText,
+          newTaskMaxScore,
+          newTaskCriteria,
+          options,
+          indexOptions,
+          compareTestState,
+        ),
+        isFormData: false,
+      });
     }
 
     setIsNewTaskSaving(true);
@@ -294,8 +226,6 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
 
     setIsNameEdit(false);
   };
-
-  // UI SPLIT
 
   const createTestHeaderTitle = (
     <div className={`${DEFAULT_CLASSNAME}_text-container_name-text`}>
@@ -431,11 +361,9 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 options={task?.variants}
-                setOptions={setOptions}
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 indexOptions={task?.variants}
-                setIndexOptions={setIndexOptions}
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 compareOptions={task?.variants}
@@ -467,7 +395,6 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
               setNewTaskAssetsError={setNewTaskAssetsError}
               isNewTaskSaving={isNewTaskSaving}
               setIsNewTask={setIsNewTask}
-              // Test options
               options={options}
               setOptions={setOptions}
               indexOptions={indexOptions}

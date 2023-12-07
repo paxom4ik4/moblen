@@ -1,5 +1,4 @@
-import { TaskWithAnswer } from './task.ts';
-import { CompareOption } from '../components/task-card/task-card.tsx';
+import { CompareOption, TaskWithAnswer } from './task.ts';
 
 export interface Test {
   id: string;

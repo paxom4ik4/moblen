@@ -1,5 +1,4 @@
-import { ConvertedCompareOption, TestIndexOption, TestOption } from 'types/task.ts';
-import { CompareOption } from 'components/task-card/task-card.tsx';
+import { CompareOption, ConvertedCompareOption, TestIndexOption, TestOption } from 'types/task.ts';
 
 export const convertTestOptionsToCriteria = (options: TestOption[]): string => {
   const correctOptions = options

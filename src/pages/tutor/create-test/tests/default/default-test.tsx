@@ -34,7 +34,7 @@ export const DefaultTask: FC<DefaultTestProps> = (props) => {
 
   return (
     <div className={`${DEFAULT_CLASSNAME}_criteria`}>
-      <div className={`${DEFAULT_CLASSNAME}_criteria-text`}>
+      <div className={`${DEFAULT_CLASSNAME}_criteria-text`} style={{ padding: '16px 0' }}>
         <div className={`${DEFAULT_CLASSNAME}_criteria-text_title`}>Критерии</div>
         <div className={`${DEFAULT_CLASSNAME}_task-container_content`}>
           {isCreateMode && (

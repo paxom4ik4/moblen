@@ -36,7 +36,7 @@ export const OrderedTest: FC<OrderedTestProps> = (props) => {
     handleIndexAddOption = () => {},
   } = props;
 
-  const formItemDisabled = !isEditMode || !isCreateMode;
+  const formItemDisabled = !isEditMode && !isCreateMode;
 
   return (
     <div className={`${DEFAULT_CLASSNAME}_test_content`} onClick={() => setIsEditMode(true)}>

@@ -30,7 +30,7 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
     handleLinkChange = () => {},
   } = props;
 
-  const formItemDisabled = !isCreateMode || !isEditMode;
+  const formItemDisabled = !isCreateMode && !isEditMode;
 
   return (
     <div
@@ -40,46 +40,48 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
       <FormGroup onClick={() => !isCreateMode && setIsEditMode(true)}>
         <Box display="flex" justifyContent="space-between" gap={2}>
           <div style={{ width: '50%' }}>
-            {isCreateMode &&
-              compareTestState.leftOptions.map((option, index) => (
-                <Box
-                  className={`${DEFAULT_CLASSNAME}_compareItem`}
-                  key={index}
-                  display="flex"
-                  alignItems="center"
-                  mt={1}>
-                  <span
-                    style={{
-                      marginRight: '12px',
-                      backgroundColor: '#6750a4',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      width: '28px',
-                      height: '24px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    {index + 1}
-                  </span>
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    value={option.text}
-                    onChange={(e) => {
-                      const newLeftOptions = [...compareTestState.leftOptions];
-                      newLeftOptions[index].text = e.target.value;
-                      setCompareTestState({
-                        ...compareTestState,
-                        leftOptions: newLeftOptions,
-                      });
-                    }}
-                  />
-                  <Button onClick={() => handleRemoveCompareOption(index, 'left')}>
-                    <RemoveIcon />
-                  </Button>
-                </Box>
-              ))}
+            {compareTestState?.leftOptions?.map((option, index) => (
+              <Box
+                className={`${DEFAULT_CLASSNAME}_compareItem`}
+                key={index}
+                display="flex"
+                alignItems="center"
+                mt={1}>
+                <span
+                  style={{
+                    marginRight: '12px',
+                    backgroundColor: '#6750a4',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    minWidth: '20px',
+                    minHeight: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  {index + 1}
+                </span>
+                <TextField
+                  disabled={formItemDisabled}
+                  variant="outlined"
+                  fullWidth
+                  value={option.text}
+                  onChange={(e) => {
+                    const newLeftOptions = [...compareTestState.leftOptions];
+                    newLeftOptions[index].text = e.target.value;
+                    setCompareTestState({
+                      ...compareTestState,
+                      leftOptions: newLeftOptions,
+                    });
+                  }}
+                />
+                <Button
+                  disabled={formItemDisabled}
+                  onClick={() => handleRemoveCompareOption(index, 'left')}>
+                  <RemoveIcon />
+                </Button>
+              </Box>
+            ))}
             {!formItemDisabled && (
               <Button style={{ color: '#6750a4' }} onClick={() => handleAddCompareOption('left')}>
                 + Добавить опцию
@@ -87,62 +89,66 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
             )}
           </div>
           <div style={{ width: '50%' }}>
-            {isCreateMode &&
-              compareTestState.rightOptions.map((option, index) => (
-                <Box
-                  className={`${DEFAULT_CLASSNAME}_compareItem`}
-                  key={index}
-                  display="flex"
-                  alignItems="center"
-                  mt={1}>
-                  <span
-                    style={{
-                      marginRight: '12px',
-                      backgroundColor: '#6750a4',
-                      color: '#fff',
-                      borderRadius: '50%',
-                      width: '32px',
-                      height: '24px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                    {`${String.fromCharCode(65 + index)}`}
-                  </span>
-                  <Select
-                    variant="outlined"
-                    style={{ width: '120px', marginRight: '12px' }}
-                    multiple
-                    value={option.connected}
-                    onChange={(e) =>
-                      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                      // @ts-ignore
-                      handleLinkChange(index, e.target.value, 'right')
-                    }>
-                    {compareTestState.leftOptions.map((leftOption, leftIndex) => (
-                      <MenuItem key={leftOption.index} value={leftOption.index}>
-                        {leftIndex + 1}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    value={option.text}
-                    onChange={(e) => {
-                      const newRightOptions = [...compareTestState.rightOptions];
-                      newRightOptions[index].text = e.target.value;
-                      setCompareTestState({
-                        ...compareTestState,
-                        rightOptions: newRightOptions,
-                      });
-                    }}
-                  />
-                  <Button onClick={() => handleRemoveCompareOption(index, 'right')}>
-                    <RemoveIcon />
-                  </Button>
-                </Box>
-              ))}
+            {compareTestState?.rightOptions?.map((option, index) => (
+              <Box
+                className={`${DEFAULT_CLASSNAME}_compareItem`}
+                key={index}
+                display="flex"
+                alignItems="center"
+                mt={1}>
+                <span
+                  style={{
+                    marginRight: '12px',
+                    backgroundColor: '#6750a4',
+                    color: '#fff',
+                    borderRadius: '50%',
+                    minWidth: '20px',
+                    minHeight: '20px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                  {`${String.fromCharCode(65 + index)}`}
+                </span>
+                <Select
+                  MenuProps={{ disablePortal: true }}
+                  disabled={formItemDisabled}
+                  variant="outlined"
+                  style={{ width: '120px', marginRight: '12px' }}
+                  multiple
+                  value={option.connected}
+                  onChange={(e) =>
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-ignore
+                    handleLinkChange(index, e.target.value, 'right')
+                  }>
+                  {compareTestState.leftOptions.map((leftOption, leftIndex) => (
+                    <MenuItem key={leftOption.index} value={leftOption.index}>
+                      {leftIndex + 1}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <TextField
+                  disabled={formItemDisabled}
+                  variant="outlined"
+                  fullWidth
+                  value={option.text}
+                  onChange={(e) => {
+                    const newRightOptions = [...compareTestState.rightOptions];
+                    newRightOptions[index].text = e.target.value;
+                    setCompareTestState({
+                      ...compareTestState,
+                      rightOptions: newRightOptions,
+                    });
+                  }}
+                />
+                <Button
+                  disabled={formItemDisabled}
+                  onClick={() => handleRemoveCompareOption(index, 'right')}>
+                  <RemoveIcon />
+                </Button>
+              </Box>
+            ))}
             {!formItemDisabled && (
               <Button style={{ color: '#6750a4' }} onClick={() => handleAddCompareOption('right')}>
                 + Добавить опцию

@@ -1,4 +1,4 @@
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 
 import './task-card.scss';
 
@@ -18,7 +18,6 @@ import {
   ListSubheader,
   MenuItem,
   Select,
-  SelectChangeEvent,
   TextareaAutosize,
   TextField,
   Tooltip,
@@ -111,9 +110,7 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
   const [editTaskMaxBall, setEditTaskMaxBall] = useState(
     !props.isCreateMode && props.maxScore ? props.maxScore : 0,
   );
-  const [editTaskFormat, setEditTaskFormat] = useState(
-    !props.isCreateMode && props.format ? props.format : '',
-  );
+  const [editTaskFormat] = useState(!props.isCreateMode && props.format ? props.format : '');
 
   const [isEditMode, setIsEditMode] = useState(false);
 
@@ -167,10 +164,6 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
         variants,
       });
     }
-  };
-
-  const handleFormatChange = (event: SelectChangeEvent) => {
-    setEditTaskFormat(event.target.value as string);
   };
 
   const handleAssetDelete = (index: number) => {
@@ -345,15 +338,18 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
       ? props.compareTestState[optionsKey]
       : compareTestState[optionsKey];
 
-    const newIndex = currentOptions.length + 1;
+    const newIndex =
+      side === 'left'
+        ? currentOptions.length + 1
+        : `${String.fromCharCode(64 + currentOptions.length + 1)}`;
     const newOptions = [...currentOptions, { index: newIndex, text: '', connected: [] }];
 
     const updatedState = props.isCreateMode
       ? { ...props.compareTestState, [optionsKey]: newOptions }
       : { ...compareTestState, [optionsKey]: newOptions };
 
-    side === 'left'
-      ? props.isCreateMode && props.setCompareTestState(updatedState)
+    props.isCreateMode
+      ? props.setCompareTestState(updatedState)
       : setCompareTestState(updatedState);
   };
 
@@ -397,16 +393,23 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
     isCreateMode ? props.setCompareTestState(updatedState) : setCompareTestState(updatedState);
   };
 
-  const [compareTestState, setCompareTestState] = useState<CompareState>({
-    leftOptions: props.compareOptions?.filter((option) => !option.connected) ?? [],
-    rightOptions: props.compareOptions?.filter((option) => option.connected) ?? [],
-  });
+  const compareOptions = useMemo(() => {
+    return {
+      leftOptions: props.compareOptions?.filter((option) => !option.connected) ?? [],
+      rightOptions:
+        props.compareOptions
+          ?.filter((option) => option.connected)
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          .map((item) => ({ ...item, connected: item.connected.split(' ') })) ?? [],
+    };
+  }, [props.compareOptions]);
+
+  const [compareTestState, setCompareTestState] = useState<CompareState>(compareOptions);
 
   const getTaskFormat = () => {
     if (props.isCreateMode && props.newTaskFormat) {
-      const format = props.newTaskFormat;
-
-      if (format.includes(TEST_FORMAT))
+      if (props.newTaskFormat.includes(TEST_FORMAT)) {
         return (
           <UnorderedTest
             options={props.options}
@@ -418,8 +421,9 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
             handleRemoveOption={handleRemoveOption}
           />
         );
+      }
 
-      if (format.includes(TEST_FORMAT_WITH_INDEX))
+      if (props.newTaskFormat.includes(TEST_FORMAT_WITH_INDEX)) {
         return (
           <OrderedTest
             setIsEditMode={setIsEditMode}
@@ -431,8 +435,9 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
             handleIndexRemoveOption={handleIndexRemoveOption}
           />
         );
+      }
 
-      if (format.includes(COMPARE_TEST_FORMAT))
+      if (props.newTaskFormat.includes(COMPARE_TEST_FORMAT)) {
         return (
           <CompareTask
             compareTestState={props.compareTestState}
@@ -445,6 +450,7 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
             handleLinkChange={handleLinkChange}
           />
         );
+      }
 
       return (
         <DefaultTask
@@ -458,7 +464,7 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
     }
 
     if (!props.isCreateMode && props.format) {
-      if (props.format.includes(TEST_FORMAT))
+      if (props.format.includes(TEST_FORMAT)) {
         return (
           <UnorderedTest
             options={currentOptions}
@@ -470,8 +476,9 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
             handleRemoveOption={handleRemoveOption}
           />
         );
+      }
 
-      if (props.format.includes(TEST_FORMAT_WITH_INDEX))
+      if (props.format.includes(TEST_FORMAT_WITH_INDEX)) {
         return (
           <OrderedTest
             setIsEditMode={setIsEditMode}
@@ -483,8 +490,9 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
             handleIndexRemoveOption={handleIndexRemoveOption}
           />
         );
+      }
 
-      if (props.format.includes(COMPARE_TEST_FORMAT))
+      if (props.format.includes(COMPARE_TEST_FORMAT)) {
         return (
           <CompareTask
             compareTestState={compareTestState}
@@ -497,6 +505,7 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
             handleLinkChange={handleLinkChange}
           />
         );
+      }
 
       return (
         <DefaultTask
@@ -622,17 +631,7 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
                     {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
                   </Select>
                 )}
-                {!props.isCreateMode && isEditMode && (
-                  <Select
-                    fullWidth
-                    value={editTaskFormat || ''}
-                    onChange={handleFormatChange}
-                    defaultValue=""
-                    MenuProps={{ PaperProps: { sx: { maxHeight: 320 } }, disablePortal: true }}>
-                    {props.taskFormats?.map((taskFormat) => renderFormatGroup(taskFormat))}
-                  </Select>
-                )}
-                {!isEditMode && !props.isCreateMode && (
+                {!props.isCreateMode && (
                   <Typography onClick={() => setIsEditMode(true)}>
                     {props.format.replace(',', ': ')}
                   </Typography>

@@ -3,7 +3,7 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useEffect, useState } from '
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { ConvertedCompareOption, TaskWithAnswer, TestIndexOption, TestOption } from 'types/task.ts';
+import { CompareOption, TaskWithAnswer, TestIndexOption, TestOption } from 'types/task.ts';
 
 import './task-pass-card.scss';
 import { Answers } from 'pages/student/pass-test/pass-test.tsx';
@@ -12,13 +12,20 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import { createPortal } from 'react-dom';
 import { LibraryMusic, VideoLibrary } from '@mui/icons-material';
-import { TEST_FORMAT, TEST_FORMAT_WITH_INDEX } from '../../constants/testTaskFormats.ts';
 import {
+  COMPARE_TEST_FORMAT,
+  TEST_FORMAT,
+  TEST_FORMAT_WITH_INDEX,
+} from '../../constants/testTaskFormats.ts';
+import {
+  convertTestOptionsToCompareCriteria,
   convertTestOptionsToCriteria,
   convertTestOptionsToOrderedCriteria,
 } from 'pages/tutor/create-test/utils.ts';
 import { OrderedTest } from '../../pages/student/pass-test/tests/ordered-test/ordered-test.tsx';
 import { UnorderedTest } from '../../pages/student/pass-test/tests/unordered-test/unordered-test.tsx';
+import { CompareState } from '../../types/test.ts';
+import { CompareTest } from '../../pages/student/pass-test/tests/compare-test/compare-test.tsx';
 
 const DEFAULT_CLASSNAME = 'task-pass-card';
 
@@ -47,7 +54,7 @@ interface TaskPassCardProps {
 
   files: { file_name: string; url: string }[];
 
-  options?: TestOption[] | TestIndexOption[] | ConvertedCompareOption[];
+  options?: TestOption[] | TestIndexOption[] | CompareOption[];
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
@@ -71,7 +78,10 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     options = [],
   } = props;
 
-  const isTestTask = format.includes(TEST_FORMAT) || format.includes(TEST_FORMAT_WITH_INDEX);
+  const isTestTask =
+    format.includes(TEST_FORMAT) ||
+    format.includes(TEST_FORMAT_WITH_INDEX) ||
+    format.includes(COMPARE_TEST_FORMAT);
   const isViewMode = mode === VIEW_MODE;
 
   const [isCriteriaOpened, setIsCriteriaOpened] = useState(false);
@@ -177,6 +187,37 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     options?.map((item) => ({ ...item, correctIndex: '' })) ?? [],
   );
 
+  const [compareOptions, setCompareOptions] = useState<CompareState>({
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    leftOptions: options?.filter((option) => !option.connected) ?? [],
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    rightOptions: options
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      ?.filter((option) => option.connected)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      .map((item) => ({ ...item, connected: [] })),
+  });
+
+  const handleLinkChange = (index: number, linkedTo: number[], side: 'left' | 'right') => {
+    const optionsKey = side === 'left' ? 'leftOptions' : 'rightOptions';
+
+    const currentOptions = compareOptions[optionsKey];
+    const newOptions = [...currentOptions];
+
+    newOptions[index].connected = linkedTo;
+
+    const updatedState = {
+      ...compareOptions,
+      [optionsKey]: newOptions,
+    };
+
+    setCompareOptions(updatedState);
+  };
+
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
     const newOptions = [...optionsToUse];
 
@@ -207,6 +248,12 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     }
   }, [indexOptionsToUse]);
 
+  useEffect(() => {
+    if (onAnswerChange) {
+      onAnswerChange(id, convertTestOptionsToCompareCriteria(compareOptions.rightOptions));
+    }
+  }, [compareOptions]);
+
   useEffect(() => {}, [indexOptionsToUse]);
 
   const getTaskContent = () => {
@@ -229,6 +276,33 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
       return (
         <OrderedTest
           handleIndexOptionChange={handleIndexOptionChange}
+          options={renderOptions}
+          text={text}
+          isViewMode={isViewMode}
+        />
+      );
+    }
+
+    if (format.includes(COMPARE_TEST_FORMAT)) {
+      const viewCompareOptions = {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        leftOptions: options?.filter((option) => !option.connected) ?? [],
+        rightOptions:
+          options
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            ?.filter((option) => option.connected)
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            .map((item) => ({ ...item, connected: item.connected.split(' ') })) ?? [],
+      };
+
+      const renderOptions = isViewMode ? viewCompareOptions : compareOptions;
+
+      return (
+        <CompareTest
+          handleLinkChange={handleLinkChange}
           options={renderOptions}
           text={text}
           isViewMode={isViewMode}

@@ -25,7 +25,7 @@ export const convertCompareOptions = (
 
   const convertedRightOptions = rightOptions.map((item) => ({
     text: item.text,
-    index: `${String.fromCharCode(64 + item.index)}`,
+    index: `${item.index}`,
     connected: item?.connected?.map((item) => `${item}`).join(' ') ?? '',
   }));
 
@@ -35,7 +35,7 @@ export const convertCompareOptions = (
 export const convertTestOptionsToCompareCriteria = (options: CompareOption[]): string => {
   const convertedOption = options.map((item) => ({
     text: item.text,
-    index: `${String.fromCharCode(64 + item.index)}`,
+    index: `${item.index}`,
     connected: item?.connected?.map((item) => `${item}`).join(' ') ?? '',
   }));
 

@@ -379,6 +379,8 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
       : compareTestState[optionsKey];
     const newOptions = [...currentOptions];
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     newOptions[index].connected = linkedTo;
 
     const updatedState = {

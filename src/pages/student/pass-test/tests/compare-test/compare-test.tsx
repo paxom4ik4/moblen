@@ -1,12 +1,12 @@
-import { Box, FormGroup, MenuItem, Select, TextField } from '@mui/material';
+import { Box, FormGroup, MenuItem, Select } from '@mui/material';
 import { FC } from 'react';
-import { ConvertedCompareOption, TestIndexOption, TestOption } from 'types/task.ts';
 import { Typography } from 'common/typography/typography.tsx';
+import { CompareState } from 'types/test.ts';
 
-const DEFAULT_CLASSNAME = 'task-card';
+const DEFAULT_CLASSNAME = 'task-pass-card';
 
 type CompareTaskProps = {
-  options?: TestOption[] | TestIndexOption[] | ConvertedCompareOption[];
+  options?: CompareState;
   text?: string;
   isViewMode?: boolean;
 
@@ -49,7 +49,7 @@ export const CompareTest: FC<CompareTaskProps> = (props) => {
                   }}>
                   {index + 1}
                 </span>
-                <TextField disabled fullWidth value={option.text} />
+                <Typography>{option.text}</Typography>
               </Box>
             ))}
           </div>
@@ -93,7 +93,7 @@ export const CompareTest: FC<CompareTaskProps> = (props) => {
                     </MenuItem>
                   ))}
                 </Select>
-                <TextField disabled fullWidth value={option.text} />
+                <Typography>{option.text}</Typography>
               </Box>
             ))}
           </div>

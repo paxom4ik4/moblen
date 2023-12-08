@@ -3,7 +3,7 @@ import { FC, memo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Typography } from 'common/typography/typography.tsx';
 import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
-import { Task } from 'types/task.ts';
+import { ConvertedCompareOption, Task, TestIndexOption, TestOption } from 'types/task.ts';
 import CheckIcon from 'assets/icons/check-icon.svg';
 
 import { StudentRoutes } from 'constants/routes.ts';
@@ -105,7 +105,9 @@ const PassTest: FC = memo(() => {
               index={index}
               showCriteria={false}
               files={task?.files ?? []}
-              options={task?.variants?.length ? task?.variants : []}
+              compareOptions={task.variants as ConvertedCompareOption[]}
+              unorderedTestOptions={task.variants as TestOption[]}
+              orderedTestOptions={task.variants as TestIndexOption[]}
             />
           ))}
           <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>

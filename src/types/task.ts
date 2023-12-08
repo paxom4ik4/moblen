@@ -45,17 +45,24 @@ export interface GenerateTaskPayload {
 export interface TestOption {
   text: string;
   isCorrect: boolean;
+  [key: string]: boolean | string;
 }
 
 export interface TestIndexOption {
   text: string;
   correctIndex: string;
+  [key: string]: boolean | string;
 }
 
 export interface CompareOption {
-  index: number;
+  index: string;
   text: string;
   connected?: number[];
+}
+
+export interface CompareLeftOption {
+  index: string;
+  text: string;
 }
 
 export interface ConvertedCompareOption {

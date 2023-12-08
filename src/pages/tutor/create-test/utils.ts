@@ -33,7 +33,7 @@ export const convertCompareOptions = (
 };
 
 export const convertTestOptionsToCompareCriteria = (options: CompareOption[]): string => {
-  const convertedOption = options.map((item) => ({
+  const convertedOption = options?.map((item) => ({
     text: item.text,
     index: `${item.index}`,
     connected: item?.connected?.map((item) => `${item}`).join(' ') ?? '',

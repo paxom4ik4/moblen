@@ -3,7 +3,7 @@ import { ChangeEvent, Dispatch, FC, SetStateAction, useEffect, useState } from '
 import ArrowDown from 'assets/icons/arrow-down.svg';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { CompareOption, TaskWithAnswer, TestIndexOption, TestOption } from 'types/task.ts';
+import { ConvertedCompareOption, TaskWithAnswer, TestIndexOption, TestOption } from 'types/task.ts';
 
 import './task-pass-card.scss';
 import { Answers } from 'pages/student/pass-test/pass-test.tsx';
@@ -54,7 +54,9 @@ interface TaskPassCardProps {
 
   files: { file_name: string; url: string }[];
 
-  options?: TestOption[] | TestIndexOption[] | CompareOption[];
+  compareOptions?: ConvertedCompareOption[];
+  unorderedTestOptions?: TestOption[];
+  orderedTestOptions?: TestIndexOption[];
 }
 
 export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
@@ -75,7 +77,9 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     format = 'Текстовый',
     files = [],
 
-    options = [],
+    unorderedTestOptions = [],
+    orderedTestOptions = [],
+    compareOptions = [],
   } = props;
 
   const isTestTask =
@@ -180,49 +184,46 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
   };
 
   const [optionsToUse, setOptionsToUse] = useState<TestOption[]>(
-    options?.map((item) => ({ ...item, isCorrect: false })) ?? [],
+    unorderedTestOptions?.map((item) => ({ ...item, isCorrect: false })) ?? [],
   );
 
   const [indexOptionsToUse, setIndexOptionsToUse] = useState<TestIndexOption[]>(
-    options?.map((item) => ({ ...item, correctIndex: '' })) ?? [],
+    orderedTestOptions?.map((item) => ({ ...item, correctIndex: '' })) ?? [],
   );
 
-  const [compareOptions, setCompareOptions] = useState<CompareState>({
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    leftOptions: options?.filter((option) => !option.connected) ?? [],
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    rightOptions: options
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
+  const [compareOptionsToUse, setCompareOptionsToUse] = useState<CompareState>({
+    leftOptions: compareOptions?.filter((option) => !option.connected) ?? [],
+
+    rightOptions: compareOptions
       ?.filter((option) => option.connected)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       .map((item) => ({ ...item, connected: [] })),
   });
 
   const handleLinkChange = (index: number, linkedTo: number[], side: 'left' | 'right') => {
     const optionsKey = side === 'left' ? 'leftOptions' : 'rightOptions';
 
-    const currentOptions = compareOptions[optionsKey];
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    const currentOptions = compareOptionsToUse[optionsKey];
     const newOptions = [...currentOptions];
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     newOptions[index].connected = linkedTo;
 
     const updatedState = {
-      ...compareOptions,
+      ...compareOptionsToUse,
       [optionsKey]: newOptions,
     };
 
-    setCompareOptions(updatedState);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    setCompareOptionsToUse(updatedState);
   };
 
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
     const newOptions = [...optionsToUse];
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     newOptions[index][field] = value;
     setOptionsToUse(newOptions);
   };
@@ -249,16 +250,16 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
   }, [indexOptionsToUse]);
 
   useEffect(() => {
-    if (onAnswerChange) {
-      onAnswerChange(id, convertTestOptionsToCompareCriteria(compareOptions.rightOptions));
+    if (onAnswerChange && compareOptionsToUse?.rightOptions?.length) {
+      onAnswerChange(id, convertTestOptionsToCompareCriteria(compareOptionsToUse?.rightOptions));
     }
-  }, [compareOptions]);
+  }, [compareOptionsToUse]);
 
   useEffect(() => {}, [indexOptionsToUse]);
 
   const getTaskContent = () => {
     if (format.includes(TEST_FORMAT)) {
-      const renderOptions = isViewMode ? options : optionsToUse;
+      const renderOptions = isViewMode ? unorderedTestOptions : optionsToUse;
 
       return (
         <UnorderedTest
@@ -271,7 +272,7 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     }
 
     if (format.includes(TEST_FORMAT_WITH_INDEX)) {
-      const renderOptions = isViewMode ? options : indexOptionsToUse;
+      const renderOptions = isViewMode ? orderedTestOptions : indexOptionsToUse;
 
       return (
         <OrderedTest
@@ -285,25 +286,19 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
 
     if (format.includes(COMPARE_TEST_FORMAT)) {
       const viewCompareOptions = {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        leftOptions: options?.filter((option) => !option.connected) ?? [],
+        leftOptions: compareOptions?.filter((option) => !option.connected) ?? [],
         rightOptions:
-          options
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
+          compareOptions
             ?.filter((option) => option.connected)
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            .map((item) => ({ ...item, connected: item.connected.split(' ') })) ?? [],
+            .map((item) => ({ ...item, connected: item.connected!.split(' ') })) ?? [],
       };
 
-      const renderOptions = isViewMode ? viewCompareOptions : compareOptions;
+      const renderOptions = isViewMode ? viewCompareOptions : compareOptionsToUse;
 
       return (
         <CompareTest
           handleLinkChange={handleLinkChange}
-          options={renderOptions}
+          options={renderOptions as CompareState}
           text={text}
           isViewMode={isViewMode}
         />

@@ -20,7 +20,13 @@ import {
   TaskCreatePayload,
 } from 'services/tasks';
 import { TutorRoutes } from 'constants/routes.ts';
-import { GenerateTaskPayload, Task, TestIndexOption, TestOption } from 'types/task.ts';
+import {
+  ConvertedCompareOption,
+  GenerateTaskPayload,
+  Task,
+  TestIndexOption,
+  TestOption,
+} from 'types/task.ts';
 import { CircularProgress, SelectChangeEvent, TextareaAutosize } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { Notification } from 'common/notification/notification.tsx';
@@ -358,15 +364,9 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
                 index={index + 1}
                 files={task?.files ?? []}
                 editModeDisabled={isEditModeDisabled}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                options={task?.variants}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                indexOptions={task?.variants}
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                compareOptions={task?.variants}
+                options={task?.variants as TestOption[]}
+                indexOptions={task?.variants as TestIndexOption[]}
+                compareOptions={task?.variants as ConvertedCompareOption[]}
               />
             ))}
 

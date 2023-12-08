@@ -1,7 +1,7 @@
 import { ChangeEvent, FC, memo, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
-import { CompletedTask } from 'types/task.ts';
+import { CompletedTask, ConvertedCompareOption, TestIndexOption, TestOption } from 'types/task.ts';
 
 import { Typography } from 'common/typography/typography.tsx';
 import { TaskPassCard } from 'components/task-pass-card/task-pass-card.tsx';
@@ -185,7 +185,9 @@ const TestResult: FC = memo(() => {
                   showCriteria={currentTaskList?.seeCriteria || isTutorMode}
                   showAnswers={currentTaskList?.seeAnswers || isTutorMode}
                   files={task.task?.files ?? []}
-                  options={task.task.variants}
+                  compareOptions={task.task.variants as ConvertedCompareOption[]}
+                  unorderedTestOptions={task.task.variants as TestOption[]}
+                  orderedTestOptions={task.task.variants as TestIndexOption[]}
                 />
               </div>
               {!!task.response.length && (

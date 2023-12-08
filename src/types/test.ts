@@ -1,4 +1,4 @@
-import { CompareOption, TaskWithAnswer } from './task.ts';
+import { CompareLeftOption, CompareOption, TaskWithAnswer } from './task.ts';
 
 export interface Test {
   id: string;
@@ -10,6 +10,6 @@ export interface Test {
 }
 
 export interface CompareState {
-  leftOptions: CompareOption[];
+  leftOptions: CompareLeftOption[];
   rightOptions: CompareOption[];
 }

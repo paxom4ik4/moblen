@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction } from 'react';
 import { SelectChangeEvent } from '@mui/material';
-import { CompareOption, TestIndexOption, TestOption } from 'types/task.ts';
+import { CompareOption, ConvertedCompareOption, TestIndexOption, TestOption } from 'types/task.ts';
 import { CompareState } from 'types/test.ts';
 
 export type CreateModeTaskCardProps = {
@@ -81,5 +81,5 @@ export type TaskCardProps = {
 
   options?: TestOption[];
   indexOptions?: TestIndexOption[];
-  compareOptions?: CompareOption[];
+  compareOptions?: ConvertedCompareOption[];
 };

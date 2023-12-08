@@ -10,7 +10,7 @@ import TextSnippetIcon from '@mui/icons-material/TextSnippet';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 
 import { Typography } from 'common/typography/typography.tsx';
-import { Task, TestIndexOption, TestOption } from 'types/task.ts';
+import { ConvertedCompareOption, Task, TestIndexOption, TestOption } from 'types/task.ts';
 import { useMutation, useQueryClient } from 'react-query';
 import { addFilesToTask, deleteFile, deleteTask, editTask } from 'services/tasks';
 import {
@@ -285,8 +285,6 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
   const handleOptionChange = (index: number, field: string, value: boolean | string) => {
     const newOptions: TestOption[] = props.isCreateMode ? [...props.options!] : [...currentOptions];
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     newOptions[index][field] = value;
     props.isCreateMode ? props.setOptions(newOptions) : setCurrentOptions(newOptions);
   };
@@ -310,8 +308,6 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
       ? [...props.indexOptions!]
       : [...currentIndexOptions];
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     newOptions[index][field] = value;
     props.isCreateMode ? props.setIndexOptions(newOptions) : setCurrentIndexOptions(newOptions);
   };
@@ -393,15 +389,17 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
     isCreateMode ? props.setCompareTestState(updatedState) : setCompareTestState(updatedState);
   };
 
-  const compareOptions = useMemo(() => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  const compareOptions: CompareState = useMemo(() => {
+    const options = props.compareOptions as ConvertedCompareOption[];
+
     return {
-      leftOptions: props.compareOptions?.filter((option) => !option.connected) ?? [],
+      leftOptions: options?.filter((option) => !option.connected) ?? [],
       rightOptions:
-        props.compareOptions
+        options
           ?.filter((option) => option.connected)
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          .map((item) => ({ ...item, connected: item.connected.split(' ') })) ?? [],
+          .map((item) => ({ ...item, connected: item.connected!.split(' ') })) ?? [],
     };
   }, [props.compareOptions]);
 

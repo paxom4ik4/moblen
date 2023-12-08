@@ -5,6 +5,10 @@
   position: relative;
   width: 100%;
 
+  &_compareItem {
+    min-height: 30px;
+  }
+
   textarea {
     resize: none !important;
     background: transparent;

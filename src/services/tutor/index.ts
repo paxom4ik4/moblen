@@ -6,7 +6,7 @@ const TUTOR_API_URL = '/tutor';
 
 const tutorAPI = {
   getTutorInfo: (tutorId: string) => {
-    return API.get(`${TUTOR_API_URL}/${tutorId}/`);
+    return localStorage.getItem('accessToken') ? API.get(`${TUTOR_API_URL}/${tutorId}/`) : null;
   },
   getTutorGroups: (tutorId: string): Promise<Group[]> => {
     return API.get(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`).then((res) => res.data);

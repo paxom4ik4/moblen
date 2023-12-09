@@ -120,10 +120,6 @@ export const LoginPage: FC = () => {
     },
   });
 
-  // const handleVKLogin = (event: MouseEvent<HTMLButtonElement>) => {
-  //   event.preventDefault();
-  // };
-
   return (
     <div className={DEFAULT_CLASSNAME}>
       <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={form.handleSubmit}>
@@ -162,13 +158,6 @@ export const LoginPage: FC = () => {
                     Зарегистрироваться
                   </span>
                 </Typography>
-
-                {/*<Typography*/}
-                {/*  onClick={() => setMode(LoginModes.passwordReset)}*/}
-                {/*  color={'purple'}*/}
-                {/*  className={`${DEFAULT_CLASSNAME}_footer_mode`}>*/}
-                {/*  Восстановить пароль*/}
-                {/*</Typography>*/}
               </>
             )}
           </div>

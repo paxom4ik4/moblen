@@ -17,6 +17,7 @@ import { GROUP_REF_LINK } from 'constants/api.ts';
 import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { CircularProgress } from '@mui/material';
+import { AxiosError } from 'axios';
 
 const DEFAULT_CLASSNAME = 'registration';
 
@@ -76,6 +77,22 @@ export const RegistrationPage: FC = () => {
       onSuccess: async () => {
         await loginAfterRegister(registerFrom.values, dispatch);
         registerFrom.resetForm();
+      },
+      onError: (error: AxiosError) => {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if ('USER_WITH_THIS_LOGIN_ALREADY_EXISTS' === error?.response?.data?.status) {
+          registerFrom.resetForm({
+            values: {
+              login: '',
+              password: '',
+              passwordRepeat: '',
+              surname: registerFrom.values.surname,
+              name: registerFrom.values.name,
+            },
+            errors: { passwordRepeat: 'Пользователь с таким логином уже существует' },
+          });
+        }
       },
     },
   );
@@ -165,9 +182,11 @@ export const RegistrationPage: FC = () => {
           type="password"
           name="passwordRepeat"
         />
+
         <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
           {registerFrom.errors.passwordRepeat}
         </div>
+
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
             <Typography

@@ -4,7 +4,9 @@ const STUDENT_URL = '/student';
 
 const studentAPI = {
   getStudentInfo: (student_uuid: string) => {
-    return API.get(`${STUDENT_URL}/${student_uuid}`).then((res) => res.data);
+    return localStorage.getItem('accessToken')
+      ? API.get(`${STUDENT_URL}/${student_uuid}`).then((res) => res.data)
+      : null;
   },
   deleteFromGroup: ({ studentId, groupId }: { studentId: string; groupId: string }) => {
     return API.delete(`${STUDENT_URL}/${studentId}/from-the-group/${groupId}/`, {

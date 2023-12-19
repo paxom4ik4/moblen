@@ -92,11 +92,11 @@ export const GenerateConfiguration: FC<GenerateConfigurationProps> = ({
           </Select>
         </div>
       </div>
-      <Tooltip title={generateText.length > 5000 && 'Текст генерации слишком большой!'}>
+      <Tooltip title={generateText.length > 3000 && 'Текст генерации слишком большой!'}>
         <button
           disabled={
             !generateText.length ||
-            generateText.length > 5000 ||
+            generateText.length > 3000 ||
             generateTaskAmount === 0 ||
             generateBallPerTask === 0 ||
             generateTaskFormat === ''

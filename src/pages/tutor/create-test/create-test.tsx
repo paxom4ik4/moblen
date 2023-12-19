@@ -310,15 +310,15 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
               Текст для генерации
             </Typography>
             <TextareaAutosize
-              placeholder={'Максимальная длина текста - 5000 символов'}
+              placeholder={'Максимальная длина текста - 3000 символов'}
               minRows={3}
               className={`${DEFAULT_CLASSNAME}_generate_container_text_area`}
               value={generateText}
               onChange={(e) => setGenerateText(e.currentTarget.value)}></TextareaAutosize>
             <Typography
               className={`${DEFAULT_CLASSNAME}_generate_container_text_info`}
-              color={generateText.length > 5000 ? 'red' : 'default'}>
-              {generateText.length} / 5000
+              color={generateText.length > 3000 ? 'red' : 'default'}>
+              {generateText.length} / 3000
             </Typography>
           </div>
         )}

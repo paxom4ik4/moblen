@@ -9,6 +9,7 @@ import {
 import RemoveIcon from 'components/task-card/close_icon.svg';
 import { Dispatch, FC, SetStateAction } from 'react';
 import { TestIndexOption } from 'types/task.ts';
+import { Typography } from 'common/typography/typography.tsx';
 
 type OrderedTestProps = {
   indexOptions?: TestIndexOption[];
@@ -62,12 +63,18 @@ export const OrderedTest: FC<OrderedTestProps> = (props) => {
                 />
               }
             />
-            <TextareaAutosize
-              disabled={formItemDisabled}
-              placeholder={'Введите вариант ответа'}
-              value={option.text}
-              onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
-            />
+            {formItemDisabled ? (
+              <Typography className={`${DEFAULT_CLASSNAME}_test_content_text`}>
+                {option.text}
+              </Typography>
+            ) : (
+              <TextareaAutosize
+                disabled={formItemDisabled}
+                placeholder={'Введите вариант ответа'}
+                value={option.text}
+                onChange={(e) => handleIndexOptionChange(index, 'text', e.target.value)}
+              />
+            )}
 
             <Button disabled={formItemDisabled} onClick={() => handleIndexRemoveOption(index)}>
               <RemoveIcon />

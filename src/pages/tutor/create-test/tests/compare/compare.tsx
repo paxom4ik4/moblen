@@ -2,6 +2,7 @@ import { Box, Button, FormGroup, MenuItem, Select, TextField } from '@mui/materi
 import RemoveIcon from 'components/task-card/close_icon.svg';
 import { Dispatch, FC, SetStateAction } from 'react';
 import { CompareState } from 'types/test.ts';
+import { Typography } from '../../../../../common/typography/typography.tsx';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -61,20 +62,27 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
                   }}>
                   {index + 1}
                 </span>
-                <TextField
-                  disabled={formItemDisabled}
-                  variant="outlined"
-                  fullWidth
-                  value={option.text}
-                  onChange={(e) => {
-                    const newLeftOptions = [...compareTestState.leftOptions];
-                    newLeftOptions[index].text = e.target.value;
-                    setCompareTestState({
-                      ...compareTestState,
-                      leftOptions: newLeftOptions,
-                    });
-                  }}
-                />
+                {formItemDisabled ? (
+                  <Typography className={`${DEFAULT_CLASSNAME}_test_content_text`}>
+                    {option.text}
+                  </Typography>
+                ) : (
+                  <TextField
+                    disabled={formItemDisabled}
+                    variant="outlined"
+                    fullWidth
+                    value={option.text}
+                    onChange={(e) => {
+                      const newLeftOptions = [...compareTestState.leftOptions];
+                      newLeftOptions[index].text = e.target.value;
+                      setCompareTestState({
+                        ...compareTestState,
+                        leftOptions: newLeftOptions,
+                      });
+                    }}
+                  />
+                )}
+
                 <Button
                   disabled={formItemDisabled}
                   onClick={() => handleRemoveCompareOption(index, 'left')}>
@@ -128,20 +136,27 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
                     </MenuItem>
                   ))}
                 </Select>
-                <TextField
-                  disabled={formItemDisabled}
-                  variant="outlined"
-                  fullWidth
-                  value={option.text}
-                  onChange={(e) => {
-                    const newRightOptions = [...compareTestState.rightOptions];
-                    newRightOptions[index].text = e.target.value;
-                    setCompareTestState({
-                      ...compareTestState,
-                      rightOptions: newRightOptions,
-                    });
-                  }}
-                />
+                {formItemDisabled ? (
+                  <Typography className={`${DEFAULT_CLASSNAME}_test_content_text`}>
+                    {option.text}
+                  </Typography>
+                ) : (
+                  <TextField
+                    disabled={formItemDisabled}
+                    variant="outlined"
+                    fullWidth
+                    value={option.text}
+                    onChange={(e) => {
+                      const newRightOptions = [...compareTestState.rightOptions];
+                      newRightOptions[index].text = e.target.value;
+                      setCompareTestState({
+                        ...compareTestState,
+                        rightOptions: newRightOptions,
+                      });
+                    }}
+                  />
+                )}
+
                 <Button
                   disabled={formItemDisabled}
                   onClick={() => handleRemoveCompareOption(index, 'right')}>

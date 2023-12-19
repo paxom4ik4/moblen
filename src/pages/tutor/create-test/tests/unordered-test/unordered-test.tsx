@@ -9,6 +9,7 @@ import {
 import RemoveIcon from 'components/task-card/close_icon.svg';
 import { Dispatch, FC, SetStateAction } from 'react';
 import { TestOption } from 'types/task.ts';
+import { Typography } from 'common/typography/typography.tsx';
 
 const DEFAULT_CLASSNAME = 'task-card';
 
@@ -61,12 +62,20 @@ export const UnorderedTest: FC<UnorderedTestProps> = (props) => {
                 />
               }
             />
-            <TextareaAutosize
-              disabled={formItemDisabled}
-              placeholder={'Введите вариант ответа'}
-              value={option.text}
-              onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
-            />
+            {formItemDisabled ? (
+              <Typography
+                className={`${DEFAULT_CLASSNAME}_test_content_text`}
+                onClick={() => !isCreateMode && setIsEditMode(true)}>
+                {option.text}
+              </Typography>
+            ) : (
+              <TextareaAutosize
+                disabled={formItemDisabled}
+                placeholder={'Введите вариант ответа'}
+                value={option.text}
+                onChange={(e) => handleOptionChange(index, 'text', e.target.value)}
+              />
+            )}
 
             <Button disabled={formItemDisabled} onClick={() => handleRemoveOption(index)}>
               <RemoveIcon />

@@ -21,6 +21,8 @@ import { AxiosError } from 'axios';
 
 const DEFAULT_CLASSNAME = 'registration';
 
+const MOBLEN_PROMO = 'moblen2023';
+
 export interface RegistrationValues {
   name: string;
   surname: string;
@@ -28,6 +30,7 @@ export interface RegistrationValues {
   password: string;
   passwordRepeat: string;
   referralLink?: string;
+  promo: string;
 }
 
 export const RegistrationPage: FC = () => {
@@ -57,17 +60,18 @@ export const RegistrationPage: FC = () => {
     }
   };
 
-  const registerFrom = useFormik({
+  const registerForm = useFormik({
     initialValues: {
       name: '',
       surname: '',
       login: '',
       password: '',
       passwordRepeat: '',
+      promo: isTutorRegister ? '' : MOBLEN_PROMO,
     },
     onSubmit: (values) =>
       isTutorRegister ? handleTutorRegister(values) : handleStudentRegister(values),
-    validate: (values) => validateFn(values),
+    validate: (values) => validateFn(values, isTutorRegister),
   });
 
   const createNewTutorMutation = useMutation(
@@ -75,20 +79,21 @@ export const RegistrationPage: FC = () => {
       createNewTutor(data),
     {
       onSuccess: async () => {
-        await loginAfterRegister(registerFrom.values, dispatch);
-        registerFrom.resetForm();
+        await loginAfterRegister(registerForm.values, dispatch);
+        registerForm.resetForm();
       },
       onError: (error: AxiosError) => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         if ('USER_WITH_THIS_LOGIN_ALREADY_EXISTS' === error?.response?.data?.status) {
-          registerFrom.resetForm({
+          registerForm.resetForm({
             values: {
               login: '',
               password: '',
               passwordRepeat: '',
-              surname: registerFrom.values.surname,
-              name: registerFrom.values.name,
+              promo: '',
+              surname: registerForm.values.surname,
+              name: registerForm.values.name,
             },
             errors: { passwordRepeat: 'Пользователь с таким логином уже существует' },
           });
@@ -102,8 +107,8 @@ export const RegistrationPage: FC = () => {
       createNewStudent(data),
     {
       onSuccess: async () => {
-        await loginAfterRegister(registerFrom.values, dispatch);
-        registerFrom.resetForm();
+        await loginAfterRegister(registerForm.values, dispatch);
+        registerForm.resetForm();
       },
     },
   );
@@ -118,74 +123,104 @@ export const RegistrationPage: FC = () => {
     }) => createNewStudentWithRef(data),
     {
       onSuccess: async () => {
-        await loginAfterRegister(registerFrom.values, dispatch);
-        registerFrom.resetForm();
+        await loginAfterRegister(registerForm.values, dispatch);
+        registerForm.resetForm();
       },
     },
   );
 
   const handleTutorRegister = async (values: RegistrationValues) => {
-    await createNewTutorMutation.mutate(values);
+    if (values.promo !== MOBLEN_PROMO) {
+      await registerForm.resetForm({
+        values: {
+          login: registerForm.values.login,
+          password: registerForm.values.password,
+          passwordRepeat: registerForm.values.passwordRepeat,
+          surname: registerForm.values.surname,
+          name: registerForm.values.name,
+          promo: '',
+        },
+        errors: { promo: 'Введен неверный промокод' },
+      });
+    } else {
+      await createNewTutorMutation.mutate(values);
+    }
   };
 
   return (
     <div className={DEFAULT_CLASSNAME}>
-      <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={registerFrom.handleSubmit}>
+      <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={registerForm.handleSubmit}>
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
           Регистрация {isTutorRegister ? 'преподавателя' : 'ученика'}
         </Typography>
 
         <Input
-          onBlur={registerFrom.handleBlur}
-          onChange={registerFrom.handleChange}
-          value={registerFrom.values.name}
+          onBlur={registerForm.handleBlur}
+          onChange={registerForm.handleChange}
+          value={registerForm.values.name}
           label={'Имя'}
           type="name"
           name="name"
         />
-        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerFrom.errors.name}</div>
+        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerForm.errors.name}</div>
         <Input
-          onBlur={registerFrom.handleBlur}
-          onChange={registerFrom.handleChange}
-          value={registerFrom.values.surname}
+          onBlur={registerForm.handleBlur}
+          onChange={registerForm.handleChange}
+          value={registerForm.values.surname}
           label={'Фамилия'}
           type="surname"
           name="surname"
         />
-        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerFrom.errors.surname}</div>
+        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerForm.errors.surname}</div>
         <Input
-          onBlur={registerFrom.handleBlur}
-          onChange={registerFrom.handleChange}
-          value={registerFrom.values.login}
+          onBlur={registerForm.handleBlur}
+          onChange={registerForm.handleChange}
+          value={registerForm.values.login}
           placeholder={'Email или телефон'}
           label={'Логин'}
           type="login"
           name="login"
         />
-        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerFrom.errors.login}</div>
+        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerForm.errors.login}</div>
         <Input
-          onBlur={registerFrom.handleBlur}
-          onChange={registerFrom.handleChange}
-          value={registerFrom.values.password}
+          onBlur={registerForm.handleBlur}
+          onChange={registerForm.handleChange}
+          value={registerForm.values.password}
           label={'Пароль'}
           type="password"
           name="password"
         />
         <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
-          {registerFrom.errors.password}
+          {registerForm.errors.password}
         </div>
         <Input
-          onBlur={registerFrom.handleBlur}
-          onChange={registerFrom.handleChange}
-          value={registerFrom.values.passwordRepeat}
+          onBlur={registerForm.handleBlur}
+          onChange={registerForm.handleChange}
+          value={registerForm.values.passwordRepeat}
           label={'Повторите пароль'}
           type="password"
           name="passwordRepeat"
         />
 
         <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
-          {registerFrom.errors.passwordRepeat}
+          {registerForm.errors.passwordRepeat}
         </div>
+
+        {isTutorRegister && (
+          <>
+            <Input
+              label={'Промокод'}
+              value={registerForm.values.promo}
+              onChange={registerForm.handleChange}
+              type="text"
+              name="promo"
+            />
+
+            <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
+              {registerForm.errors.promo}
+            </div>
+          </>
+        )}
 
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>

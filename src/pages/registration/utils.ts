@@ -13,7 +13,7 @@ const WRONG_MAIL_FORMAT = 'Неверный формат Email';
 const WRONG_PHONE_FORMAT = 'Неверный формат телефона';
 const PASSWORD_CHECK_ERROR = 'Минимум 8 символов, содержащий цифру';
 
-export const validateFn = (values: RegistrationValues) => {
+export const validateFn = (values: RegistrationValues, isTutorRegister: boolean) => {
   const errors: Partial<RegistrationValues> = {};
   if (!values.login) {
     errors.login = REQUIRED;
@@ -32,6 +32,10 @@ export const validateFn = (values: RegistrationValues) => {
 
   if (!values.surname) {
     errors.surname = REQUIRED;
+  }
+
+  if (isTutorRegister && !values.promo) {
+    errors.promo = REQUIRED;
   }
 
   if (!values.password) {

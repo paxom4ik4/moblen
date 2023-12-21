@@ -95,6 +95,7 @@ export const GenerateConfiguration: FC<GenerateConfigurationProps> = ({
       <Tooltip title={generateText.length > 3000 && 'Текст генерации слишком большой!'}>
         <button
           disabled={
+            isEditModeDisabled ||
             !generateText.length ||
             generateText.length > 3000 ||
             generateTaskAmount === 0 ||

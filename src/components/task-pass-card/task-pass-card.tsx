@@ -192,11 +192,15 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
   );
 
   const [compareOptionsToUse, setCompareOptionsToUse] = useState<CompareState>({
-    leftOptions: compareOptions?.filter((option) => !option.connected) ?? [],
+    leftOptions: compareOptions?.filter((option) => !isNaN(Number(option.index))) ?? [],
 
-    rightOptions: compareOptions
-      ?.filter((option) => option.connected)
-      .map((item) => ({ ...item, connected: [] })),
+    rightOptions:
+      compareOptions
+        ?.filter((option) => isNaN(Number(option.index)))
+        .map((item) => ({
+          ...item,
+          connected: [],
+        })) ?? [],
   });
 
   const handleLinkChange = (index: number, linkedTo: number[], side: 'left' | 'right') => {
@@ -284,13 +288,19 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
       );
     }
 
+    const getAnswerOptions = (answer: string, option: string): string[] => {
+      const answerOptions = answer.split(' ');
+
+      return answerOptions.filter((item) => item.includes(option)).map((item) => item[0]);
+    };
+
     if (format.includes(COMPARE_TEST_FORMAT)) {
       const viewCompareOptions = {
-        leftOptions: compareOptions?.filter((option) => !option.connected) ?? [],
+        leftOptions: compareOptions?.filter((option) => !isNaN(Number(option.index))) ?? [],
         rightOptions:
           compareOptions
-            ?.filter((option) => option.connected)
-            .map((item) => ({ ...item, connected: item.connected!.split(' ') })) ?? [],
+            ?.filter((option) => isNaN(Number(option.index)))
+            .map((item) => ({ ...item, connected: getAnswerOptions(answer!, item.index) })) ?? [],
       };
 
       const renderOptions = isViewMode ? viewCompareOptions : compareOptionsToUse;

@@ -21,7 +21,7 @@ import { AxiosError } from 'axios';
 
 const DEFAULT_CLASSNAME = 'registration';
 
-const MOBLEN_PROMO = 'moblen2023';
+const MOBLEN_PROMO = 'moblen2024';
 
 export interface RegistrationValues {
   name: string;
@@ -75,7 +75,7 @@ export const RegistrationPage: FC = () => {
   });
 
   const createNewTutorMutation = useMutation(
-    (data: { name: string; surname: string; login: string; password: string }) =>
+    (data: { name: string; surname: string; login: string; password: string; promo: string }) =>
       createNewTutor(data),
     {
       onSuccess: async () => {

@@ -10,17 +10,20 @@ const registrationAPI = {
     surname,
     login,
     password,
+    promo,
   }: {
     name: string;
     surname: string;
     login: string;
     password: string;
+    promo: string;
   }) => {
     return API.post(`${TUTOR_REGISTER}/`, {
       tutor_name: name,
       tutor_surname: surname,
       login,
       password,
+      promo_code: promo,
     }).then((res) => res.data);
   },
   createNewStudent: ({

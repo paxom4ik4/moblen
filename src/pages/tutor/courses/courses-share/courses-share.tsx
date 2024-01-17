@@ -18,6 +18,10 @@ import dayjs from 'dayjs';
 import { ShareDataType } from 'types/share.data.type.ts';
 import { shareTaskList } from 'services/tasks';
 
+import GroupsIcon from 'assets/icons/groups-icon.svg';
+import { useNavigate } from 'react-router-dom';
+import { TutorRoutes } from '../../../../constants/routes.ts';
+
 const DEFAULT_CLASSNAME = 'courses-share';
 
 interface CoursesShareProps {
@@ -78,8 +82,25 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
     setTaskListShared(true);
   };
 
+  const navigate = useNavigate();
+
+  const emptyGroups = (
+    <div className={`${DEFAULT_CLASSNAME}_share_content_empty`}>
+      <GroupsIcon />
+      <div className={`${DEFAULT_CLASSNAME}_share_content_empty-text`}>
+        У вас еще нет ни одной группы. Cоздайте их{' '}
+        <span
+          className={`${DEFAULT_CLASSNAME}_share_content_empty-text_link`}
+          onClick={() => navigate(TutorRoutes.GROUPS)}>
+          тут
+        </span>{' '}
+        чтобы поделиться заданиями с учениками
+      </div>
+    </div>
+  );
+
   return (
-    <div className={`${DEFAULT_CLASSNAME}_share`}>
+    <div className={`${DEFAULT_CLASSNAME}_share ${!groups?.length && 'empty-share'}`}>
       <div className={`${DEFAULT_CLASSNAME}_share_title`}>
         <div className={`${DEFAULT_CLASSNAME}_share_title-name`}>{'Отправить задание'}</div>
         <div
@@ -90,100 +111,103 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
       </div>
       <div className={`${DEFAULT_CLASSNAME}_share_content`}>
         <div className={`${DEFAULT_CLASSNAME}_share_content_groups`}>
-          {!!groups?.length &&
-            groups!.map((group) => (
-              <GroupCard
-                active={selectedShareGroups.includes(group.group_uuid)}
-                selectedShareGroups={selectedShareGroups}
-                setSelectedShareGroups={setSelectedShareGroups}
-                key={group.group_uuid}
-                id={group.group_uuid}
-                name={group.group_name}
-                amount={group.students?.length}
-                hideControls
-              />
-            ))}
+          {groups?.length
+            ? groups!.map((group) => (
+                <GroupCard
+                  active={selectedShareGroups.includes(group.group_uuid)}
+                  selectedShareGroups={selectedShareGroups}
+                  setSelectedShareGroups={setSelectedShareGroups}
+                  key={group.group_uuid}
+                  id={group.group_uuid}
+                  name={group.group_name}
+                  amount={group.students?.length}
+                  hideControls
+                />
+              ))
+            : emptyGroups}
         </div>
-        <div className={`${DEFAULT_CLASSNAME}_share_content_config`}>
-          <div className={`${DEFAULT_CLASSNAME}_share_content_config_task`}>
-            <Typography>{testToShare.course + ' - ' + testToShare.topic}</Typography>
-            <Typography color={'purple'} size={'large'}>
-              {testToShare.name}
-            </Typography>
-            <Typography color={'gray'} size={'small'}>
-              {'Заданий - '} {testToShare.task_amount}
-            </Typography>
-          </div>
-          <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime`}>
-            <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime_time`}>
-              <TitledCheckbox
-                name={'deadline'}
-                checked={withDeadline}
-                onChange={() => setWithDeadline(!withDeadline)}>
-                Дедлайн
-              </TitledCheckbox>
-              {withDeadline && (
-                <div className={`${DEFAULT_CLASSNAME}_share_content_config_deadline`}>
-                  <DateTimePicker
-                    label="Выберите дедлайн"
-                    value={deadline}
-                    onChange={(newValue) => setDeadline(newValue!)}
-                  />
-                </div>
-              )}
-              <TitledCheckbox
-                name={'mark'}
-                checked={appreciable}
-                onChange={() => setAppreciable(!appreciable)}>
-                Оценка
-              </TitledCheckbox>
-              <TitledCheckbox
-                name={'timeLimit'}
-                checked={withTimeLimit}
-                onChange={() => setWithTimeLimit(!withTimeLimit)}>
-                Ограничение по времени
-              </TitledCheckbox>
-              {withTimeLimit && (
-                <div className={`${DEFAULT_CLASSNAME}_share_content_config_timeDeadline`}>
-                  <Typography>Ограничение по времени (мин.)</Typography>
-                  <input
-                    type={'text'}
-                    value={timeLimit}
-                    onChange={(e) => setTimeLimit(+e.currentTarget.value)}
-                  />
-                </div>
-              )}
-              <TitledCheckbox name={'retry'} checked={replay} onChange={() => setReplay(!replay)}>
-                Можно перепройти
-              </TitledCheckbox>
-              <TitledCheckbox
-                name={'answers'}
-                checked={seeAnswers}
-                onChange={() => setSeeAnswers(!seeAnswers)}>
-                Смотр. ответы после сдачи
-              </TitledCheckbox>
-              <TitledCheckbox
-                name={'criteria'}
-                checked={seeCriteria}
-                onChange={() => setSeeCriteria(!seeCriteria)}>
-                Просмотр критериев
-              </TitledCheckbox>
+        {!!groups?.length && (
+          <div className={`${DEFAULT_CLASSNAME}_share_content_config`}>
+            <div className={`${DEFAULT_CLASSNAME}_share_content_config_task`}>
+              <Typography>{testToShare.course + ' - ' + testToShare.topic}</Typography>
+              <Typography color={'purple'} size={'large'}>
+                {testToShare.name}
+              </Typography>
+              <Typography color={'gray'} size={'small'}>
+                {'Заданий - '} {testToShare.task_amount}
+              </Typography>
             </div>
+            <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime`}>
+              <div className={`${DEFAULT_CLASSNAME}_share_content_config_dateTime_time`}>
+                <TitledCheckbox
+                  name={'deadline'}
+                  checked={withDeadline}
+                  onChange={() => setWithDeadline(!withDeadline)}>
+                  Дедлайн
+                </TitledCheckbox>
+                {withDeadline && (
+                  <div className={`${DEFAULT_CLASSNAME}_share_content_config_deadline`}>
+                    <DateTimePicker
+                      label="Выберите дедлайн"
+                      value={deadline}
+                      onChange={(newValue) => setDeadline(newValue!)}
+                    />
+                  </div>
+                )}
+                <TitledCheckbox
+                  name={'mark'}
+                  checked={appreciable}
+                  onChange={() => setAppreciable(!appreciable)}>
+                  Оценка
+                </TitledCheckbox>
+                <TitledCheckbox
+                  name={'timeLimit'}
+                  checked={withTimeLimit}
+                  onChange={() => setWithTimeLimit(!withTimeLimit)}>
+                  Ограничение по времени
+                </TitledCheckbox>
+                {withTimeLimit && (
+                  <div className={`${DEFAULT_CLASSNAME}_share_content_config_timeDeadline`}>
+                    <Typography>Ограничение по времени (мин.)</Typography>
+                    <input
+                      type={'text'}
+                      value={timeLimit}
+                      onChange={(e) => setTimeLimit(+e.currentTarget.value)}
+                    />
+                  </div>
+                )}
+                <TitledCheckbox name={'retry'} checked={replay} onChange={() => setReplay(!replay)}>
+                  Можно перепройти
+                </TitledCheckbox>
+                <TitledCheckbox
+                  name={'answers'}
+                  checked={seeAnswers}
+                  onChange={() => setSeeAnswers(!seeAnswers)}>
+                  Смотр. ответы после сдачи
+                </TitledCheckbox>
+                <TitledCheckbox
+                  name={'criteria'}
+                  checked={seeCriteria}
+                  onChange={() => setSeeCriteria(!seeCriteria)}>
+                  Просмотр критериев
+                </TitledCheckbox>
+              </div>
+            </div>
+            <Button
+              className={'share-btn'}
+              title={'Отправить задание'}
+              icon={<CheckIcon />}
+              disabled={!selectedShareGroups.length}
+              onClick={handleTaskListShare}
+            />
+            <Typography
+              size={'small'}
+              color={'red'}
+              className={`${DEFAULT_CLASSNAME}_share_infoText`}>
+              После отправки редактирование теста станет невозможным!
+            </Typography>
           </div>
-          <Button
-            className={'share-btn'}
-            title={'Отправить задание'}
-            icon={<CheckIcon />}
-            disabled={!selectedShareGroups.length}
-            onClick={handleTaskListShare}
-          />
-          <Typography
-            size={'small'}
-            color={'red'}
-            className={`${DEFAULT_CLASSNAME}_share_infoText`}>
-            После отправки редактирование теста станет невозможным!
-          </Typography>
-        </div>
+        )}
       </div>
     </div>
   );

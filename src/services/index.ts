@@ -1,4 +1,4 @@
 import axios from 'axios';
-import { BASE_URL as baseURL } from '../constants/api.ts';
+import { getBaseUrl } from './services.utils.ts';
 
-export default axios.create({ baseURL });
+export default axios.create({ baseURL: getBaseUrl() });

@@ -58,9 +58,6 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
     },
   );
 
-  const [taskCount, setTaskCount] = useState(tasksData?.tasks?.length ?? 0);
-  useEffect(() => setIsGeneratingInProgress(false), [taskCount]);
-
   const [maxScore, setMaxScore] = useState(0);
 
   useEffect(() => {
@@ -68,8 +65,6 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
       setMaxScore(
         tasksData?.tasks?.reduce((score: number, task: Task) => score + Number(task.max_ball), 0),
       );
-
-      setTaskCount(tasksData?.tasks?.length);
     }
   }, [tasksData]);
 
@@ -187,22 +182,28 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
   const [generateTaskAmount, setGenerateTaskAmount] = useState(0);
 
   const clearGenerateTaskState = () => {
+    setIsGeneratingInProgress(false);
     setGenerateTaskFormat('');
     setGenerateBallPerTask(0);
     setGenerateTaskAmount(0);
-    setGenerateStarted(true);
   };
 
   const [generateStarted, setGenerateStarted] = useState(false);
 
   const generateTaskMutation = useMutation(
     (data: GenerateTaskPayload) => generateTask(tasksData.list_uuid, data),
-    { onSuccess: () => clearGenerateTaskState() },
+    {
+      onSuccess: async () => {
+        clearGenerateTaskState();
+        await queryClient.invalidateQueries('tasks');
+      },
+    },
   );
 
   const handleTaskGeneration = async () => {
     const format = generateTaskFormat.split(',');
 
+    setGenerateStarted(true);
     setIsGeneratingInProgress(true);
 
     await generateTaskMutation.mutate({

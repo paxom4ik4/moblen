@@ -88,13 +88,12 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
     <div className={`${DEFAULT_CLASSNAME}_share_content_empty`}>
       <GroupsIcon />
       <div className={`${DEFAULT_CLASSNAME}_share_content_empty-text`}>
-        У вас еще нет ни одной группы. Cоздайте их{' '}
+        У вас еще нет ни одной группы. Чтобы поделится заданием с учениками, создайте группу{' '}
         <span
           className={`${DEFAULT_CLASSNAME}_share_content_empty-text_link`}
           onClick={() => navigate(TutorRoutes.GROUPS)}>
           тут
         </span>{' '}
-        чтобы поделиться заданиями с учениками
       </div>
     </div>
   );

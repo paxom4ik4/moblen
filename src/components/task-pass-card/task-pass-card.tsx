@@ -289,9 +289,9 @@ export const TaskPassCard: FC<TaskPassCardProps> = (props) => {
     }
 
     const getAnswerOptions = (answer: string, option: string): string[] => {
-      const answerOptions = answer.split(' ');
+      const answerOptions = answer?.split(' ');
 
-      return answerOptions.filter((item) => item.includes(option)).map((item) => item[0]);
+      return answerOptions?.filter((item) => item.includes(option)).map((item) => item[0]);
     };
 
     if (format.includes(COMPARE_TEST_FORMAT)) {

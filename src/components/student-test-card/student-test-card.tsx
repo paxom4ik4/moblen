@@ -138,6 +138,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
         <button
           disabled={
             (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
+            (!!deadline && new Date(deadline) < new Date(Date.now())) ||
             listStatus !== LIST_STATUS.completed
           }
           className={`${DEFAULT_CLASSNAME}_status ${

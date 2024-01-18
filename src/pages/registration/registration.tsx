@@ -13,11 +13,12 @@ import {
 } from 'services/registration/registration.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoginRoutes } from 'constants/routes.ts';
-import { GROUP_REF_LINK } from 'constants/api.ts';
+import {GROUP_DEV_REF_LINK, GROUP_REF_LINK} from 'constants/api.ts';
 import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { CircularProgress } from '@mui/material';
 import { AxiosError } from 'axios';
+import {DEV_HOSTNAME} from "../../services/services.utils.ts";
 
 const DEFAULT_CLASSNAME = 'registration';
 
@@ -52,7 +53,7 @@ export const RegistrationPage: FC = () => {
     if (location.pathname.includes('ref')) {
       const { groupId } = params;
 
-      const referralLink = `${GROUP_REF_LINK}${groupId}`;
+      const referralLink = `${location.hostname === DEV_HOSTNAME ? GROUP_DEV_REF_LINK : GROUP_REF_LINK}${groupId}`;
 
       await createStudentWithRefMutation({ ...values, referralLink });
     } else {

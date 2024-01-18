@@ -4,7 +4,6 @@ import { useFormik } from 'formik';
 import { Input } from 'common/input/input.tsx';
 
 import CheckIcon from 'assets/icons/check-icon.svg';
-// import VKIcon from 'assets/icons/vk-icon.svg';
 import { Typography } from 'common/typography/typography.tsx';
 import { LoginModes } from 'constants/appTypes.ts';
 
@@ -15,9 +14,10 @@ import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { handleDataStoring, remapStudentData, remapTutorData } from './utils.ts';
 import { LoginRoutes, TutorRoutes } from 'constants/routes.ts';
-import { GROUP_REF_LINK } from 'constants/api.ts';
+import { GROUP_DEV_REF_LINK, GROUP_REF_LINK } from 'constants/api.ts';
 import { useMutation } from 'react-query';
 import { CircularProgress } from '@mui/material';
+import { DEV_HOSTNAME } from '../../services/services.utils.ts';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -63,7 +63,12 @@ export const LoginPage: FC = () => {
 
   const loginHandler = async (values: { login: string; password: string }) => {
     const loginValues = params?.groupId
-      ? { ...values, referral_link: `${GROUP_REF_LINK}${params.groupId}` }
+      ? {
+          ...values,
+          referral_link: `${
+            location.hostname === DEV_HOSTNAME ? GROUP_DEV_REF_LINK : GROUP_REF_LINK
+          }${params.groupId}`,
+        }
       : values;
 
     try {

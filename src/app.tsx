@@ -107,7 +107,7 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    const config = appMode === AppModes.tutor ? routeConfig : studentRouteConfig;
+    const config = appMode === AppModes.TT ? routeConfig : studentRouteConfig;
 
     setCurrentTitle(config.find((route) => route.path === location.pathname)?.title ?? '');
   }, [appMode, location]);
@@ -168,7 +168,7 @@ const App: FC = () => {
       </div>
       <Routes>
         <Route path="*" element={<Navigate to="/assignments" replace />} />
-        {appMode === AppModes.tutor ? tutorRoutes : studentRoutes}
+        {appMode === AppModes.TT ? tutorRoutes : studentRoutes}
       </Routes>
     </div>
   );
@@ -177,9 +177,9 @@ const App: FC = () => {
     <Routes>
       <Route path="*" element={<Navigate to={LoginRoutes.LOGIN} replace />} />
       <Route path={LoginRoutes.LOGIN} element={<LoginPage />} />
-      <Route path={LoginRoutes.LOGIN_WITH_REF} element={<LoginPage />} />
+      <Route path={LoginRoutes.JOIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />
-      <Route path={LoginRoutes.REGISTRATION_WITH_REF} element={<RegistrationPage />} />
+      <Route path={LoginRoutes.REGISTER_WITH_REF} element={<RegistrationPage />} />
     </Routes>
   );
 

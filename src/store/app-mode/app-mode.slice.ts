@@ -2,18 +2,18 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppModes } from 'constants/appTypes.ts';
 
 export interface AppModeState {
-  appMode: AppModes.tutor | AppModes.student | null;
+  appMode: AppModes.TT | AppModes.ST | null;
 }
 
 const initialState: AppModeState = {
-  appMode: AppModes.tutor,
+  appMode: AppModes.TT,
 };
 
 export const appModeSlice = createSlice({
   name: 'appMode',
   initialState,
   reducers: {
-    setAppMode: (state, action: PayloadAction<AppModes.tutor | AppModes.student | null>) => {
+    setAppMode: (state, action: PayloadAction<AppModes.TT | AppModes.ST | null>) => {
       state.appMode = action.payload;
     },
   },

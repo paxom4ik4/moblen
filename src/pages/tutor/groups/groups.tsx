@@ -19,7 +19,7 @@ import { deleteFromGroup } from 'services/student/student.ts';
 import { CircularProgress, Tooltip } from '@mui/material';
 import { clearSelectedStudent } from 'store/results/results.slice.ts';
 import Tests from '../../student/tests/tests.tsx';
-import GroupCardLoader from '../../../components/group-card/group-card-loader/group-card-loader.tsx';
+import GroupCardLoader from 'components/group-card/group-card-loader/group-card-loader.tsx';
 
 const DEFAULT_CLASSNAME = 'groups';
 
@@ -42,14 +42,11 @@ const Groups: FC<GroupsProps> = memo((props) => {
     };
   }, [dispatch]);
 
-  const { userData } = useSelector((state: RootState) => state.userData);
   const [isNewGroupCreating, setIsNewGroupCreating] = useState(false);
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
-  const { data: groups, isLoading } = useQuery('groups', () =>
-    getTutorGroups(userData?.uuid ?? ''),
-  );
+  const { data: groups, isLoading } = useQuery('groups', () => getTutorGroups());
 
   const { data: selectedGroupData, isLoading: isGroupLoading } = useQuery(
     ['groupData', selectedGroup],
@@ -115,7 +112,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
               id={group.group_uuid}
               active={selectedGroup === group}
               name={group.group_name}
-              amount={group.students?.length}
+              amount={group.members_count}
               iconUrl={group.iconUrl}
               url={group.url}
             />
@@ -152,16 +149,16 @@ const Groups: FC<GroupsProps> = memo((props) => {
 
           {selectedGroup &&
             selectedGroupData &&
-            selectedGroupData?.students?.map((student: Student) => (
+            selectedGroupData?.members?.map((student: Student) => (
               <StudentCard
-                active={student.student_uuid === selectedStudent}
+                active={student.user_uuid === selectedStudent}
                 resultsViewMode={viewMode}
                 groupId={selectedGroup.group_uuid}
-                id={student.student_uuid}
-                key={student.student_uuid}
-                name={student.student_name}
-                surname={student.student_surname}
-                imgUrl={student.student_photo}
+                id={student.user_uuid}
+                key={student.user_uuid}
+                name={student.first_name}
+                surname={student.last_name}
+                imgUrl={student.photo}
               />
             ))}
           {!viewMode && (

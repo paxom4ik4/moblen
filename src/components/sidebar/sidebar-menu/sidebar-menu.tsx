@@ -18,7 +18,7 @@ export const SidebarMenu: FC<{ setIsSidebarOpened: Dispatch<SetStateAction<boole
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
-  const config = appMode === AppModes.tutor ? sidebarMenuConfig : studentSidebarMenuConfig;
+  const config = appMode === AppModes.TT ? sidebarMenuConfig : studentSidebarMenuConfig;
 
   return (
     <div className={DEFAULT_CLASSNAME}>

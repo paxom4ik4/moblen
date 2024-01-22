@@ -1,23 +1,16 @@
 import API from '../index.ts';
-import { Tutor } from 'types/tutor.ts';
 import { Group } from 'types/group.ts';
 
 const TUTOR_API_URL = '/tutor';
 
+const GROUPS_API_URL = '/group';
+
 const tutorAPI = {
-  getTutorInfo: (tutorId: string) => {
-    return localStorage.getItem('accessToken') ? API.get(`${TUTOR_API_URL}/${tutorId}/`) : null;
+  getTutorGroups: (): Promise<Group[]> => {
+    return API.get(GROUPS_API_URL).then((res) => res.data);
   },
-  getTutorGroups: (tutorId: string): Promise<Group[]> => {
-    return API.get(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`).then((res) => res.data);
-  },
-  createTutorGroup: ({ tutorId, groupName }: { tutorId: string; groupName: string }) => {
-    return API.post(`${TUTOR_API_URL}/${tutorId}/tutor-groups/`, { group_name: groupName }).then(
-      (res) => res.data,
-    );
-  },
-  editTutorInfo: (tutorId: string, tutorData: Partial<Tutor>) => {
-    return API.patch(`${TUTOR_API_URL}/${tutorId}/`, { ...tutorData });
+  createTutorGroup: ({ groupName }: { groupName: string }) => {
+    return API.post(`${GROUPS_API_URL}`, { group_name: groupName }).then((res) => res.data);
   },
   editTutorPhoto: (tutorId: string, formData: FormData) => {
     return API.patch(`${TUTOR_API_URL}/${tutorId}/`, formData, {
@@ -36,12 +29,5 @@ const tutorAPI = {
   },
 };
 
-export const {
-  deleteTutor,
-  getTutorInfo,
-  editTutorInfo,
-  getTutorGroups,
-  addStudentToList,
-  createTutorGroup,
-  editTutorPhoto,
-} = tutorAPI;
+export const { deleteTutor, getTutorGroups, addStudentToList, createTutorGroup, editTutorPhoto } =
+  tutorAPI;

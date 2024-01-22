@@ -1,22 +1,24 @@
 import API from '../index.ts';
 
-const LOGIN_URL = '/users/login/';
-const LOGOUT_URL = '/users/revoke_token/';
-const REFRESH_TOKEN = '/users/refresh_token/';
+const LOGIN_URL = '/auth/login';
+const LOGOUT_URL = '/auth/logout';
+const REFRESH_TOKEN = '/auth/refresh';
 
 const loginAPI = {
   loginUser: ({
     login,
     password,
-    referral_link,
+    referral,
   }: {
     login: string;
     password: string;
-    referral_link?: string;
+    referral?: string;
   }) => {
-    return API.post(LOGIN_URL, { login, password, referral_link }, { withCredentials: false }).then(
-      (res) => res.data,
-    );
+    return API.post(
+      `${LOGIN_URL}?referral_link=${referral}`,
+      { login, password },
+      { withCredentials: false },
+    ).then((res) => res.data);
   },
   logoutUser: (token: string) => {
     return API.post(LOGOUT_URL, { token }).then((res) => res.data);

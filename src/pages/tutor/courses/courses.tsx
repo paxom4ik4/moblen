@@ -53,7 +53,7 @@ const Courses: FC = memo(() => {
     data: courses,
     isLoading,
     isLoadingError,
-  } = useQuery(['courses', userData?.uuid], () => getTutorsCourses(userData!.uuid));
+  } = useQuery(['courses'], () => getTutorsCourses());
 
   useEffect(() => {
     if (courses?.length && !activeCourse) {
@@ -64,17 +64,17 @@ const Courses: FC = memo(() => {
         dispatch(setActiveTopic(null));
       });
     }
-  }, [courses, dispatch, userData?.uuid]);
+  }, [courses, dispatch, userData?.user_uuid]);
 
   const createNewCourseMutation = useMutation(
-    (data: { tutorId: string; courseName: string }) => createCourse(data),
+    (data: { courseName: string }) => createCourse(data),
     {
       onSuccess: () => queryClient.invalidateQueries('courses'),
     },
   );
 
   const { data: topics, isLoading: isTopicsLoading } = useQuery(
-    ['topics', userData?.uuid, activeCourse],
+    ['topics', userData?.user_uuid, activeCourse],
     () => getTopics(activeCourse ?? null),
   );
 
@@ -90,10 +90,10 @@ const Courses: FC = memo(() => {
     if (topics?.length && !activeTopic) {
       dispatch(setActiveTopic(topics[0].topic_uuid));
     }
-  }, [activeTopic, dispatch, topics, userData?.uuid]);
+  }, [activeTopic, dispatch, topics, userData?.user_uuid]);
 
   const { data: taskList, isLoading: isTaskListLoading } = useQuery(
-    ['taskList', userData?.uuid, activeTopic],
+    ['taskList', userData?.user_uuid, activeTopic],
     () => getTaskList(activeTopic ?? null),
   );
 
@@ -142,7 +142,7 @@ const Courses: FC = memo(() => {
 
   const saveNewSubjectHandler = () => {
     if (newSubjectName.length) {
-      createNewCourseMutation.mutate({ tutorId: userData!.uuid, courseName: newSubjectName });
+      createNewCourseMutation.mutate({ courseName: newSubjectName });
     }
 
     setNewSubjectName('');

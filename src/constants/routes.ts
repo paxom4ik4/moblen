@@ -15,7 +15,7 @@ export enum StudentRoutes {
 
 export enum LoginRoutes {
   LOGIN = '/login-page',
-  LOGIN_WITH_REF = '/login-page/ref/:groupId',
   REGISTRATION = '/registration',
-  REGISTRATION_WITH_REF = '/registration/ref/:groupId',
+  JOIN_WITH_REF = '/joinGroup/:groupId',
+  REGISTER_WITH_REF = '/registerGroup/:groupId',
 }

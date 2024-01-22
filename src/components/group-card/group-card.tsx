@@ -8,8 +8,6 @@ import CheckIcon from 'assets/icons/check-icon.svg';
 import TrashIcon from 'assets/icons/trash-icon.svg';
 import { useDrop } from 'react-dnd';
 import { DraggableTypes } from 'types/draggable/draggable.types.ts';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store/store.ts';
 
 import './group-card.scss';
 
@@ -61,13 +59,10 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
     url = '',
     iconUrl,
     isNewGroupCreating,
-
     onClick,
   } = props;
 
   const queryClient = useQueryClient();
-
-  const { userData } = useSelector((state: RootState) => state.userData);
 
   const [newGroupName, setNewGroupName] = useState(name);
   const [newGroupImage, setNewGroupImage] = useState<File | null>(null);
@@ -96,7 +91,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
       setIsNewGroupCreating(false);
       setIsEditMode(false);
 
-      createGroupMutation.mutate({ groupName: newGroupName, tutorId: userData!.uuid });
+      createGroupMutation.mutate({ groupName: newGroupName });
     } else {
       if (id && newGroupName.length) {
         editGroupNameMutation.mutate({ groupId: id!, groupName: newGroupName });
@@ -117,7 +112,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
     },
   );
   const addToGroupMutation = useMutation(
-    (data: { studentId: string; groupId: string }) => addNewStudent(data),
+    (data: { studentId: string; groupUrl: string }) => addNewStudent(data),
     {
       onSuccess: () => queryClient.invalidateQueries('groups'),
     },
@@ -129,7 +124,7 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
 
   const handleStudentCardDrop = async (studentId: string, groupId: string) => {
     await deleteStudentFromGroupMutation.mutate({ studentId, groupId });
-    await addToGroupMutation.mutate({ groupId: id!, studentId });
+    await addToGroupMutation.mutate({ groupUrl: url, studentId });
   };
 
   const handlerRefreshRefLink = async () => await refreshGroupLinkMutation.mutate(id!);

@@ -5,8 +5,8 @@ import { Typography } from 'common/typography/typography.tsx';
 import { StudentTestCard } from 'components/student-test-card/student-test-card.tsx';
 
 import './tests.scss';
-import { useQuery } from 'react-query';
-import { getStudentInfo, getStudentTaskLists } from 'services/student/student.ts';
+import { useQuery, useQueryClient } from 'react-query';
+import { getStudentTaskLists } from 'services/student/student.ts';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { Tutor } from 'types/tutor.ts';
 import { RootState } from 'store/store.ts';
@@ -14,6 +14,8 @@ import { setActiveCourse, setActiveTopic, setActiveTutor } from 'store/student/s
 import { TaskList } from 'types/task.ts';
 import { Notification } from 'common/notification/notification.tsx';
 import { CircularProgress } from '@mui/material';
+import { getRelations } from 'services/relate/relate.ts';
+import { useNavigate } from 'react-router-dom';
 
 const DEFAULT_CLASSNAME = 'tests';
 
@@ -29,17 +31,15 @@ const Tests: FC<TestsProps> = memo((props) => {
     (state: RootState) => state.student,
   );
 
-  const { resultsView = false, selectedStudent } = props;
+  const queryClient = useQueryClient();
 
-  const { userData } = useSelector((state: RootState) => state.userData);
+  const { resultsView = false, selectedStudent } = props;
 
   const {
     data: studentData,
     isLoading: isStudentDataLoading,
     isLoadingError,
-  } = useQuery(['studentData'], () =>
-    getStudentInfo(resultsView ? selectedStudent! : userData?.uuid ?? ''),
-  );
+  } = useQuery(['studentData'], () => getRelations());
 
   const {
     data: studentTaskLists,
@@ -49,14 +49,21 @@ const Tests: FC<TestsProps> = memo((props) => {
     ['taskLists', activeTutor, selectedStudent],
     () =>
       getStudentTaskLists({
-        student_uuid: resultsView ? selectedStudent! : userData?.uuid ?? '',
-        tutor_uuid: resultsView ? userData?.uuid ?? '' : activeTutor,
+        user_uuid: resultsView ? selectedStudent ?? '' : activeTutor,
       }),
     { refetchInterval: 5000 },
   );
 
   const [topics, setTopics] = useState<{ topic_uuid: string; topic_name: string }[]>([]);
   const [taskLists, setTaskLists] = useState([]);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      await queryClient.invalidateQueries('taskLists');
+    })();
+  }, [navigate]);
 
   useEffect(() => {
     if (!studentTaskLists?.length) {
@@ -120,8 +127,8 @@ const Tests: FC<TestsProps> = memo((props) => {
   }, [activeTopic]);
 
   useEffect(() => {
-    if (studentData?.tutors?.length && !activeTutor) {
-      dispatch(setActiveTutor(studentData.tutors[0].tutor_uuid));
+    if (studentData?.length && !activeTutor) {
+      dispatch(setActiveTutor(studentData[0].user_uuid));
     }
   }, [studentData]);
 
@@ -135,7 +142,7 @@ const Tests: FC<TestsProps> = memo((props) => {
     return <Typography>Произошла ошибка во время загруки... Попробуйте позже</Typography>;
   }
 
-  if (!studentData?.tutors?.length) {
+  if (!studentData?.length) {
     return (
       <Typography color={'purple'} size={'large'}>
         У вас нет преподавателей / групп
@@ -156,20 +163,20 @@ const Tests: FC<TestsProps> = memo((props) => {
       />
       {!resultsView && (
         <div className={`${DEFAULT_CLASSNAME}_tutors`}>
-          {!!studentData?.tutors &&
-            studentData.tutors.map((tutor: Tutor) => (
+          {!!studentData &&
+            studentData.map((tutor: Tutor) => (
               <div
-                key={tutor.tutor_uuid}
-                onClick={() => dispatch(setActiveTutor(tutor.tutor_uuid))}
+                key={tutor.user_uuid}
+                onClick={() => dispatch(setActiveTutor(tutor.user_uuid))}
                 className={`${DEFAULT_CLASSNAME}_tutors_item ${
-                  activeTutor === tutor.tutor_uuid ? 'active-tutor-item' : ''
+                  activeTutor === tutor.user_uuid ? 'active-tutor-item' : ''
                 }`}>
                 <div className={`${DEFAULT_CLASSNAME}_tutors_item_image`}>
-                  {tutor?.tutor_photo ? (
+                  {tutor?.photo ? (
                     <img
                       color={`${DEFAULT_CLASSNAME}_tutors_item_image_img`}
                       alt={'tutor-profile'}
-                      src={tutor.tutor_photo}
+                      src={tutor.photo}
                     />
                   ) : (
                     <TutorIcon />
@@ -179,7 +186,7 @@ const Tests: FC<TestsProps> = memo((props) => {
                   size={'small'}
                   color={'gray'}
                   className={`${DEFAULT_CLASSNAME}_tutors_item_name`}>
-                  {tutor.tutor_name}
+                  {tutor.first_name} {tutor.last_name}
                 </Typography>
               </div>
             ))}

@@ -19,3 +19,5 @@ export enum LoginRoutes {
   REGISTRATION = '/registration',
   REGISTRATION_WITH_REF = '/registration/ref/:groupId',
 }
+
+export const PLATFORM_ROUTE = '/platform';

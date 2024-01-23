@@ -25,13 +25,14 @@ import {
 } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
-import { LoginRoutes, StudentRoutes, TutorRoutes } from './constants/routes.ts';
+import { LoginRoutes, PLATFORM_ROUTE, StudentRoutes, TutorRoutes } from './constants/routes.ts';
 
 import MenuIcon from 'assets/icons/menu-item.svg';
 import { axiosAddAuthToken } from './services/tokenHelper.ts';
 import { refreshToken } from './services/login/login.ts';
 import { CircularProgress } from '@mui/material';
 import { Feedback } from './components/feedback/feedback.tsx';
+import { Platform } from './pages/platform/platform.tsx';
 
 const DEFAULT_CLASSNAME = 'app';
 
@@ -153,7 +154,13 @@ const App: FC = () => {
     </>
   );
 
-  const appContent = (
+  const isPlatformRoute = location.pathname.includes(PLATFORM_ROUTE);
+
+  const appContent = isPlatformRoute ? (
+    <Routes>
+      <Route path={PLATFORM_ROUTE} element={<Platform />} />
+    </Routes>
+  ) : (
     <div className={DEFAULT_CLASSNAME}>
       <Sidebar isSidebarOpened={isSidebarOpened} setIsSidebarOpened={setIsSidebarOpened} />
       <Feedback />
@@ -167,6 +174,7 @@ const App: FC = () => {
         {currentTitle}
       </div>
       <Routes>
+        <Route path={PLATFORM_ROUTE} element={<Platform />} />
         <Route path="*" element={<Navigate to="/assignments" replace />} />
         {appMode === AppModes.tutor ? tutorRoutes : studentRoutes}
       </Routes>
@@ -180,6 +188,7 @@ const App: FC = () => {
       <Route path={LoginRoutes.LOGIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />
       <Route path={LoginRoutes.REGISTRATION_WITH_REF} element={<RegistrationPage />} />
+      <Route path={PLATFORM_ROUTE} element={<Platform />} />
     </Routes>
   );
 

@@ -1,8 +1,8 @@
 export interface Tutor {
-  tutor_uuid: string;
-  tutor_name: string;
-  tutor_surname: string;
-  tutor_photo?: string;
+  user_uuid: string;
+  first_name: string;
+  last_name: string;
+  photo?: string;
   phone_number: string;
   email: string;
   has_access?: boolean;

@@ -7,5 +7,6 @@ export interface Group {
   amount: number;
   url: string;
   owner_uuid: string;
-  students?: Student[];
+  members?: Student[];
+  members_count?: number;
 }

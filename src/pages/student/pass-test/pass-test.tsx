@@ -10,8 +10,7 @@ import { StudentRoutes } from 'constants/routes.ts';
 
 import './pass-test.scss';
 import { useMutation, useQuery } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from 'store/store.ts';
+import { useDispatch } from 'react-redux';
 import { setCurrentTaskList } from 'store/student/student.slice.ts';
 import { getTasks } from 'services/tasks';
 import { sendTaskListAnswers } from 'services/student/student.ts';
@@ -34,8 +33,6 @@ const PassTest: FC = memo(() => {
 
   const { id } = useParams();
 
-  const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
-
   const { data: tasksData, isLoading: isTasksLoading } = useQuery('tasks', () => getTasks(id!));
 
   const maxScore = tasksData?.tasks?.reduce(
@@ -44,8 +41,7 @@ const PassTest: FC = memo(() => {
   );
 
   const sendTaskListAnswersMutation = useMutation(
-    (data: { student_uuid: string; list_uuid: string; answers: Answer[] }) =>
-      sendTaskListAnswers(data),
+    (data: { list_uuid: string; answers: Answer[] }) => sendTaskListAnswers(data),
   );
 
   const submitTestHandler = () => {
@@ -55,7 +51,6 @@ const PassTest: FC = memo(() => {
     }));
 
     sendTaskListAnswersMutation.mutate({
-      student_uuid: uuid,
       list_uuid: tasksData?.list_uuid ?? id,
       answers: formattedAnswers,
     });

@@ -1,6 +1,6 @@
 export enum AppModes {
-  student = 'student',
-  tutor = 'tutor',
+  ST = 'ST',
+  TT = 'TT',
 }
 
 export enum LoginModes {
@@ -9,11 +9,12 @@ export enum LoginModes {
 }
 
 export interface UserData {
-  uuid: string;
-  name: string;
-  surname: string;
+  user_uuid: string;
+  first_name: string;
+  last_name: string;
   phone_number: null | string;
   email: null | string;
   photo: null | string;
   has_access?: boolean;
+  role: string;
 }

@@ -12,12 +12,10 @@ import { loginUser } from 'services/login/login.ts';
 import { useDispatch, batch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
-import { handleDataStoring, remapStudentData, remapTutorData } from './utils.ts';
+import { handleDataStoring } from './utils.ts';
 import { LoginRoutes, TutorRoutes } from 'constants/routes.ts';
-import { GROUP_DEV_REF_LINK, GROUP_REF_LINK } from 'constants/api.ts';
 import { useMutation } from 'react-query';
 import { CircularProgress } from '@mui/material';
-import { DEV_HOSTNAME } from '../../services/services.utils.ts';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -35,19 +33,8 @@ export const LoginPage: FC = () => {
 
   const [mode] = useState<LoginModes.login | LoginModes.passwordReset>(LoginModes.login);
 
-  // const passwordResetContent = (
-  //   <>
-  //     <Input label={'Логин'} type="login" name="login" />
-  //     <ErrorMessage className={`${DEFAULT_CLASSNAME}_form_error_filed`} name="login" component="div" />
-  //     <Input label={'Новый пароль'} type="password" name="password" />
-  //     <ErrorMessage className={`${DEFAULT_CLASSNAME}_form_error_filed`} name="password" component="div" />
-  //     <Input label={'Повторите новый пароль'} type="passwordRepeat" name="passwordRepeat" />
-  //     <ErrorMessage className={`${DEFAULT_CLASSNAME}_form_error_filed`} name="passwordRepeat" component="div" />
-  //   </>
-  // );
-
   const { isLoading, mutateAsync: loginUserMutation } = useMutation(
-    (data: { login: string; password: string; referral_link?: string }) => loginUser(data),
+    (data: { login: string; password: string; referral?: string }) => loginUser(data),
     {
       onSuccess: () => {
         navigate(TutorRoutes.ASSIGNMENTS);
@@ -65,40 +52,34 @@ export const LoginPage: FC = () => {
     const loginValues = params?.groupId
       ? {
           ...values,
-          referral_link: `${
-            location.hostname === DEV_HOSTNAME ? GROUP_DEV_REF_LINK : GROUP_REF_LINK
-          }${params.groupId}`,
+          referral: params.groupId,
         }
       : values;
 
     try {
       const loginData = await loginUserMutation(loginValues);
 
-      const { status, role, user, token } = await loginData;
+      const { status, user, token } = await loginData;
 
       if (status === 'AUTHORIZED') {
         localStorage.setItem('accessToken', token.access_token);
         localStorage.setItem('refreshToken', token.refresh_token);
         localStorage.setItem('expiresIn', String(Date.now() + Number(`${token.expires_in}000`)));
 
-        if (role === 'tutor') {
-          const tutorData = remapTutorData(user);
-
+        if (user.role === 'TT') {
           batch(() => {
-            dispatch(setUser(tutorData));
-            dispatch(setAppMode(role));
+            dispatch(setUser(user));
+            dispatch(setAppMode(user.role));
           });
 
-          handleDataStoring(tutorData, role);
+          handleDataStoring(user, user.role);
         } else {
-          const studentData = remapStudentData(user);
-
           batch(() => {
-            dispatch(setUser(studentData));
-            dispatch(setAppMode(role));
+            dispatch(setUser(user));
+            dispatch(setAppMode(user.role));
           });
 
-          handleDataStoring(studentData, role);
+          handleDataStoring(user, user.role);
         }
       }
     } catch (error) {
@@ -159,7 +140,15 @@ export const LoginPage: FC = () => {
               <>
                 <Typography className={`${DEFAULT_CLASSNAME}_footer_mode`}>
                   Нет аккаунта?{' '}
-                  <span onClick={() => navigate(LoginRoutes.REGISTRATION)} color={'purple'}>
+                  <span
+                    onClick={() =>
+                      navigate(
+                        params?.groupId
+                          ? `/registerGroup/${params?.groupId}`
+                          : LoginRoutes.REGISTRATION,
+                      )
+                    }
+                    color={'purple'}>
                     Зарегистрироваться
                   </span>
                 </Typography>

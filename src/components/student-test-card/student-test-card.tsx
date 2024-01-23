@@ -74,7 +74,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     );
 
     if (listStatus === LIST_STATUS.completed) {
-      navigate(appMode === AppModes.tutor ? `/groups/result/${id}` : `/assignments/result/${id}`);
+      navigate(appMode === AppModes.TT ? `/groups/result/${id}` : `/assignments/result/${id}`);
     } else if (listStatus === LIST_STATUS.pending) {
       navigate(`/assignments/${id}`);
     }

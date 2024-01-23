@@ -11,10 +11,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'store/store.ts';
 import { useQuery, useQueryClient } from 'react-query';
 import { getCompletedTaskList } from 'services/student/student.ts';
-import { AppModes } from '../../../constants/appTypes.ts';
+import { AppModes } from 'constants/appTypes.ts';
 import { Pagination } from '@mui/material';
-import { setSelectedStudent } from '../../../store/results/results.slice.ts';
-import { StudentRoutes, TutorRoutes } from '../../../constants/routes.ts';
+import { setSelectedStudent } from 'store/results/results.slice.ts';
+import { StudentRoutes, TutorRoutes } from 'constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'test-result';
 
@@ -30,7 +30,7 @@ const TestResult: FC = memo(() => {
 
   const navigate = useNavigate();
 
-  const { uuid } = useSelector((state: RootState) => state.userData.userData)!;
+  const { user_uuid } = useSelector((state: RootState) => state.userData.userData)!;
   const { currentTaskList } = useSelector((state: RootState) => state.student)!;
 
   useEffect(() => {
@@ -40,22 +40,21 @@ const TestResult: FC = memo(() => {
   }, [currentTaskList]);
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
-  const isTutorMode = appMode === AppModes.tutor;
+  const isTutorMode = appMode === AppModes.TT;
 
   const { data: tasksHistory } = useQuery(
-    ['completedTasks', currentTaskList?.selectedStudent, uuid],
+    ['completedTasks', currentTaskList?.selectedStudent, user_uuid],
     () =>
       getCompletedTaskList({
         list_uuid: id!,
-        student_uuid: currentTaskList?.selectedStudent?.length
-          ? currentTaskList?.selectedStudent
-          : uuid,
+        student_uuid: isTutorMode ? currentTaskList?.selectedStudent : '',
+        isTutor: isTutorMode,
       }),
   );
 
   useEffect(() => {
     (async () => queryClient.invalidateQueries('completedTasks'))();
-  }, [uuid]);
+  }, [user_uuid]);
 
   const [maxScore, setMaxScore] = useState(0);
   const [currentScore, setCurrentScore] = useState(0);

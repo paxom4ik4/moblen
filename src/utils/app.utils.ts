@@ -41,11 +41,11 @@ export const getStoredAppMode = (): AppModes | null => {
     return null;
   }
 
-  if (storedAppMode === AppModes[AppModes.tutor]) {
-    return AppModes.tutor;
+  if (storedAppMode.toUpperCase() === AppModes[AppModes.TT]) {
+    return AppModes.TT;
   }
 
-  return AppModes.student;
+  return AppModes.ST;
 };
 
 export const dateTimeConfig = {

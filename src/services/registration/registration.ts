@@ -1,8 +1,6 @@
 import API from '../index.ts';
 
-const TUTOR_REGISTER = '/tutor';
-
-const STUDENT_REGISTER = '/student';
+const REGISTRATION_URL = '/user';
 
 const registrationAPI = {
   createNewTutor: ({
@@ -18,12 +16,12 @@ const registrationAPI = {
     password: string;
     promo: string;
   }) => {
-    return API.post(`${TUTOR_REGISTER}/`, {
-      tutor_name: name,
-      tutor_surname: surname,
+    return API.post(`${REGISTRATION_URL}?promo_code=${promo}`, {
+      first_name: name,
+      last_name: surname,
       login,
       password,
-      promo_code: promo,
+      role: 'tt',
     }).then((res) => res.data);
   },
   createNewStudent: ({
@@ -37,11 +35,12 @@ const registrationAPI = {
     login: string;
     password: string;
   }) => {
-    return API.post(`${STUDENT_REGISTER}/`, {
-      student_name: name,
-      student_surname: surname,
+    return API.post(`${REGISTRATION_URL}`, {
+      first_name: name,
+      last_name: surname,
       login,
       password,
+      role: 'st',
     }).then((res) => res.data);
   },
   createNewStudentWithRef: ({
@@ -49,20 +48,20 @@ const registrationAPI = {
     surname,
     login,
     password,
-    referralLink,
+    referral,
   }: {
     name: string;
     surname: string;
     login: string;
     password: string;
-    referralLink?: string;
+    referral?: string;
   }) => {
-    return API.post(`${STUDENT_REGISTER}/with-ref-link/`, {
-      student_name: name,
-      student_surname: surname,
+    return API.post(`${REGISTRATION_URL}?referral=${referral}`, {
+      first_name: name,
+      last_name: surname,
       login,
       password,
-      referral_link: referralLink,
+      role: 'st',
     }).then((res) => res.data);
   },
 };

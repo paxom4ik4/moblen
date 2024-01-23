@@ -79,7 +79,7 @@ export const loginAfterRegister = async (
         dispatch(setAppMode(AppModes.ST));
       });
 
-      handleDataStoring(user, AppModes.TT);
+      handleDataStoring(user, AppModes.ST);
     }
   }
 };

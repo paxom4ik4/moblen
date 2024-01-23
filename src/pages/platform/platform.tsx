@@ -7,9 +7,10 @@ import ex2 from './assets/ex2-1100w.png';
 import ex3 from './assets/ex3-600h.png';
 import ex4 from './assets/ex4-1200w.png';
 import moneyBag from './assets/money-bags-with-rubles---stocks-going-up-1-1200w-200h.png';
-import pasted2 from './assets/pastedimage-yxbd.svg';
 import pnglogtype from './assets/pnglogotype-1500h.png';
 import websiteInterface from './assets/website-interface-200h.png';
+
+import PastedIcon from './assets/pastedimage-yxbd.svg';
 
 export const Platform = () => {
   return (
@@ -69,7 +70,7 @@ export const Platform = () => {
                   <span className="home-text008">Попробовать</span>
                 </div>
                 <div id="open-mobile-menu" className="home-burger-menu">
-                  <img alt="pastedImage" src={pasted2} className="home-mobile-menu-button" />
+                  <PastedIcon />
                 </div>
               </div>
             </nav>
@@ -181,7 +182,7 @@ export const Platform = () => {
                 <span>продвинутым</span>
                 <br></br>
                 <span>оцениванием и</span>
-                <span>аналитикой</span>
+                <span> аналитикой</span>
               </h2>
               <div className="home-category">
                 <span className="home-text043">Оценивание</span>

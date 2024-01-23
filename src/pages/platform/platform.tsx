@@ -11,8 +11,35 @@ import pnglogtype from './assets/pnglogotype-1500h.png';
 import websiteInterface from './assets/website-interface-200h.png';
 
 import PastedIcon from './assets/pastedimage-yxbd.svg';
+import { Input } from '../../common/input/input.tsx';
+import { useFormik } from 'formik';
+import { useState } from 'react';
+import { Typography } from '../../common/typography/typography.tsx';
+
+const DEFAULT_CLASSNAME = 'contact';
 
 export const Platform = () => {
+  const [personType, setPersonType] = useState<'person' | 'organization'>('person');
+  const [userAgreed, setUserAgreed] = useState(false);
+
+  const contactForm = useFormik({
+    initialValues: {
+      organization_name: '',
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      comment: '',
+    },
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
+
+  const [activeVideoSection, setActiveVideoSection] = useState<'check' | 'generation'>('check');
+
+  const [isMobileMenuOpened, setIsMobileMenuOpened] = useState(false);
+
   return (
     <div className="home-container">
       <Helmet>
@@ -24,23 +51,28 @@ export const Platform = () => {
       </Helmet>
       <section className="home-hero">
         <div className="home-menu">
-          <div id="mobile-menu" className="home-mobile-navigation">
+          <div
+            id="mobile-menu"
+            className={`${isMobileMenuOpened && 'home-mobile-navigation_open'} home-mobile-navigation`}>
             <img alt="pastedImage" src={pnglogtype} className="home-logo" />
             <div className="home-links">
-              <a href={'#benefits'}>
+              <a href={'#benefits'} onClick={() => setIsMobileMenuOpened(false)}>
                 <span className="Link">Выгоды</span>
               </a>
-              <a href={'#possibility'}>
+              <a href={'#possibility'} onClick={() => setIsMobileMenuOpened(false)}>
                 <span className="Link">Возможности</span>
               </a>
-              <a href={'#tarif'}>
+              <a href={'#tarif'} onClick={() => setIsMobileMenuOpened(false)}>
                 <span className="Link">Тарифы</span>
               </a>
-              <a href={'#pilot'}>
+              <a href={'#pilot'} onClick={() => setIsMobileMenuOpened(false)}>
                 <span className="Link">Пилот</span>
               </a>
             </div>
-            <div id="close-mobile-menu" className="home-close-mobile-menu">
+            <div
+              id="close-mobile-menu"
+              className="home-close-mobile-menu"
+              onClick={() => setIsMobileMenuOpened(false)}>
               <svg viewBox="0 0 804.5714285714286 1024" className="home-icon">
                 <path d="M741.714 755.429c0 14.286-5.714 28.571-16 38.857l-77.714 77.714c-10.286 10.286-24.571 16-38.857 16s-28.571-5.714-38.857-16l-168-168-168 168c-10.286 10.286-24.571 16-38.857 16s-28.571-5.714-38.857-16l-77.714-77.714c-10.286-10.286-16-24.571-16-38.857s5.714-28.571 16-38.857l168-168-168-168c-10.286-10.286-16-24.571-16-38.857s5.714-28.571 16-38.857l77.714-77.714c10.286-10.286 24.571-16 38.857-16s28.571 5.714 38.857 16l168 168 168-168c10.286-10.286 24.571-16 38.857-16s28.571 5.714 38.857 16l77.714 77.714c10.286 10.286 16 24.571 16 38.857s-5.714 28.571-16 38.857l-168 168 168 168c10.286 10.286 16 24.571 16 38.857z"></path>
               </svg>
@@ -66,10 +98,15 @@ export const Platform = () => {
                 </div>
               </div>
               <div className="home-right">
-                <div className="home-get-started">
-                  <span className="home-text008">Попробовать</span>
-                </div>
-                <div id="open-mobile-menu" className="home-burger-menu">
+                <a href={'#pilot'}>
+                  <div className="home-get-started">
+                    <span className="home-text008">Попробовать</span>
+                  </div>
+                </a>
+                <div
+                  onClick={() => setIsMobileMenuOpened(true)}
+                  id="open-mobile-menu"
+                  className="home-burger-menu">
                   <PastedIcon />
                 </div>
               </div>
@@ -89,9 +126,6 @@ export const Platform = () => {
             Передовой образовательный ассистент, создающий и проверяющий домашние задания, тесты и
             контрольные для ваших курсов
           </p>
-          <div className="home-get-started1">
-            <span className="home-text014">Начать</span>
-          </div>
         </header>
       </section>
       <section className="home-features" id={'benefits'}>
@@ -160,9 +194,11 @@ export const Platform = () => {
                 </span>
                 <br></br>
               </span>
-              <div className="home-get-started2 template-button">
-                <span className="home-text034">Попробовать</span>
-              </div>
+              <a href={'#tarif'}>
+                <div className="home-get-started2 template-button">
+                  <span className="home-text034">Попробовать</span>
+                </div>
+              </a>
             </div>
             <div className="home-image-container3">
               <img alt="Ex1" src={ex4} className="home-cards-image3" />
@@ -197,9 +233,11 @@ export const Platform = () => {
                   В открытых заданиях Moblen дает ученикам аналитику по их ответу: недостатки, пути
                   улучшения ответа и фактические ошибки
                 </span>
-                <div className="home-get-started3 template-button">
-                  <span className="home-text047">Узнать больше</span>
-                </div>
+                <a href={'#tarif'}>
+                  <div className="home-get-started3 template-button">
+                    <span className="home-text047">Узнать больше</span>
+                  </div>
+                </a>
               </div>
             </div>
           </div>
@@ -215,9 +253,11 @@ export const Platform = () => {
                 Для тех, у кого нет своей платформы. В Moblen-LMS можно добавлять учеников,
                 создавать и структурировать группы и курсы, следить за успеваемостью
               </span>
-              <div className="home-get-started4 template-button">
-                <span className="home-text051">Начать</span>
-              </div>
+              <a href={'#tarif'}>
+                <div className="home-get-started4 template-button">
+                  <span className="home-text051">Начать</span>
+                </div>
+              </a>
             </div>
             <div className="home-image-container5">
               <img alt="ex3" src={ex3} className="home-cards-image5" />
@@ -232,10 +272,14 @@ export const Platform = () => {
           <div className="home-separator"></div>
           <nav className="home-nav">
             <nav className="home-nav1">
-              <div className="home-get-started5 template-button">
+              <div
+                onClick={() => setActiveVideoSection('check')}
+                className={`${activeVideoSection === 'check' ? 'home-get-started5' : 'home-get-started6'} template-button`}>
                 <span className="home-text054">Проверка</span>
               </div>
-              <div className="home-get-started6 template-button">
+              <div
+                onClick={() => setActiveVideoSection('generation')}
+                className={`${activeVideoSection === 'generation' ? 'home-get-started5' : 'home-get-started6'} template-button`}>
                 <span className="home-text055">Генерация</span>
               </div>
             </nav>
@@ -248,6 +292,7 @@ export const Platform = () => {
             muted={true}
             poster="https://play.teleporthq.io/static/svg/videoposter.svg"
             preload="auto"
+            controls={false}
             autoPlay={true}
             className="home-video"></video>
         </div>
@@ -288,7 +333,9 @@ export const Platform = () => {
                 <span className="home-text074">✔ 12 форматов</span>
                 <span className="home-text075">✔ Создание курсов и групп</span>
               </div>
-              <button className="home-button button">Попробовать</button>
+              <a href={'#pilot'}>
+                <button className="home-button button">Попробовать</button>
+              </a>
             </div>
             <div className="home-pricing-card1">
               <span className="home-text076">ЛУЧШИЙ ПОМОЩНИК</span>
@@ -315,9 +362,11 @@ export const Platform = () => {
                 <span className="home-text090">✔ Поддержка 24/7</span>
                 <span className="home-text091">✔ Полный функционал</span>
               </div>
-              <button className="home-button1 button">Подключить</button>
+              <a href={'#pilot'}>
+                <button className="home-button1 button">Подключить</button>
+              </a>
             </div>
-            <div className="home-pricing-card2">
+            <a className="home-pricing-card2" style={{ justifySelf: 'flex-end' }} href={'#pilot'}>
               <span className="home-text092">ПРОСТОЙ АССИСТЕНТ</span>
               <div className="home-container18">
                 <span className="home-text093">
@@ -341,7 +390,7 @@ export const Platform = () => {
                 <span className="home-text105">✔ Лучший для репетиторов</span>
               </div>
               <button className="home-button2 button">Подключить</button>
-            </div>
+            </a>
           </div>
           <span className="home-text106 title">
             *Генерация нескольких заданий за один запрос значительно снижает издержки
@@ -352,6 +401,99 @@ export const Platform = () => {
         <div className="home-left7">
           <span className="home-text107">Сотрудничество</span>
           <h2 className="home-text108 title">Оставьте заявку</h2>
+
+          <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={contactForm.handleSubmit}>
+            <div className={`${DEFAULT_CLASSNAME}_form_select`}>
+              <div
+                onClick={() => setPersonType('person')}
+                className={`${personType === 'person' ? 'home-get-started5' : 'home-get-started6'} template-button`}>
+                <span className="home-text054">Преподаватель</span>
+              </div>
+              <div
+                onClick={() => setPersonType('organization')}
+                className={`${personType === 'organization' ? 'home-get-started5' : 'home-get-started6'} template-button`}>
+                <span className="home-text055">Представитель Организации</span>
+              </div>
+            </div>
+
+            {personType === 'organization' && (
+              <Input
+                fullWidth={true}
+                onBlur={contactForm.handleBlur}
+                onChange={contactForm.handleChange}
+                value={contactForm.values.organization_name}
+                label={'Название оргинизации'}
+                type="organization_name"
+                name="organization_name"
+              />
+            )}
+            <Input
+              fullWidth={true}
+              onBlur={contactForm.handleBlur}
+              onChange={contactForm.handleChange}
+              value={contactForm.values.first_name}
+              label={'Имя *'}
+              type="first_name"
+              name="first_name"
+            />
+            <Input
+              fullWidth={true}
+              onBlur={contactForm.handleBlur}
+              onChange={contactForm.handleChange}
+              value={contactForm.values.last_name}
+              label={'Фамилия *'}
+              type="last_name"
+              name="last_name"
+            />
+            <Input
+              fullWidth={true}
+              onBlur={contactForm.handleBlur}
+              onChange={contactForm.handleChange}
+              value={contactForm.values.email}
+              label={'Электронная почта *'}
+              type="email"
+              name="email"
+            />
+            <Input
+              fullWidth={true}
+              onBlur={contactForm.handleBlur}
+              onChange={contactForm.handleChange}
+              value={contactForm.values.phone}
+              label={'Телефон для связи *'}
+              type="phone"
+              name="phone"
+            />
+            <Input
+              fullWidth={true}
+              onBlur={contactForm.handleBlur}
+              onChange={contactForm.handleChange}
+              value={contactForm.values.comment}
+              label={'Комментарий'}
+              type="comment"
+              name="comment"
+            />
+
+            <div className={'policy-agreement'}>
+              <input
+                checked={userAgreed}
+                onChange={() => setUserAgreed(!userAgreed)}
+                type={'checkbox'}
+              />
+              <Typography size={'default'}>Согласен на обработку персональных данных</Typography>
+            </div>
+
+            <button
+              disabled={
+                !userAgreed ||
+                !contactForm.values.first_name.trim().length ||
+                !contactForm.values.last_name.trim().length ||
+                !contactForm.values.email.trim().length ||
+                !contactForm.values.phone.trim().length
+              }
+              className={`send-button home-get-started6 template-button`}>
+              <span className="home-text054">Отправить</span>
+            </button>
+          </form>
         </div>
       </div>
       <div className="home-testimonial">
@@ -420,22 +562,38 @@ export const Platform = () => {
             <div className="home-category2">
               <span className="home-text125">Связь</span>
               <div className="home-links2">
-                <span className="home-text126">partnership@moblen.ru</span>
-                <span className="home-text127">+79087856734</span>
-                <span className="home-text128">t.me/fatherjones</span>
-                <span className="home-text129">
-                  <span>vk.com/a1122</span>
-                  <br></br>
-                </span>
+                <a href={'mailto:partnership@moblen.ru'}>
+                  <span className="home-text126">partnership@moblen.ru</span>
+                </a>
+                <a href={'tel:+79087856734'}>
+                  <span className="home-text127">+79087856734</span>
+                </a>
+                <a href={'https://t.me/fatherjones'} target={'_blank'}>
+                  <span className="home-text128">t.me/fatherjones</span>
+                </a>
+                <a href={'https://vk.com/a1122'} target={'_blank'}>
+                  <span className="home-text129">
+                    <span>vk.com/a1122</span>
+                    <br></br>
+                  </span>
+                </a>
               </div>
             </div>
             <div className="home-category3">
               <span className="home-text132">Moblen</span>
               <div className="home-links3">
-                <span className="home-text133">Выгоды</span>
-                <span className="home-text134">Демонстрация</span>
-                <span className="home-text135">Цены</span>
-                <span className="home-text136">Пилотная версия</span>
+                <a href={'#benefits'}>
+                  <span className="home-text133">Выгоды</span>
+                </a>
+                <a href={'#possibility'}>
+                  <span className="home-text134">Демонстрация</span>
+                </a>
+                <a href={'#tarif'}>
+                  <span className="home-text135">Цены</span>
+                </a>
+                <a href={'#pilot'}>
+                  <span className="home-text136">Пилотная версия</span>
+                </a>
               </div>
             </div>
           </div>

@@ -473,7 +473,7 @@ export const Platform = () => {
                 onBlur={contactForm.handleBlur}
                 onChange={contactForm.handleChange}
                 value={contactForm.values.organization_name}
-                label={'Название оргинизации'}
+                label={'Название организации'}
                 type="organization_name"
                 name="organization_name"
               />

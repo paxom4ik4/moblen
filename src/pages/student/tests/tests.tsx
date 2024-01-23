@@ -5,7 +5,7 @@ import { Typography } from 'common/typography/typography.tsx';
 import { StudentTestCard } from 'components/student-test-card/student-test-card.tsx';
 
 import './tests.scss';
-import { useQuery, useQueryClient } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { getStudentTaskLists } from 'services/student/student.ts';
 import { batch, useDispatch, useSelector } from 'react-redux';
 import { Tutor } from 'types/tutor.ts';
@@ -16,6 +16,8 @@ import { Notification } from 'common/notification/notification.tsx';
 import { CircularProgress } from '@mui/material';
 import { getRelations } from 'services/relate/relate.ts';
 import { useNavigate } from 'react-router-dom';
+import { addNewStudent } from 'services/groups';
+import { StudentRoutes } from 'constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'tests';
 
@@ -131,6 +133,23 @@ const Tests: FC<TestsProps> = memo((props) => {
       dispatch(setActiveTutor(studentData[0].user_uuid));
     }
   }, [studentData]);
+
+  const joinGroupMutation = useMutation(
+    (data: { studentId?: string; groupUrl: string }) => addNewStudent(data),
+    {
+      onSuccess: () => {
+        navigate(StudentRoutes.ASSIGNMENTS);
+      },
+    },
+  );
+
+  useEffect(() => {
+    if (location.href.includes('/joinGroup')) {
+      joinGroupMutation.mutate({
+        groupUrl: location.pathname,
+      });
+    }
+  }, []);
 
   const [testPassed, setTestPassed] = useState(false);
 

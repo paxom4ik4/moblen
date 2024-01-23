@@ -22,13 +22,14 @@ const groupsAPI = {
       (res) => res.data,
     );
   },
-  addNewStudent: ({ groupUrl, studentId }: { groupUrl: string; studentId: string }) => {
+  addNewStudent: ({ groupUrl, studentId }: { groupUrl: string; studentId?: string }) => {
     const referralIndex = groupUrl.lastIndexOf('/');
     const referral = groupUrl.slice(referralIndex + 1);
 
-    return API.post(`${GROUPS_API_URL}/member?student_uuid=${studentId}`, { referral }).then(
-      (res) => res.data,
-    );
+    return API.post(
+      studentId ? GROUPS_API_URL + `/member?student_uuid=${studentId}` : `${GROUPS_API_URL}/member`,
+      { referral },
+    ).then((res) => res.data);
   },
 };
 

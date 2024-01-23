@@ -151,6 +151,7 @@ const App: FC = () => {
       <Route path={StudentRoutes.ASSIGNMENTS} element={<Tests />} />
       <Route path={StudentRoutes.PASS_TEST} element={<PassTest />} />
       <Route path={StudentRoutes.TEST_RESULT} element={<TestResult />} />
+      <Route path={LoginRoutes.JOIN_WITH_REF} element={<Tests />} />
     </>
   );
 

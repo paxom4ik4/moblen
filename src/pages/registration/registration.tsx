@@ -17,6 +17,7 @@ import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { CircularProgress } from '@mui/material';
 import { AxiosError } from 'axios';
+import { Helmet } from 'react-helmet';
 
 const DEFAULT_CLASSNAME = 'registration';
 
@@ -141,6 +142,14 @@ export const RegistrationPage: FC = () => {
 
   return (
     <div className={DEFAULT_CLASSNAME}>
+      <Helmet>
+        <title>Moblen - Регистрация</title>
+        <meta
+          property="og:title"
+          content="Присоединяйтесь к Moblen. Образовательный ассистент для педагогов нового поколения."
+        />
+      </Helmet>
+
       <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={registerForm.handleSubmit}>
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
           Регистрация {isTutorRegister ? 'преподавателя' : 'ученика'}

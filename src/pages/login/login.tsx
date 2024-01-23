@@ -16,6 +16,7 @@ import { handleDataStoring } from './utils.ts';
 import { LoginRoutes, TutorRoutes } from 'constants/routes.ts';
 import { useMutation } from 'react-query';
 import { CircularProgress } from '@mui/material';
+import { Helmet } from 'react-helmet';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -108,6 +109,11 @@ export const LoginPage: FC = () => {
 
   return (
     <div className={DEFAULT_CLASSNAME}>
+      <Helmet>
+        <title>Moblen - Войти</title>
+        <meta property="og:title" content="Войдите в свой аккаунт Moblen." />
+      </Helmet>
+
       <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={form.handleSubmit}>
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
           {mode === LoginModes.login ? 'Вход' : 'Восстановить пароль'}

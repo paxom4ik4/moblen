@@ -19,6 +19,9 @@ import { useMutation } from 'react-query';
 import { PlatformFormData, sentForm } from '../../services/platform-form/platformForm.ts';
 import { Notification } from '../../common/notification/notification.tsx';
 
+import checkVideo from './check.mp4';
+import generationVideo from './generation.mp4';
+
 const DEFAULT_CLASSNAME = 'contact';
 
 export const Platform = () => {
@@ -335,7 +338,7 @@ export const Platform = () => {
         </div>
         <div className="home-container09">
           <video
-            src={''}
+            src={activeVideoSection === 'check' ? checkVideo : generationVideo}
             loop={true}
             muted={true}
             poster="https://play.teleporthq.io/static/svg/videoposter.svg"

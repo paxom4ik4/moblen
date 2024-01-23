@@ -33,6 +33,7 @@
     width: fit-content;
     gap: 24px;
     margin-right: 20px;
+    max-width: 160px;
 
     &_item {
       display: flex;
@@ -42,6 +43,10 @@
       gap: 4px;
       cursor: pointer;
       transition: 0.3s;
+
+      p {
+        text-align: center;
+      }
 
       &:hover {
         opacity: 0.8;

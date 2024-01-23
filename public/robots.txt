@@ -1,0 +1,6 @@
+User-agent: *
+Allow: https://moblen.ru/platform
+Allow: https://moblen.ru/login-page
+Allow: https://moblen.ru/assignments
+Disallow: https://moblen.ru/media/user_photos/
+Disallow: https://moblen.ru/media/task_files/

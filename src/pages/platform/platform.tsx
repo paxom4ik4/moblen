@@ -226,7 +226,7 @@ export const Platform = () => {
           </div>
         </div>
       </section>
-      <section className="home-banners" id={'possibility'}>
+      <section className="home-banners">
         <div className="home-banner-manage">
           <div className="home-container07">
             <div className="home-left4">
@@ -316,7 +316,7 @@ export const Platform = () => {
           </div>
         </div>
       </section>
-      <div className="home-banner1">
+      <div className="home-banner1" id={'possibility'}>
         <div className="home-left6">
           <span className="home-text052">Демонстрация</span>
           <h2 className="home-text053 title">Как это работает?</h2>

@@ -1,5 +1,6 @@
 import API from '../index.ts';
 
+// SHOULD BE REFACTORED AND MOVED TO CORRESPONDING SERVICES
 const REGISTRATION_URL = '/user';
 
 const registrationAPI = {

@@ -1,5 +1,6 @@
 import API from '../index.ts';
 
+// SHOULD BE REFACTORED AND MOVED TO CORRESPONDING SERVICES
 const STUDENT_URL = '/student';
 const GROUP_URL = '/group/member';
 const TASK_URL = '/tasklist';

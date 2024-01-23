@@ -81,7 +81,7 @@ export const CompareTest: FC<CompareTaskProps> = (props) => {
                   variant="outlined"
                   style={{ width: '120px', marginRight: '12px' }}
                   multiple
-                  value={option.connected}
+                  value={Array.isArray(option.connected) ? option.connected : []}
                   onChange={(e) =>
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                     // @ts-ignore

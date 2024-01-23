@@ -15,7 +15,7 @@ const loginAPI = {
     referral?: string;
   }) => {
     return API.post(
-      `${LOGIN_URL}?referral_link=${referral}`,
+      `${referral ? LOGIN_URL + `?referral=${referral}` : LOGIN_URL}`,
       { login, password },
       { withCredentials: false },
     ).then((res) => res.data);

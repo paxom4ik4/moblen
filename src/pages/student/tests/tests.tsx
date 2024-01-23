@@ -46,7 +46,7 @@ const Tests: FC<TestsProps> = memo((props) => {
     isLoading: isDataLoading,
     isLoadingError: isTaskListLoadingError,
   } = useQuery(
-    ['taskLists', activeTutor, selectedStudent],
+    ['taskLists', activeTutor, selectedStudent, studentData],
     () =>
       getStudentTaskLists({
         user_uuid: resultsView ? selectedStudent ?? '' : activeTutor,

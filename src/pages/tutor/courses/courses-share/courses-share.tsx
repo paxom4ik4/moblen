@@ -9,8 +9,6 @@ import { TitledCheckbox } from 'common/titled-checkbox/titled-checkbox.tsx';
 import { DateTimePicker } from '@mui/x-date-pickers';
 
 import './courses-share.scss';
-import { useSelector } from 'react-redux';
-import { RootState } from 'store/store.ts';
 import { useMutation, useQuery } from 'react-query';
 import { Button } from 'common/button/button.tsx';
 import { getTutorGroups } from 'services/tutor';
@@ -20,7 +18,7 @@ import { shareTaskList } from 'services/tasks';
 
 import GroupsIcon from 'assets/icons/groups-icon.svg';
 import { useNavigate } from 'react-router-dom';
-import { TutorRoutes } from '../../../../constants/routes.ts';
+import { TutorRoutes } from 'constants/routes.ts';
 
 const DEFAULT_CLASSNAME = 'courses-share';
 
@@ -45,9 +43,7 @@ interface CoursesShareProps {
 }
 
 export const CoursesShare: FC<CoursesShareProps> = (props) => {
-  const { userData } = useSelector((state: RootState) => state.userData);
-
-  const { data: groups } = useQuery('groups', () => getTutorGroups(userData!.uuid));
+  const { data: groups } = useQuery('groups', () => getTutorGroups());
 
   const { setTestToShare, testToShare, setTaskListShared } = props;
 
@@ -119,7 +115,7 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
                   key={group.group_uuid}
                   id={group.group_uuid}
                   name={group.group_name}
-                  amount={group.students?.length}
+                  amount={group.members_count}
                   hideControls
                 />
               ))

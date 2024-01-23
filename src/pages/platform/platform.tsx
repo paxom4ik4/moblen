@@ -13,8 +13,11 @@ import websiteInterface from './assets/website-interface-200h.png';
 import PastedIcon from './assets/pastedimage-yxbd.svg';
 import { Input } from '../../common/input/input.tsx';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Typography } from '../../common/typography/typography.tsx';
+import { useMutation } from 'react-query';
+import { PlatformFormData, sentForm } from '../../services/platform-form/platformForm.ts';
+import { Notification } from '../../common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'contact';
 
@@ -31,10 +34,46 @@ export const Platform = () => {
       phone: '',
       comment: '',
     },
-    onSubmit: (values) => {
-      console.log(values);
+    onSubmit: () => {},
+  });
+
+  const [dataSent, setDataSent] = useState(false);
+
+  const sentPlatformFromMutation = useMutation((data: PlatformFormData) => sentForm(data), {
+    onSuccess: () => {
+      contactForm.resetForm();
+      setDataSent(true);
     },
   });
+
+  const handleSubmitForm = () => {
+    const dataToSend = {
+      user_type: personType,
+      first_name: contactForm.values.first_name,
+      last_name: contactForm.values.last_name,
+      email: contactForm.values.email,
+      phone: contactForm.values.phone,
+      comment: contactForm.values.comment,
+      agreed: userAgreed,
+    };
+
+    sentPlatformFromMutation.mutate(
+      personType === 'organization'
+        ? {
+            ...dataToSend,
+            organization_name: contactForm.values.organization_name,
+          }
+        : dataToSend,
+    );
+  };
+
+  useEffect(() => {
+    if (dataSent) {
+      setTimeout(() => {
+        setDataSent(false);
+      }, 5000);
+    }
+  }, [dataSent]);
 
   const [activeVideoSection, setActiveVideoSection] = useState<'check' | 'generation'>('check');
 
@@ -42,6 +81,15 @@ export const Platform = () => {
 
   return (
     <div className="home-container">
+      {dataSent && (
+        <Notification
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          autoHideDuration={5000}
+          message={'Спасибо за заявку!'}
+          open={dataSent}
+          onClose={() => setDataSent(false)}
+        />
+      )}
       <Helmet>
         <title>Moblen - Платформа</title>
         <meta
@@ -490,6 +538,7 @@ export const Platform = () => {
                 !contactForm.values.email.trim().length ||
                 !contactForm.values.phone.trim().length
               }
+              onClick={handleSubmitForm}
               className={`send-button home-get-started6 template-button`}>
               <span className="home-text054">Отправить</span>
             </button>

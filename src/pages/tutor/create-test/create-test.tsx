@@ -189,11 +189,17 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
   };
 
   const [generateStarted, setGenerateStarted] = useState(false);
+  const [errorGenerating, setErrorGenerating] = useState(false);
 
   const generateTaskMutation = useMutation(
     (data: GenerateTaskPayload) => generateTask(tasksData.list_uuid, data),
     {
       onSuccess: async () => {
+        clearGenerateTaskState();
+        await queryClient.invalidateQueries('tasks');
+      },
+      onError: async () => {
+        setErrorGenerating(true);
         clearGenerateTaskState();
         await queryClient.invalidateQueries('tasks');
       },
@@ -293,6 +299,16 @@ const CreateTest: FC<{ isGenerateMode?: boolean }> = memo(({ isGenerateMode = fa
           message={'Началась генерация заданий (может занимать до 3х минут)'}
           open={generateStarted}
           onClose={() => setGenerateStarted(false)}
+        />
+      )}
+
+      {errorGenerating && (
+        <Notification
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+          autoHideDuration={5000}
+          message={'Ошибка во время генерации! Попробуйте изменить запрос'}
+          open={errorGenerating}
+          onClose={() => setErrorGenerating(false)}
         />
       )}
 

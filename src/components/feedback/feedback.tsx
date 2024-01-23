@@ -4,10 +4,8 @@ import { createPortal } from 'react-dom';
 import { Button, ButtonProps, styled, TextareaAutosize } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { useMutation } from 'react-query';
-import { sendFeedback } from '../../services/user';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store.ts';
-import { Notification } from '../../common/notification/notification.tsx';
+import { sendFeedback } from 'services/user';
+import { Notification } from 'common/notification/notification.tsx';
 
 const DEFAULT_CLASSNAME = 'feedback';
 
@@ -28,12 +26,10 @@ type FeedbackModalProps = {
 };
 
 const FeedbackModal: FC<FeedbackModalProps> = ({ setIsFeedbackOpened, setIsFeedbackSent }) => {
-  const { userData } = useSelector((state: RootState) => state.userData);
-
   const [feedbackText, setFeedbackText] = useState('');
 
   const sendFeedbackMutation = useMutation(
-    (data: { user_uuid: string; message: string }) => sendFeedback(data.user_uuid, data.message),
+    (data: { message: string }) => sendFeedback(data.message),
     {
       onSuccess: () => {
         setIsFeedbackOpened(false);
@@ -43,8 +39,8 @@ const FeedbackModal: FC<FeedbackModalProps> = ({ setIsFeedbackOpened, setIsFeedb
   );
 
   const sendFeedbackHandler = () => {
-    if (feedbackText.length && userData?.uuid) {
-      sendFeedbackMutation.mutate({ user_uuid: userData.uuid, message: feedbackText });
+    if (feedbackText.length) {
+      sendFeedbackMutation.mutate({ message: feedbackText });
     }
   };
 

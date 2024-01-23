@@ -169,7 +169,7 @@ const TestResult: FC = memo(() => {
         </div>
         <div className={`${DEFAULT_CLASSNAME}_tasks`}>
           {currentTask?.result?.map((task: CompletedTask, index: number) => (
-            <div className={`${DEFAULT_CLASSNAME}_tasks_item`}>
+            <div className={`${DEFAULT_CLASSNAME}_tasks_item`} key={task.task.task_uuid}>
               <div className={`${DEFAULT_CLASSNAME}_tasks_item_task`}>
                 <TaskPassCard
                   id={task.task.task_uuid}

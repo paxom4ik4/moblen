@@ -1,8 +1,8 @@
 import API from '../index.ts';
 import { Group } from 'types/group.ts';
 
+// SHOULD BE REFACTORED AND MOVED TO CORRESPONDING SERVICES
 const TUTOR_API_URL = '/tutor';
-
 const GROUPS_API_URL = '/group';
 
 const tutorAPI = {

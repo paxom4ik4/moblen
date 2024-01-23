@@ -1,12 +1,16 @@
 import API from '../index.ts';
+import { axiosAddAuthToken } from '../tokenHelper.ts';
 
 const USER_API_URL = '/user';
+const REPORT_URL = '/report';
 
 const userAPI = {
-  sendFeedback: (user_uuid: string, message: string) => {
-    return API.post(`${USER_API_URL}/${user_uuid}/report/`, { message }).then((res) => res.data);
+  sendFeedback: (message: string) => {
+    return API.post(`${REPORT_URL}`, { message }).then((res) => res.data);
   },
   getUserData: () => {
+    axiosAddAuthToken();
+
     return API.get(USER_API_URL).then((res) => res.data);
   },
   editUserPhoto: (formData: FormData) => {

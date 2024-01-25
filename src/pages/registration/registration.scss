@@ -5,6 +5,12 @@
   width: 100vw;
   height: 100vh;
 
+  &_main_button {
+    background-color: #6750a4 !important;
+    color: #FFFFFF !important;
+    margin-bottom: 48px;
+  }
+
   &_form {
     display: flex;
     flex-direction: column;

@@ -13,10 +13,11 @@ import { useDispatch, batch } from 'react-redux';
 import { setAppMode } from 'store/app-mode/app-mode.slice.ts';
 import { setUser } from 'store/user-data/user-data.slice.ts';
 import { handleDataStoring } from './utils.ts';
-import { LoginRoutes, TutorRoutes } from 'constants/routes.ts';
+import { LoginRoutes, PLATFORM_ROUTE, TutorRoutes } from 'constants/routes.ts';
 import { useMutation } from 'react-query';
 import { CircularProgress } from '@mui/material';
 import { Helmet } from 'react-helmet';
+import { Button } from '../../common/button/button.tsx';
 
 const DEFAULT_CLASSNAME = 'login';
 
@@ -115,6 +116,15 @@ export const LoginPage: FC = () => {
       </Helmet>
 
       <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={form.handleSubmit}>
+        <Button
+          onClick={() => navigate(PLATFORM_ROUTE)}
+          type="button"
+          textColor={'whiteText'}
+          className={`${DEFAULT_CLASSNAME}_main_button`}
+          color="primary"
+          title={'Перейти на главную страницу'}
+        />
+
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
           {mode === LoginModes.login ? 'Вход' : 'Восстановить пароль'}
         </Typography>

@@ -12,12 +12,13 @@ import {
   createNewTutor,
 } from 'services/registration/registration.ts';
 import { useNavigate, useParams } from 'react-router-dom';
-import { LoginRoutes } from 'constants/routes.ts';
+import { LoginRoutes, PLATFORM_ROUTE } from 'constants/routes.ts';
 import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { CircularProgress } from '@mui/material';
 import { AxiosError } from 'axios';
 import { Helmet } from 'react-helmet';
+import { Button } from '../../common/button/button.tsx';
 
 const DEFAULT_CLASSNAME = 'registration';
 
@@ -151,6 +152,15 @@ export const RegistrationPage: FC = () => {
       </Helmet>
 
       <form className={`${DEFAULT_CLASSNAME}_form`} onSubmit={registerForm.handleSubmit}>
+        <Button
+          onClick={() => navigate(PLATFORM_ROUTE)}
+          type="button"
+          textColor={'whiteText'}
+          className={`${DEFAULT_CLASSNAME}_main_button`}
+          color="primary"
+          title={'Перейти на главную страницу'}
+        />
+
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
           Регистрация {isTutorRegister ? 'преподавателя' : 'ученика'}
         </Typography>

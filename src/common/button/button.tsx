@@ -4,14 +4,16 @@ import { FC, ReactElement } from 'react';
 import './button.scss';
 import cn from 'classnames';
 import { Typography } from '../typography/typography.tsx';
+import { ButtonBaseProps } from '@mui/material';
 
-export interface ButtonProps {
+export interface ButtonProps extends ButtonBaseProps {
   title?: string;
   icon?: ReactElement;
   onClick?: () => void;
   className?: string;
   color?: 'primary' | 'dark';
   disabled?: boolean;
+  textColor?: string;
 }
 
 export const Button: FC<ButtonProps> = (props) => {
@@ -22,6 +24,7 @@ export const Button: FC<ButtonProps> = (props) => {
     icon,
     onClick,
     color = 'primary',
+    textColor,
     ...otherProps
   } = props;
 
@@ -30,7 +33,7 @@ export const Button: FC<ButtonProps> = (props) => {
       onClick={onClick}
       {...otherProps}
       className={cn(className, 'default-button', `btn-color-${color}`, { disabled: disabled })}>
-      <Typography>{title}</Typography> {icon}
+      <Typography className={textColor}>{title}</Typography> {icon}
     </button>
   );
 };

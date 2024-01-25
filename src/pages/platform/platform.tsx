@@ -395,7 +395,7 @@ export const Platform = () => {
                   <span>₽</span>
                   <br></br>
                 </span>
-                <span className="home-text080">6</span>
+                <span className="home-text080">3</span>
                 <span className="home-text081">/ проверка</span>
               </div>
               <div className="home-container16">

@@ -25,7 +25,7 @@ import {
 } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
-import { LoginRoutes, PLATFORM_ROUTE, StudentRoutes, TutorRoutes } from './constants/routes.ts';
+import { LoginRoutes, PLATFORM_ROUTE, StudentRoutes, TutorRoutes, OrgRoutes } from './constants/routes.ts';
 
 import MenuIcon from 'assets/icons/menu-item.svg';
 import { axiosAddAuthToken } from './services/tokenHelper.ts';
@@ -47,6 +47,7 @@ const App: FC = () => {
   const PassTest = lazy(() => import('./pages/student/pass-test/pass-test.tsx'));
   const TestResult = lazy(() => import('./pages/student/test-result/test-result.tsx'));
   const Results = lazy(() => import('./pages/tutor/results/results.tsx'));
+  const Organization = lazy(() => import('./pages/org/main.tsx'));
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -152,6 +153,12 @@ const App: FC = () => {
       <Route path={StudentRoutes.PASS_TEST} element={<PassTest />} />
       <Route path={StudentRoutes.TEST_RESULT} element={<TestResult />} />
       <Route path={LoginRoutes.JOIN_WITH_REF} element={<Tests />} />
+    </>
+  );
+  
+  const orgRoutes = (
+    <>
+    <Route path={OrgRoutes.ORGANIZATION} element={<Organization />} />
     </>
   );
 

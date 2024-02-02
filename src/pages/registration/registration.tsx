@@ -25,19 +25,25 @@ const DEFAULT_CLASSNAME = 'registration';
 const MOBLEN_PROMO = 'moblen2024';
 
 export interface RegistrationValues {
+  title?: string,
   name: string;
   surname: string;
   login: string;
   password: string;
   passwordRepeat: string;
   referralLink?: string;
-  promo: string;
+  promo?: string;
 }
+
+type TypeEntityRegister =  'tutor' | 'org' | 'student';
+
 
 export const RegistrationPage: FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const params = useParams();
+
+  const [entityRegister, setEntityRegister] = useState<TypeEntityRegister>('org');
 
   const [isTutorRegister, setIsTutorRegister] = useState<boolean>(true);
   const changeModeHandler = () => setIsTutorRegister(!isTutorRegister);
@@ -66,7 +72,8 @@ export const RegistrationPage: FC = () => {
       login: '',
       password: '',
       passwordRepeat: '',
-      promo: isTutorRegister ? '' : MOBLEN_PROMO,
+      promo: entityRegister === 'org' ? MOBLEN_PROMO : '',
+      // promo: isTutorRegister ? '' : MOBLEN_PROMO,
     },
     onSubmit: (values) =>
       isTutorRegister ? handleTutorRegister(values) : handleStudentRegister(values),
@@ -124,7 +131,7 @@ export const RegistrationPage: FC = () => {
   );
 
   const handleTutorRegister = async (values: RegistrationValues) => {
-    if (values.promo !== MOBLEN_PROMO) {
+    // if (values.promo !== MOBLEN_PROMO) {
       await registerForm.resetForm({
         values: {
           login: registerForm.values.login,
@@ -132,14 +139,32 @@ export const RegistrationPage: FC = () => {
           passwordRepeat: registerForm.values.passwordRepeat,
           surname: registerForm.values.surname,
           name: registerForm.values.name,
-          promo: '',
+          // promo: '',
         },
-        errors: { promo: 'Введен неверный промокод' },
+        // errors: { promo: 'Введен неверный промокод' },
       });
-    } else {
+    // } else {
+    //   await createNewTutorMutation.mutate(values);
+    // }
+  };
+const handleOrgRegister = async (values: RegistrationValues) => {
+  if (values.promo !== MOBLEN_PROMO) {
+  await registerForm.resetForm({
+    values: {
+      title: registerForm.values.title,
+      name: registerForm.values.name,
+      surname: registerForm.values.surname,        
+      login: registerForm.values.login,
+      password: registerForm.values.password,
+      passwordRepeat: registerForm.values.passwordRepeat,
+      promo: '',
+    },
+    errors: { promo: 'Введен неверный промокод' },
+  })
+      } else {
       await createNewTutorMutation.mutate(values);
     }
-  };
+}
 
   return (
     <div className={DEFAULT_CLASSNAME}>
@@ -162,7 +187,8 @@ export const RegistrationPage: FC = () => {
         />
 
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
-          Регистрация {isTutorRegister ? 'преподавателя' : 'ученика'}
+          Регистрация {entityRegister === 'org' ? 'организации' : (entityRegister === 'tutor' ? 'преподавателя' : 'ученика')}
+          {/* Регистрация {isTutorRegister ? 'преподавателя' : 'ученика'} */}
         </Typography>
 
         <Input
@@ -217,7 +243,7 @@ export const RegistrationPage: FC = () => {
           {registerForm.errors.passwordRepeat}
         </div>
 
-        {isTutorRegister && (
+        {/* {isTutorRegister && (
           <>
             <Input
               label={'Промокод'}
@@ -231,7 +257,7 @@ export const RegistrationPage: FC = () => {
               {registerForm.errors.promo}
             </div>
           </>
-        )}
+        )} */}
 
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
@@ -247,7 +273,8 @@ export const RegistrationPage: FC = () => {
                 onClick={changeModeHandler}
                 color={'purple'}
                 className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-                Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'}
+                {/* Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'} */}
+                Регистрация {entityRegister === 'org' ? 'организации' : (entityRegister === 'tutor' ? 'преподавателя' : 'ученика')}
               </Typography>
             )}
           </div>

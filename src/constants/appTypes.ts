@@ -1,6 +1,7 @@
 export enum AppModes {
   ST = 'ST',
   TT = 'TT',
+  ORG = 'ORG'
 }
 
 export enum LoginModes {

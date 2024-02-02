@@ -13,6 +13,10 @@ export enum StudentRoutes {
   TEST_RESULT = '/assignments/result/:id',
 }
 
+export enum OrgRoutes {
+  ORGANIZATION = '/organization',
+}
+
 export enum LoginRoutes {
   LOGIN = '/login-page',
   REGISTRATION = '/registration',

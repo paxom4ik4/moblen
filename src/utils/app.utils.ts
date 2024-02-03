@@ -26,6 +26,13 @@ export const studentRouteConfig = [
   },
 ];
 
+export const orgRouteConfig = [
+  {
+    title: 'преподаватели',
+    path: '/organization'
+  }
+]
+
 export const clearLocalStorage = () => {
   localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');

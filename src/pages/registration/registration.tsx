@@ -10,6 +10,7 @@ import {
   createNewStudent,
   createNewStudentWithRef,
   createNewTutor,
+  createNewOrg,
 } from 'services/registration/registration.ts';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoginRoutes, PLATFORM_ROUTE } from 'constants/routes.ts';
@@ -46,7 +47,11 @@ export const RegistrationPage: FC = () => {
   const [entityRegister, setEntityRegister] = useState<TypeEntityRegister>('org');
 
   const [isTutorRegister, setIsTutorRegister] = useState<boolean>(true);
-  const changeModeHandler = () => setIsTutorRegister(!isTutorRegister);
+
+  const changeModeHandler = (value: TypeEntityRegister) =>{
+  setEntityRegister(value);
+  }
+  // setIsTutorRegister(!isTutorRegister);
 
   const handleLoginStudentWithRef = () =>
     navigate(params.groupId ? `${LoginRoutes.LOGIN}/ref/${params.groupId}` : LoginRoutes.LOGIN);
@@ -64,24 +69,30 @@ export const RegistrationPage: FC = () => {
       await createStudentMutation(values);
     }
   };
-
+const InitValues = entityRegister === 'org' ? {
+  title: '',
+  name: '',
+  surname: '',
+  login: '',
+  password: '',
+  passwordRepeat: '',
+  promo: entityRegister === 'org' ? MOBLEN_PROMO : '',
+} : {
+  name: '',
+  surname: '',
+  login: '',
+  password: '',
+  passwordRepeat: '',
+}
   const registerForm = useFormik({
-    initialValues: {
-      name: '',
-      surname: '',
-      login: '',
-      password: '',
-      passwordRepeat: '',
-      promo: entityRegister === 'org' ? MOBLEN_PROMO : '',
-      // promo: isTutorRegister ? '' : MOBLEN_PROMO,
-    },
+    initialValues: InitValues,
     onSubmit: (values) =>
-      isTutorRegister ? handleTutorRegister(values) : handleStudentRegister(values),
+    entityRegister === 'org' ? handleOrgRegister(values) : (entityRegister === 'tutor' ? handleTutorRegister(values) : handleStudentRegister(values)),
     validate: (values) => validateFn(values, isTutorRegister),
   });
 
   const createNewTutorMutation = useMutation(
-    (data: { name: string; surname: string; login: string; password: string; promo: string }) =>
+    (data: { name: string; surname: string; login: string; password: string}) =>
       createNewTutor(data),
     {
       onSuccess: async () => {
@@ -97,7 +108,6 @@ export const RegistrationPage: FC = () => {
               login: '',
               password: '',
               passwordRepeat: '',
-              promo: '',
               surname: registerForm.values.surname,
               name: registerForm.values.name,
             },
@@ -139,21 +149,20 @@ export const RegistrationPage: FC = () => {
           passwordRepeat: registerForm.values.passwordRepeat,
           surname: registerForm.values.surname,
           name: registerForm.values.name,
-          // promo: '',
         },
         // errors: { promo: 'Введен неверный промокод' },
       });
     // } else {
-    //   await createNewTutorMutation.mutate(values);
+      await createNewTutorMutation.mutate(values);
     // }
   };
 const handleOrgRegister = async (values: RegistrationValues) => {
   if (values.promo !== MOBLEN_PROMO) {
-  await registerForm.resetForm({
+  registerForm.resetForm({
     values: {
       title: registerForm.values.title,
       name: registerForm.values.name,
-      surname: registerForm.values.surname,        
+      surname: registerForm.values.surname,
       login: registerForm.values.login,
       password: registerForm.values.password,
       passwordRepeat: registerForm.values.passwordRepeat,
@@ -161,9 +170,9 @@ const handleOrgRegister = async (values: RegistrationValues) => {
     },
     errors: { promo: 'Введен неверный промокод' },
   })
-      } else {
-      await createNewTutorMutation.mutate(values);
-    }
+  } else {
+    await createNewOrg(values);
+  }
 }
 
   return (
@@ -188,9 +197,22 @@ const handleOrgRegister = async (values: RegistrationValues) => {
 
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
           Регистрация {entityRegister === 'org' ? 'организации' : (entityRegister === 'tutor' ? 'преподавателя' : 'ученика')}
-          {/* Регистрация {isTutorRegister ? 'преподавателя' : 'ученика'} */}
         </Typography>
-
+        {entityRegister === 'org' ?
+        <>
+        <Input
+          onBlur={registerForm.handleBlur}
+          onChange={registerForm.handleChange}
+          value={registerForm.values.title}
+          label={'Название'}
+          type="title"
+          name="title"
+        />
+        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerForm.errors.title}</div>
+        </>
+        :
+        <></>
+        }
         <Input
           onBlur={registerForm.handleBlur}
           onChange={registerForm.handleChange}
@@ -243,7 +265,7 @@ const handleOrgRegister = async (values: RegistrationValues) => {
           {registerForm.errors.passwordRepeat}
         </div>
 
-        {/* {isTutorRegister && (
+        {entityRegister === 'org' && (
           <>
             <Input
               label={'Промокод'}
@@ -252,12 +274,11 @@ const handleOrgRegister = async (values: RegistrationValues) => {
               type="text"
               name="promo"
             />
-
             <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
               {registerForm.errors.promo}
             </div>
           </>
-        )} */}
+        )}
 
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
@@ -269,13 +290,27 @@ const handleOrgRegister = async (values: RegistrationValues) => {
               <Typography color={'default'}>Есть аккаунт?</Typography> Войти
             </Typography>
             {!location.pathname.includes('ref') && (
+              <>
               <Typography
-                onClick={changeModeHandler}
+                onClick={()=>{
+                  const value = (entityRegister === 'org') ? 'tutor' : (entityRegister === 'student' ? 'tutor' : 'org')
+                 return changeModeHandler(value);                  
+                }}
                 color={'purple'}
                 className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-                {/* Регистрация {isTutorRegister ? 'ученика' : 'преподавателя'} */}
-                Регистрация {entityRegister === 'org' ? 'организации' : (entityRegister === 'tutor' ? 'преподавателя' : 'ученика')}
+                Регистрация {entityRegister === 'org' ? 'преподавателя' : (entityRegister === 'student' ? 'преподавателя' : 'организации')}
               </Typography>
+              <Typography
+                onClick={()=>{
+                  const value = (entityRegister == 'org') ? 'student' : (entityRegister == 'tutor' ? 'student' : 'org');
+                 return changeModeHandler(value);                  
+                }}
+                color={'purple'}
+                className={`${DEFAULT_CLASSNAME}_footer_mode`}
+              >
+                Регистрация {entityRegister === 'org' ? 'ученика' : (entityRegister === 'tutor' ? 'ученика' : 'организации')}
+              </Typography>
+              </>
             )}
           </div>
 

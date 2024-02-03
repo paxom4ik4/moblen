@@ -4,28 +4,28 @@ import API from '../index.ts';
 const REGISTRATION_URL = '/user';
 
 const registrationAPI = {
-  createNewTutor: ({
+  createNewTutor: async ({
     name,
     surname,
     login,
     password,
-    promo,
   }: {
     name: string;
     surname: string;
     login: string;
     password: string;
-    promo: string;
   }) => {
-    return API.post(`${REGISTRATION_URL}?promo_code=${promo}`, {
+    const res = await API.post(`${REGISTRATION_URL}`, {
+      // return API.post(`${REGISTRATION_URL}?promo_code=${promo}`, {
       first_name: name,
       last_name: surname,
       login,
       password,
       role: 'tt',
-    }).then((res) => res.data);
+    });
+    return res.data;
   },
-  createNewStudent: ({
+  createNewStudent: async ({
     name,
     surname,
     login,
@@ -36,15 +36,16 @@ const registrationAPI = {
     login: string;
     password: string;
   }) => {
-    return API.post(`${REGISTRATION_URL}`, {
+    const res = await API.post(`${REGISTRATION_URL}`, {
       first_name: name,
       last_name: surname,
       login,
       password,
       role: 'st',
-    }).then((res) => res.data);
+    });
+    return res.data;
   },
-  createNewStudentWithRef: ({
+  createNewStudentWithRef: async ({
     name,
     surname,
     login,
@@ -57,14 +58,40 @@ const registrationAPI = {
     password: string;
     referral?: string;
   }) => {
-    return API.post(`${REGISTRATION_URL}?referral=${referral}`, {
+    const res = await API.post(`${REGISTRATION_URL}?referral=${referral}`, {
       first_name: name,
       last_name: surname,
       login,
       password,
       role: 'st',
-    }).then((res) => res.data);
+    });
+    return res.data;
   },
+  createNewOrg: async ({
+    title,
+    name,
+    surname,
+    login,
+    password,
+    promo
+  }: {
+    title?: string,
+    name: string,
+    surname: string,
+    login: string,
+    password: string,
+    promo?: string
+  }) => {
+    const res = await API.post(`${REGISTRATION_URL}?promo_code=${promo}`, {
+      org_name: title,
+      first_name: name,
+      last_name: surname,
+      login,
+      password,
+      role: 'org',
+    });
+    return res.data;
+  }
 };
 
-export const { createNewTutor, createNewStudent, createNewStudentWithRef } = registrationAPI;
+export const { createNewTutor, createNewStudent, createNewStudentWithRef, createNewOrg } = registrationAPI;

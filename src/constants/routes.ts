@@ -13,8 +13,10 @@ export enum StudentRoutes {
   TEST_RESULT = '/assignments/result/:id',
 }
 
+
 export enum OrgRoutes {
   ORGANIZATION = '/organization',
+  ASSIGNMENTS = '/assignments'
 }
 
 export enum LoginRoutes {

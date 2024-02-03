@@ -22,6 +22,7 @@ import {
   getStoredAppMode,
   routeConfig,
   studentRouteConfig,
+  orgRouteConfig
 } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
@@ -62,7 +63,7 @@ const App: FC = () => {
 
     batch(() => {
       dispatch(setUser(null));
-      dispatch(setAppMode(null));
+      dispatch((null));
     });
   };
 
@@ -109,7 +110,7 @@ const App: FC = () => {
   }, []);
 
   useEffect(() => {
-    const config = appMode === AppModes.TT ? routeConfig : studentRouteConfig;
+    const config = appMode === AppModes.TT ? routeConfig : (appMode === AppModes.ORG ? orgRouteConfig : studentRouteConfig);
 
     setCurrentTitle(config.find((route) => route.path === location.pathname)?.title ?? '');
   }, [appMode, location]);
@@ -158,7 +159,9 @@ const App: FC = () => {
   
   const orgRoutes = (
     <>
-    <Route path={OrgRoutes.ORGANIZATION} element={<Organization />} />
+    <Route path="*" element={<Navigate to={OrgRoutes.ASSIGNMENTS} replace />} />
+    <Route path={OrgRoutes.ASSIGNMENTS} element={<Organization />} />
+    {/* <Route path={OrgRoutes.ORGANIZATION} element={<Organization />} /> */}
     </>
   );
 
@@ -184,7 +187,7 @@ const App: FC = () => {
       <Routes>
         <Route path={PLATFORM_ROUTE} element={<Platform />} />
         <Route path="*" element={<Navigate to="/assignments" replace />} />
-        {appMode === AppModes.TT ? tutorRoutes : studentRoutes}
+        {appMode === AppModes.TT ? tutorRoutes : (appMode === AppModes.ORG ? orgRoutes : studentRoutes)}
       </Routes>
     </div>
   );

@@ -75,7 +75,15 @@ export const LoginPage: FC = () => {
           });
 
           handleDataStoring(user, user.role);
-        } else {
+        } else if (user.role === 'ST'){
+          batch(() => {
+            dispatch(setUser(user));
+            dispatch(setAppMode(user.role));
+          });
+
+          handleDataStoring(user, user.role);
+        }
+        else {
           batch(() => {
             dispatch(setUser(user));
             dispatch(setAppMode(user.role));

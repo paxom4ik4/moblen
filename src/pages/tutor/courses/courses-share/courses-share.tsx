@@ -71,7 +71,7 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
       see_criteria: seeCriteria,
       replay,
       appreciable,
-      deadline: withDeadline ? dayjs(deadline).format('YYYY-MM-DDThh:mm:ss.SSSZ') : null,
+      deadline: withDeadline ? dayjs(deadline).format('YYYY-MM-DDTHH:mm:ss.SSSZ') : null,
       time_limit: withTimeLimit ? Number(timeLimit) : null,
     });
 

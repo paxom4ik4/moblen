@@ -24,7 +24,7 @@ export const Typography: FC<TypographyProps> = (props) => {
 
   return (
     <p
-      style={{ whiteSpace: 'pre-wrap' }}
+      style={{ whiteSpace: 'pre' }}
       onClick={onClick}
       className={cl(
         className,

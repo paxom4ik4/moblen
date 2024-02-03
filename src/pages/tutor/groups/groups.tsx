@@ -147,6 +147,7 @@ const Groups: FC<GroupsProps> = memo((props) => {
             <Typography></Typography>
           )}
 
+          <div className={`${DEFAULT_CLASSNAME}_scrolled`}>
           {selectedGroup &&
             selectedGroupData &&
             selectedGroupData?.members?.map((student: Student) => (
@@ -161,6 +162,8 @@ const Groups: FC<GroupsProps> = memo((props) => {
                 imgUrl={student.photo}
               />
             ))}
+          </div>
+
           {!viewMode && (
             <Tooltip placement={'top'} title="Удалить">
               <div

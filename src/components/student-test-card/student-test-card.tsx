@@ -57,6 +57,9 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     seeCriteria = true,
   } = props;
 
+  // console.log('deadline props', props);
+  
+
   const [listStatus, score, maxScore] = status;
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
@@ -138,7 +141,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
         <button
           disabled={
             (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
-            (!!deadline && new Date(deadline) < new Date(Date.now())) ||
+            (deadline && new Date(deadline) < new Date(Date.now())) ||
             listStatus !== LIST_STATUS.completed
           }
           className={`${DEFAULT_CLASSNAME}_status ${
@@ -177,7 +180,11 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
       )}
       {!resultsView && (
         <button
-          disabled={listStatus === LIST_STATUS.pending && tasksAmount === 0}
+        disabled={
+          (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
+          (deadline && new Date(deadline) < new Date(Date.now())) ||
+          listStatus !== LIST_STATUS.completed
+        }
           className={`${DEFAULT_CLASSNAME}_status ${
             listStatus === LIST_STATUS.pending && !!deadline && 'red-border'
           }`}

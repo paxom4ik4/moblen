@@ -11,20 +11,19 @@ import { AppModes } from 'constants/appTypes.ts';
 const REQUIRED = 'Обязательное поле';
 const PASSWORD_MATCH = 'Пароли несовпадают';
 const WRONG_MAIL_FORMAT = 'Неверный формат Email';
-const WRONG_PHONE_FORMAT = 'Неверный формат телефона';
-const PASSWORD_CHECK_ERROR = 'Минимум 8 символов, содержащий цифру';
+// const WRONG_PHONE_FORMAT = 'Неверный формат телефона';
+const PASSWORD_CHECK_ERROR = 'Минимум 8 символов, содержащий цифру, без кириллицы';
 
 export const validateFn = (values: RegistrationValues, isTutorRegister: boolean) => {
   const errors: Partial<RegistrationValues> = {};
+  // eslint-disable-next-line no-useless-escape
+  const regMail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
   if (!values.login) {
     errors.login = REQUIRED;
-  } else if (
-    /\D/.test(values.login) &&
-    !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.login)
-  ) {
-    errors.login = WRONG_MAIL_FORMAT;
-  } else if (!/\D/.test(values.login) && values.login.length < 11) {
-    errors.login = WRONG_PHONE_FORMAT;
+  } else {
+    if (!regMail.test(values.login)) {
+      errors.login = WRONG_MAIL_FORMAT;
+    }
   }
 
   if (!values.name) {
@@ -39,9 +38,12 @@ export const validateFn = (values: RegistrationValues, isTutorRegister: boolean)
     errors.promo = REQUIRED;
   }
 
+  // eslint-disable-next-line no-useless-escape
+  const regPassword = /(?=.*[0-9])[0-9a-zA-Z\\!\.\/\[\]\-\=@#$%^>\,\.<&{?}~*]{8,}/g
+
   if (!values.password) {
     errors.password = REQUIRED;
-  } else if (!/(?=.*[0-9])(?=.*[a-z])[0-9a-zA-Z!@#$%^&*]{8,}/g.test(values.password)) {
+  } else if (!regPassword.test(values.password)) {
     errors.password = PASSWORD_CHECK_ERROR;
   }
 

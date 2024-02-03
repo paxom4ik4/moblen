@@ -364,7 +364,7 @@ export const Platform = () => {
                   <span>₽</span>
                   <br></br>
                 </span>
-                <span className="home-text065">15</span>
+                <span className="home-text065">8</span>
                 <span className="home-text066">/ проверка</span>
               </div>
               <div className="home-container13">
@@ -372,7 +372,7 @@ export const Platform = () => {
                   <span>₽</span>
                   <br></br>
                 </span>
-                <span className="home-text070">15</span>
+                <span className="home-text070">9</span>
                 <span className="home-text071">/ генерация(в среднем)*</span>
               </div>
               <span className="home-text072">
@@ -395,7 +395,7 @@ export const Platform = () => {
                   <span>₽</span>
                   <br></br>
                 </span>
-                <span className="home-text080">3</span>
+                <span className="home-text080">5</span>
                 <span className="home-text081">/ проверка</span>
               </div>
               <div className="home-container16">

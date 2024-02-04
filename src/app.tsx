@@ -22,11 +22,17 @@ import {
   getStoredAppMode,
   routeConfig,
   studentRouteConfig,
-  orgRouteConfig
+  orgRouteConfig,
 } from './utils/app.utils.ts';
 import { setUser } from './store/user-data/user-data.slice.ts';
 import { setAppMode } from './store/app-mode/app-mode.slice.ts';
-import { LoginRoutes, PLATFORM_ROUTE, StudentRoutes, TutorRoutes, OrgRoutes } from './constants/routes.ts';
+import {
+  LoginRoutes,
+  PLATFORM_ROUTE,
+  StudentRoutes,
+  TutorRoutes,
+  OrgRoutes,
+} from './constants/routes.ts';
 
 import MenuIcon from 'assets/icons/menu-item.svg';
 import { axiosAddAuthToken } from './services/tokenHelper.ts';
@@ -63,10 +69,10 @@ const App: FC = () => {
 
     batch(() => {
       dispatch(setUser(null));
-      dispatch((null));
+      dispatch(setAppMode(null));
     });
   };
-console.log(localStorage.getItem('accessToken'))
+  console.log(localStorage.getItem('accessToken'));
   const refreshTokenHandler = (res: {
     access_token: string;
     refresh_token: string;
@@ -110,7 +116,12 @@ console.log(localStorage.getItem('accessToken'))
   }, []);
 
   useEffect(() => {
-    const config = appMode === AppModes.TT ? routeConfig : (appMode === AppModes.ORG ? orgRouteConfig : studentRouteConfig);
+    const config =
+      appMode === AppModes.TT
+        ? routeConfig
+        : appMode === AppModes.ORG
+          ? orgRouteConfig
+          : studentRouteConfig;
 
     setCurrentTitle(config.find((route) => route.path === location.pathname)?.title ?? '');
   }, [appMode, location]);
@@ -156,12 +167,12 @@ console.log(localStorage.getItem('accessToken'))
       <Route path={LoginRoutes.JOIN_WITH_REF} element={<Tests />} />
     </>
   );
-  
+
   const orgRoutes = (
     <>
-    <Route path="*" element={<Navigate to={OrgRoutes.ASSIGNMENTS} replace />} />
-    <Route path={OrgRoutes.ASSIGNMENTS} element={<Organization />} />
-    {/* <Route path={OrgRoutes.ORGANIZATION} element={<Organization />} /> */}
+      <Route path="*" element={<Navigate to={OrgRoutes.ASSIGNMENTS} replace />} />
+      <Route path={OrgRoutes.ASSIGNMENTS} element={<Organization />} />
+      {/* <Route path={OrgRoutes.ORGANIZATION} element={<Organization />} /> */}
     </>
   );
 
@@ -187,7 +198,11 @@ console.log(localStorage.getItem('accessToken'))
       <Routes>
         <Route path={PLATFORM_ROUTE} element={<Platform />} />
         <Route path="*" element={<Navigate to="/assignments" replace />} />
-        {appMode === AppModes.TT ? tutorRoutes : (appMode === AppModes.ORG ? orgRoutes : studentRoutes)}
+        {appMode === AppModes.TT
+          ? tutorRoutes
+          : appMode === AppModes.ORG
+            ? orgRoutes
+            : studentRoutes}
       </Routes>
     </div>
   );
@@ -200,6 +215,7 @@ console.log(localStorage.getItem('accessToken'))
       <Route path={LoginRoutes.JOIN_WITH_REF} element={<LoginPage />} />
       <Route path={LoginRoutes.REGISTRATION} element={<RegistrationPage />} />
       <Route path={LoginRoutes.REGISTER_WITH_REF} element={<RegistrationPage />} />
+      <Route path={LoginRoutes.REGISTER_ORG_WITH_REF} element={<RegistrationPage />} />
     </Routes>
   );
 

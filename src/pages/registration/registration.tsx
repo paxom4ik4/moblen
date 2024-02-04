@@ -26,7 +26,7 @@ const DEFAULT_CLASSNAME = 'registration';
 const MOBLEN_PROMO = 'moblen2024';
 
 export interface RegistrationValues {
-  title?: string,
+  title?: string;
   name: string;
   surname: string;
   login: string;
@@ -36,8 +36,7 @@ export interface RegistrationValues {
   promo?: string;
 }
 
-type TypeEntityRegister =  'tutor' | 'org' | 'student';
-
+type TypeEntityRegister = 'tutor' | 'org' | 'student';
 
 export const RegistrationPage: FC = () => {
   const navigate = useNavigate();
@@ -46,18 +45,21 @@ export const RegistrationPage: FC = () => {
 
   const [entityRegister, setEntityRegister] = useState<TypeEntityRegister>('org');
 
-  const [isTutorRegister, setIsTutorRegister] = useState<boolean>(true);
+  const [isTutorRegister] = useState<boolean>(true);
 
-  const changeModeHandler = (value: TypeEntityRegister) =>{
-  setEntityRegister(value);
-  }
-  // setIsTutorRegister(!isTutorRegister);
+  const changeModeHandler = (value: TypeEntityRegister) => {
+    setEntityRegister(value);
+  };
 
   const handleLoginStudentWithRef = () =>
     navigate(params.groupId ? `${LoginRoutes.LOGIN}/ref/${params.groupId}` : LoginRoutes.LOGIN);
 
   useEffect(() => {
-    params.groupId && setIsTutorRegister(false);
+    if (params.groupId && location.pathname.includes('joinOrg')) {
+      changeModeHandler('tutor');
+    } else {
+      changeModeHandler('student');
+    }
   }, [params.groupId]);
 
   const handleStudentRegister = async (values: RegistrationValues) => {
@@ -69,30 +71,37 @@ export const RegistrationPage: FC = () => {
       await createStudentMutation(values);
     }
   };
-const InitValues = entityRegister === 'org' ? {
-  title: '',
-  name: '',
-  surname: '',
-  login: '',
-  password: '',
-  passwordRepeat: '',
-  promo: entityRegister === 'org' ? MOBLEN_PROMO : '',
-} : {
-  name: '',
-  surname: '',
-  login: '',
-  password: '',
-  passwordRepeat: '',
-}
+  const InitValues =
+    entityRegister === 'org'
+      ? {
+          title: '',
+          name: '',
+          surname: '',
+          login: '',
+          password: '',
+          passwordRepeat: '',
+          promo: entityRegister === 'org' ? MOBLEN_PROMO : '',
+        }
+      : {
+          name: '',
+          surname: '',
+          login: '',
+          password: '',
+          passwordRepeat: '',
+        };
   const registerForm = useFormik({
     initialValues: InitValues,
     onSubmit: (values) =>
-    entityRegister === 'org' ? handleOrgRegister(values) : (entityRegister === 'tutor' ? handleTutorRegister(values) : handleStudentRegister(values)),
+      entityRegister === 'org'
+        ? handleOrgRegister(values)
+        : entityRegister === 'tutor'
+          ? handleTutorRegister(values)
+          : handleStudentRegister(values),
     validate: (values) => validateFn(values, isTutorRegister),
   });
 
   const createNewTutorMutation = useMutation(
-    (data: { name: string; surname: string; login: string; password: string}) =>
+    (data: { name: string; surname: string; login: string; password: string; reflink?: string }) =>
       createNewTutor(data),
     {
       onSuccess: async () => {
@@ -140,40 +149,53 @@ const InitValues = entityRegister === 'org' ? {
     },
   );
 
+  const { isLoading: isOrgLoading, mutateAsync: createOrgMutation } = useMutation(
+    (data: {
+      title?: string;
+      name: string;
+      surname: string;
+      login: string;
+      password: string;
+      promo?: string;
+    }) => createNewOrg(data),
+    {
+      onSuccess: async () => {
+        await loginAfterRegister(registerForm.values, dispatch);
+        registerForm.resetForm();
+      },
+    },
+  );
+
   const handleTutorRegister = async (values: RegistrationValues) => {
-    // if (values.promo !== MOBLEN_PROMO) {
-      await registerForm.resetForm({
+    const tutorRefLink = location.pathname.split('/');
+    const refLink = location.pathname.includes('joinOrg') && tutorRefLink[tutorRefLink.length - 1];
+
+    if (refLink) {
+      await createNewTutorMutation.mutate({ ...values, reflink: refLink });
+    } else {
+      await createNewTutorMutation.mutate(values);
+    }
+  };
+  const handleOrgRegister = async (values: RegistrationValues) => {
+    if (values.promo !== MOBLEN_PROMO) {
+      registerForm.resetForm({
         values: {
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-expect-error
+          title: registerForm.values.title,
+          name: registerForm.values.name,
+          surname: registerForm.values.surname,
           login: registerForm.values.login,
           password: registerForm.values.password,
           passwordRepeat: registerForm.values.passwordRepeat,
-          surname: registerForm.values.surname,
-          name: registerForm.values.name,
+          promo: '',
         },
-        // errors: { promo: 'Введен неверный промокод' },
+        errors: { promo: 'Введен неверный промокод' },
       });
-    // } else {
-      await createNewTutorMutation.mutate(values);
-    // }
+    } else {
+      await createOrgMutation(values);
+    }
   };
-const handleOrgRegister = async (values: RegistrationValues) => {
-  if (values.promo !== MOBLEN_PROMO) {
-  registerForm.resetForm({
-    values: {
-      title: registerForm.values.title,
-      name: registerForm.values.name,
-      surname: registerForm.values.surname,
-      login: registerForm.values.login,
-      password: registerForm.values.password,
-      passwordRepeat: registerForm.values.passwordRepeat,
-      promo: '',
-    },
-    errors: { promo: 'Введен неверный промокод' },
-  })
-  } else {
-    await createNewOrg(values);
-  }
-}
 
   return (
     <div className={DEFAULT_CLASSNAME}>
@@ -196,23 +218,30 @@ const handleOrgRegister = async (values: RegistrationValues) => {
         />
 
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
-          Регистрация {entityRegister === 'org' ? 'организации' : (entityRegister === 'tutor' ? 'преподавателя' : 'ученика')}
+          Регистрация{' '}
+          {entityRegister === 'org'
+            ? 'организации'
+            : entityRegister === 'tutor'
+              ? 'преподавателя'
+              : 'ученика'}
         </Typography>
-        {entityRegister === 'org' ?
-        <>
-        <Input
-          onBlur={registerForm.handleBlur}
-          onChange={registerForm.handleChange}
-          value={registerForm.values.title}
-          label={'Название'}
-          type="title"
-          name="title"
-        />
-        <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>{registerForm.errors.title}</div>
-        </>
-        :
-        <></>
-        }
+        {entityRegister === 'org' ? (
+          <>
+            <Input
+              onBlur={registerForm.handleBlur}
+              onChange={registerForm.handleChange}
+              value={registerForm.values.title}
+              label={'Название'}
+              type="title"
+              name="title"
+            />
+            <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
+              {registerForm.errors.title}
+            </div>
+          </>
+        ) : (
+          <></>
+        )}
         <Input
           onBlur={registerForm.handleBlur}
           onChange={registerForm.handleChange}
@@ -291,30 +320,49 @@ const handleOrgRegister = async (values: RegistrationValues) => {
             </Typography>
             {!location.pathname.includes('ref') && (
               <>
-              <Typography
-                onClick={()=>{
-                  const value = (entityRegister === 'org') ? 'tutor' : (entityRegister === 'student' ? 'tutor' : 'org')
-                 return changeModeHandler(value);                  
-                }}
-                color={'purple'}
-                className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-                Регистрация {entityRegister === 'org' ? 'преподавателя' : (entityRegister === 'student' ? 'преподавателя' : 'организации')}
-              </Typography>
-              <Typography
-                onClick={()=>{
-                  const value = (entityRegister == 'org') ? 'student' : (entityRegister == 'tutor' ? 'student' : 'org');
-                 return changeModeHandler(value);                  
-                }}
-                color={'purple'}
-                className={`${DEFAULT_CLASSNAME}_footer_mode`}
-              >
-                Регистрация {entityRegister === 'org' ? 'ученика' : (entityRegister === 'tutor' ? 'ученика' : 'организации')}
-              </Typography>
+                <Typography
+                  onClick={() => {
+                    const value =
+                      entityRegister === 'org'
+                        ? 'tutor'
+                        : entityRegister === 'student'
+                          ? 'tutor'
+                          : 'org';
+                    return changeModeHandler(value);
+                  }}
+                  color={'purple'}
+                  className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+                  Регистрация{' '}
+                  {entityRegister === 'org'
+                    ? 'преподавателя'
+                    : entityRegister === 'student'
+                      ? 'преподавателя'
+                      : 'организации'}
+                </Typography>
+                <Typography
+                  onClick={() => {
+                    const value =
+                      entityRegister == 'org'
+                        ? 'student'
+                        : entityRegister == 'tutor'
+                          ? 'student'
+                          : 'org';
+                    return changeModeHandler(value);
+                  }}
+                  color={'purple'}
+                  className={`${DEFAULT_CLASSNAME}_footer_mode`}>
+                  Регистрация{' '}
+                  {entityRegister === 'org'
+                    ? 'ученика'
+                    : entityRegister === 'tutor'
+                      ? 'ученика'
+                      : 'организации'}
+                </Typography>
               </>
             )}
           </div>
 
-          {isLoading || isRefLoading ? (
+          {isLoading || isRefLoading || isOrgLoading ? (
             <CircularProgress sx={{ color: '#c8caff' }} />
           ) : (
             <button className={`${DEFAULT_CLASSNAME}_form_submit`} type={'submit'}>

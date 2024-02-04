@@ -13,10 +13,9 @@ export enum StudentRoutes {
   TEST_RESULT = '/assignments/result/:id',
 }
 
-
 export enum OrgRoutes {
   ORGANIZATION = '/organization',
-  ASSIGNMENTS = '/assignments'
+  ASSIGNMENTS = '/assignments',
 }
 
 export enum LoginRoutes {
@@ -24,6 +23,7 @@ export enum LoginRoutes {
   REGISTRATION = '/registration',
   JOIN_WITH_REF = '/joinGroup/:groupId',
   REGISTER_WITH_REF = '/registerGroup/:groupId',
+  REGISTER_ORG_WITH_REF = '/joinOrg/:groupId',
 }
 
 export const PLATFORM_ROUTE = '/platform';

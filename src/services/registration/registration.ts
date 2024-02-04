@@ -9,20 +9,24 @@ const registrationAPI = {
     surname,
     login,
     password,
+    reflink,
   }: {
     name: string;
     surname: string;
     login: string;
     password: string;
+    reflink?: string;
   }) => {
-    const res = await API.post(`${REGISTRATION_URL}`, {
-      // return API.post(`${REGISTRATION_URL}?promo_code=${promo}`, {
-      first_name: name,
-      last_name: surname,
-      login,
-      password,
-      role: 'tt',
-    });
+    const res = await API.post(
+      reflink ? `${REGISTRATION_URL}?referral=${reflink}` : `${REGISTRATION_URL}`,
+      {
+        first_name: name,
+        last_name: surname,
+        login,
+        password,
+        role: 'tt',
+      },
+    );
     return res.data;
   },
   createNewStudent: async ({
@@ -73,14 +77,14 @@ const registrationAPI = {
     surname,
     login,
     password,
-    promo
+    promo,
   }: {
-    title?: string,
-    name: string,
-    surname: string,
-    login: string,
-    password: string,
-    promo?: string
+    title?: string;
+    name: string;
+    surname: string;
+    login: string;
+    password: string;
+    promo?: string;
   }) => {
     const res = await API.post(`${REGISTRATION_URL}?promo_code=${promo}`, {
       org_name: title,
@@ -91,7 +95,8 @@ const registrationAPI = {
       role: 'org',
     });
     return res.data;
-  }
+  },
 };
 
-export const { createNewTutor, createNewStudent, createNewStudentWithRef, createNewOrg } = registrationAPI;
+export const { createNewTutor, createNewStudent, createNewStudentWithRef, createNewOrg } =
+  registrationAPI;

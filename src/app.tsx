@@ -48,7 +48,7 @@ const App: FC = () => {
   const PassTest = lazy(() => import('./pages/student/pass-test/pass-test.tsx'));
   const TestResult = lazy(() => import('./pages/student/test-result/test-result.tsx'));
   const Results = lazy(() => import('./pages/tutor/results/results.tsx'));
-  const Organization = lazy(() => import('./pages/org/main.tsx'));
+  const Organization = lazy(() => import('./pages/org/org.tsx'));
 
   const location = useLocation();
   const dispatch = useDispatch();
@@ -66,7 +66,7 @@ const App: FC = () => {
       dispatch((null));
     });
   };
-
+console.log(localStorage.getItem('accessToken'))
   const refreshTokenHandler = (res: {
     access_token: string;
     refresh_token: string;

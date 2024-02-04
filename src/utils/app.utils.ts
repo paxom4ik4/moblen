@@ -50,9 +50,12 @@ export const getStoredAppMode = (): AppModes | null => {
 
   if (storedAppMode.toUpperCase() === AppModes[AppModes.TT]) {
     return AppModes.TT;
+  } 
+  else if (storedAppMode.toUpperCase() === AppModes[AppModes.ST]) {
+    return AppModes.ST;
   }
-
-  return AppModes.ST;
+  return AppModes.ORG;
+  
 };
 
 export const dateTimeConfig = {

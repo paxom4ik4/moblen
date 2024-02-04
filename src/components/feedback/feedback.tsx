@@ -1,11 +1,15 @@
 import './feedback.scss';
-import { Dispatch, FC, SetStateAction, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useState} from 'react';
+import { useSelector } from 'react-redux';
 import { createPortal } from 'react-dom';
 import { Button, ButtonProps, styled, TextareaAutosize } from '@mui/material';
 import { ClickAwayListener } from '@mui/base/ClickAwayListener';
 import { useMutation } from 'react-query';
 import { sendFeedback } from 'services/user';
 import { Notification } from 'common/notification/notification.tsx';
+import Balance from 'components/balance/balance';
+import { AppModes } from 'constants/appTypes';
+import { RootState } from 'store/store.ts';
 
 const DEFAULT_CLASSNAME = 'feedback';
 
@@ -63,6 +67,9 @@ const FeedbackModal: FC<FeedbackModalProps> = ({ setIsFeedbackOpened, setIsFeedb
 };
 
 export const Feedback = () => {
+
+  const { appMode } = useSelector((state: RootState) => state.appMode);
+console.log(appMode)
   const [isFeedbackOpened, setIsFeedbackOpened] = useState(false);
   const [isFeedbackSent, setIsFeedbackSent] = useState(false);
 
@@ -85,7 +92,9 @@ export const Feedback = () => {
           </div>,
           document.body,
         )}
-      <div className={DEFAULT_CLASSNAME}>
+        
+      <div className={DEFAULT_CLASSNAME} style={{display: 'flex', justifyContent: 'space-between', width: '70%'}}>
+        {appMode === AppModes.ORG ? <Balance /> : <></>}
         <button onClick={() => setIsFeedbackOpened(!isFeedbackOpened)}>Сообщить о проблеме</button>
       </div>
     </>

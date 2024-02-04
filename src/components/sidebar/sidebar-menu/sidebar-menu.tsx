@@ -2,7 +2,7 @@ import { Dispatch, FC, SetStateAction } from 'react';
 import { useSelector } from 'react-redux';
 
 import './sidebar-menu.scss';
-import { sidebarMenuConfig, studentSidebarMenuConfig } from './sidebar-menu-config.tsx';
+import { sidebarMenuConfig, studentSidebarMenuConfig} from './sidebar-menu-config.tsx';
 import { Link, useLocation } from 'react-router-dom';
 import { AppModes } from 'constants/appTypes.ts';
 import { RootState } from 'store/store.ts';
@@ -18,7 +18,7 @@ export const SidebarMenu: FC<{ setIsSidebarOpened: Dispatch<SetStateAction<boole
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
 
-  const config = appMode === AppModes.TT ? sidebarMenuConfig : studentSidebarMenuConfig;
+  const config = appMode === AppModes.TT ? sidebarMenuConfig : (appMode === AppModes.ORG ? sidebarMenuConfig : studentSidebarMenuConfig);
 
   return (
     <div className={DEFAULT_CLASSNAME}>

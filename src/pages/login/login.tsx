@@ -62,7 +62,7 @@ export const LoginPage: FC = () => {
       const loginData = await loginUserMutation(loginValues);
 
       const { status, user, token } = await loginData;
-
+console.log(loginData)
       if (status === 'AUTHORIZED') {
         localStorage.setItem('accessToken', token.access_token);
         localStorage.setItem('refreshToken', token.refresh_token);

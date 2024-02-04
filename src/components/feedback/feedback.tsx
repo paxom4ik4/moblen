@@ -8,6 +8,7 @@ import { useMutation } from 'react-query';
 import { sendFeedback } from 'services/user';
 import { Notification } from 'common/notification/notification.tsx';
 import Balance from 'components/balance/balance';
+import RefOrg from 'components/refOrg/refOrg'
 import { AppModes } from 'constants/appTypes';
 import { RootState } from 'store/store.ts';
 
@@ -94,7 +95,7 @@ console.log(appMode)
         )}
         
       <div className={DEFAULT_CLASSNAME} style={{display: 'flex', justifyContent: 'space-between', width: '70%'}}>
-        {appMode === AppModes.ORG ? <Balance /> : <></>}
+        {appMode === AppModes.ORG ? <><Balance /> <RefOrg></RefOrg></>: <></>}
         <button onClick={() => setIsFeedbackOpened(!isFeedbackOpened)}>Сообщить о проблеме</button>
       </div>
     </>

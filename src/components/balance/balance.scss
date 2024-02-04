@@ -1,0 +1,23 @@
+.balance_modal {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    z-index: 100;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 400px;
+    height: 230px;
+    border: 1px solid black;
+    border-radius: 25px;
+    .balance_modal_item {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 5px;
+    }
+
+    
+
+}

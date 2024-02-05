@@ -3,6 +3,7 @@ import API from '../index.ts';
 const ORG_URL = '/organization';
 const BALANCE_URL = '/balance';
 const ORG_REF = '/orgRef'
+const ORG_RELATE = '/relate'
 
 const orgAPI = {
   getOrgInfo: (org_uuid: string) => {
@@ -26,6 +27,10 @@ const orgAPI = {
     const res = await API.put(`${ORG_REF}`);
       return res.data;
   },
+  getTutorsForOrg: async () => {
+    const res = await API.get(`${ORG_RELATE}`);
+    return res.data;
+  }
 };
 
-export const { getOrgInfo, getBalance, getOrgLink, refreshOrgLink } = orgAPI;
+export const { getOrgInfo, getBalance, getOrgLink, refreshOrgLink, getTutorsForOrg } = orgAPI;

@@ -94,7 +94,7 @@ console.log(appMode)
           document.body,
         )}
         
-      <div className={DEFAULT_CLASSNAME} style={{display: 'flex', justifyContent: 'space-between', width: '70%'}}>
+      <div className={DEFAULT_CLASSNAME} style={appMode === AppModes.ORG ? {display: 'flex', justifyContent: 'space-between', width: '70%'} : {}}>
         {appMode === AppModes.ORG ? <><Balance /> <RefOrg></RefOrg></>: <></>}
         <button onClick={() => setIsFeedbackOpened(!isFeedbackOpened)}>Сообщить о проблеме</button>
       </div>

@@ -1,0 +1,25 @@
+.ref_org {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    .ref_org_buttons-referral {
+        width: 180px;
+        height: 54px;
+        overflow: hidden;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        border: 1px solid grey;
+        border-radius: 25px;
+        padding: 10px;
+        font-size: 12px;
+        cursor: pointer;
+    }
+    .ref_org_buttons-referral-link {
+        display: flex;
+        width: 100px;
+        margin-left: 17px;
+        margin-right: 11px;
+        overflow: hidden;
+    }
+}

@@ -111,6 +111,7 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
           <div className={`${DEFAULT_CLASSNAME}_content_info_name`}>
             <Typography
               size={'large'}
+              isPre
               className={`${DEFAULT_CLASSNAME}_content_info_name-container`}>
               {name}
             </Typography>
@@ -140,9 +141,11 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
       {resultsView && (
         <button
           disabled={
-            (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
-            (deadline && new Date(deadline) < new Date(Date.now())) ||
-            listStatus !== LIST_STATUS.completed
+            (appMode !== AppModes.TT) && !seeAnswers && Boolean(deadline && new Date(deadline) < new Date(Date.now()))
+            // seeAnswers && (deadline && new Date(deadline) < new Date(Date.now()))
+            // (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
+            // (deadline && new Date(deadline) < new Date(Date.now())) ||
+            // listStatus !== LIST_STATUS.completed
           }
           className={`${DEFAULT_CLASSNAME}_status ${
             listStatus === LIST_STATUS.pending && !!deadline && 'red-border'
@@ -181,9 +184,10 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
       {!resultsView && (
         <button
         disabled={
-          (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
-          (deadline && new Date(deadline) < new Date(Date.now())) ||
-          listStatus !== LIST_STATUS.completed
+            (appMode !== AppModes.TT) && !seeAnswers && Boolean(deadline && new Date(deadline) < new Date(Date.now()))
+        //   (listStatus === LIST_STATUS.pending && tasksAmount === 0) ||
+        //   (deadline && new Date(deadline) < new Date(Date.now())) ||
+        //   listStatus !== LIST_STATUS.completed
         }
           className={`${DEFAULT_CLASSNAME}_status ${
             listStatus === LIST_STATUS.pending && !!deadline && 'red-border'

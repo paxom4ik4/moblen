@@ -106,20 +106,31 @@ export const CoursesShare: FC<CoursesShareProps> = (props) => {
       </div>
       <div className={`${DEFAULT_CLASSNAME}_share_content`}>
         <div className={`${DEFAULT_CLASSNAME}_share_content_groups`}>
-          {groups?.length
-            ? groups!.map((group) => (
-                <GroupCard
-                  active={selectedShareGroups.includes(group.group_uuid)}
-                  selectedShareGroups={selectedShareGroups}
-                  setSelectedShareGroups={setSelectedShareGroups}
-                  key={group.group_uuid}
-                  id={group.group_uuid}
-                  name={group.group_name}
-                  amount={group.members_count}
-                  hideControls
-                />
-              ))
-            : emptyGroups}
+          {groups && groups.length == 0 && (
+            emptyGroups
+          )}
+          {!groups && (
+          <div className={`${DEFAULT_CLASSNAME}_share_content_empty`}>
+            <div className={`${DEFAULT_CLASSNAME}_share_content_empty-text`}>
+              Загрузка...
+            </div>
+          </div>
+          )}
+          {groups && groups.length !== 0 && (
+            groups!.map((group) => (
+              <GroupCard
+                active={selectedShareGroups.includes(group.group_uuid)}
+                selectedShareGroups={selectedShareGroups}
+                setSelectedShareGroups={setSelectedShareGroups}
+                key={group.group_uuid}
+                id={group.group_uuid}
+                name={group.group_name}
+                amount={group.members_count}
+                hideControls
+              />
+            ))
+          )
+            }
         </div>
         {!!groups?.length && (
           <div className={`${DEFAULT_CLASSNAME}_share_content_config`}>

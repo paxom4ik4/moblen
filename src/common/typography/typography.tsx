@@ -8,6 +8,7 @@ export interface TypographyProps extends PropsWithChildren {
   size?: 'default' | 'small' | 'large';
   color?: 'default' | 'gray' | 'purple' | 'red';
   weight?: 'default' | 'bold' | 'italic';
+  isPre?: boolean;
   className?: string;
   onClick?: () => void;
 }
@@ -18,13 +19,14 @@ export const Typography: FC<TypographyProps> = (props) => {
     size = 'default',
     weight = 'default',
     color = 'default',
+    isPre,
     className,
     children,
   } = props;
 
   return (
     <p
-      style={{ whiteSpace: 'pre' }}
+      style={{ whiteSpace: isPre ? 'pre' : 'pre-wrap' }}
       onClick={onClick}
       className={cl(
         className,

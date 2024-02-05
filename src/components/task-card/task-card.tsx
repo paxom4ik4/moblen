@@ -338,7 +338,7 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
       side === 'left'
         ? currentOptions.length + 1
         : `${String.fromCharCode(64 + currentOptions.length + 1)}`;
-    const newOptions = [...currentOptions, { index: newIndex, text: '', connected: [] }];
+    const newOptions = [...currentOptions, { index: newIndex, text: '', connected: [], isLeft: optionsKey === 'leftOptions' ? true : false }];
 
     const updatedState = props.isCreateMode
       ? { ...props.compareTestState, [optionsKey]: newOptions }
@@ -397,10 +397,11 @@ export const TaskCard: FC<CreateModeTaskCardProps | TaskCardProps> = (props) => 
     const options = props.compareOptions as ConvertedCompareOption[];
 
     return {
-      leftOptions: options?.filter((option) => !option.connected) ?? [],
+      leftOptions: options?.filter((option) => option.isLeft),
+      // leftOptions: options?.filter((option) => !option.connected) ?? [],
       rightOptions:
         options
-          ?.filter((option) => option.connected)
+          ?.filter((option) => !option.isLeft)
           .map((item) => ({ ...item, connected: item.connected!.split(' ') })) ?? [],
     };
   }, [props.compareOptions]);

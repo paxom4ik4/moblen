@@ -33,8 +33,6 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
 
   const formItemDisabled = !isCreateMode && !isEditMode;
 
-  // console.log('compareTestState',  compareTestState);
-
   return (
     <div
       onClick={() => setIsEditMode(true)}
@@ -75,8 +73,6 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
                     fullWidth
                     value={option.text}
                     onChange={(e) => {
-                      // console.log('compareTestStatecompareTestState LEFT', compareTestState);
-                      
                       const newLeftOptions = [...compareTestState.leftOptions];
                       newLeftOptions[index].text = e.target.value;
                       setCompareTestState({
@@ -151,9 +147,6 @@ export const CompareTask: FC<CompareTaskProps> = (props) => {
                     fullWidth
                     value={option.text}
                     onChange={(e) => {
-                      // console.log('compareTestStatecompareTestState RIGHT', compareTestState);
-
-
                       const newRightOptions = [...compareTestState.rightOptions];
                       newRightOptions[index].text = e.target.value;
                       setCompareTestState({

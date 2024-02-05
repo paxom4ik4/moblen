@@ -35,6 +35,9 @@ const PassTest: FC = memo(() => {
 
   const { data: tasksData, isLoading: isTasksLoading } = useQuery('tasks', () => getTasks(id!));
 
+  console.log(tasksData);
+  
+
   const maxScore = tasksData?.tasks?.reduce(
     (score: number, task: Task) => score + Number(task.max_ball),
     0,
@@ -105,6 +108,7 @@ const PassTest: FC = memo(() => {
               orderedTestOptions={task.variants as TestIndexOption[]}
             />
           ))}
+
           <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>
             <CheckIcon />
           </button>

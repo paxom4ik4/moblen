@@ -233,7 +233,7 @@ export const RegistrationPage: FC = () => {
         />
 
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
-          Регистрация 
+          Регистрация{' '}
           {entityRegister === 'org'
             ? 'организации'
             : entityRegister === 'tutor'

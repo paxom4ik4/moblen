@@ -70,7 +70,7 @@ const FeedbackModal: FC<FeedbackModalProps> = ({ setIsFeedbackOpened, setIsFeedb
 export const Feedback = () => {
 
   const { appMode } = useSelector((state: RootState) => state.appMode);
-console.log(appMode)
+
   const [isFeedbackOpened, setIsFeedbackOpened] = useState(false);
   const [isFeedbackSent, setIsFeedbackSent] = useState(false);
 
@@ -94,8 +94,8 @@ console.log(appMode)
           document.body,
         )}
         
-      <div className={DEFAULT_CLASSNAME} style={appMode === AppModes.ORG ? {display: 'flex', justifyContent: 'space-between', width: '70%'} : {}}>
-        {appMode === AppModes.ORG ? <><Balance /> <RefOrg></RefOrg></>: <></>}
+      <div className={DEFAULT_CLASSNAME} style={appMode === AppModes.ORG ? {display: 'flex', justifyContent: 'space-between', width: '80%'} : {}}>
+        {appMode === AppModes.ORG ? <div style={{display: 'flex', justifyContent: 'space-between', width: '85%'}}><Balance /><RefOrg /></div>: <></>}
         <button onClick={() => setIsFeedbackOpened(!isFeedbackOpened)}>Сообщить о проблеме</button>
       </div>
     </>

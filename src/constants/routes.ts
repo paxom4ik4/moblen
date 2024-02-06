@@ -16,6 +16,7 @@ export enum StudentRoutes {
 export enum OrgRoutes {
   ORGANIZATION = '/organization',
   ASSIGNMENTS = '/assignments',
+  JOIN_WITH_REF = '/joinOrg/:orgId'
 }
 
 export enum LoginRoutes {

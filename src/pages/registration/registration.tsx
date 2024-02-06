@@ -12,8 +12,9 @@ import {
   createNewTutor,
   createNewOrg,
 } from 'services/registration/registration.ts';
+import {postOrgMember} from 'services/org/org.ts'
 import { useNavigate, useParams } from 'react-router-dom';
-import { LoginRoutes, PLATFORM_ROUTE } from 'constants/routes.ts';
+import { LoginRoutes, PLATFORM_ROUTE, TutorRoutes } from 'constants/routes.ts';
 import { useMutation } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { CircularProgress } from '@mui/material';
@@ -23,7 +24,7 @@ import { Button } from '../../common/button/button.tsx';
 
 const DEFAULT_CLASSNAME = 'registration';
 
-const MOBLEN_PROMO = 'moblen2024';
+// const MOBLEN_PROMO = 'moblen2024';
 
 export interface RegistrationValues {
   title?: string;
@@ -54,9 +55,23 @@ export const RegistrationPage: FC = () => {
   const handleLoginStudentWithRef = () =>
     navigate(params.groupId ? `${LoginRoutes.LOGIN}/ref/${params.groupId}` : LoginRoutes.LOGIN);
 
+    const joinOrgMutation = useMutation(
+      (data: {ref: string }) => postOrgMember(data),
+      {
+        onSuccess: () => {
+          navigate(TutorRoutes.ASSIGNMENTS);
+        },
+      },
+    );
+
+
   useEffect(() => {
     if (params.groupId && location.pathname.includes('joinOrg')) {
       changeModeHandler('tutor');
+      // console.log(location.pathname.split('/joinOrg/')[1])
+      joinOrgMutation.mutate({
+        ref: location.pathname.split('/joinOrg/')[1],
+      });
     } else {
       changeModeHandler('student');
     }
@@ -80,7 +95,7 @@ export const RegistrationPage: FC = () => {
           login: '',
           password: '',
           passwordRepeat: '',
-          promo: entityRegister === 'org' ? MOBLEN_PROMO : '',
+          promo: '',
         }
       : {
           name: '',
@@ -177,7 +192,7 @@ export const RegistrationPage: FC = () => {
     }
   };
   const handleOrgRegister = async (values: RegistrationValues) => {
-    if (values.promo !== MOBLEN_PROMO) {
+    // if (values.promo !== MOBLEN_PROMO) {
       registerForm.resetForm({
         values: {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -190,11 +205,11 @@ export const RegistrationPage: FC = () => {
           passwordRepeat: registerForm.values.passwordRepeat,
           promo: '',
         },
-        errors: { promo: 'Введен неверный промокод' },
+        // errors: { promo: 'Введен неверный промокод' },
       });
-    } else {
+    // } else {
       await createOrgMutation(values);
-    }
+    // }
   };
 
   return (
@@ -218,7 +233,7 @@ export const RegistrationPage: FC = () => {
         />
 
         <Typography className={`${DEFAULT_CLASSNAME}_form_title`}>
-          Регистрация{' '}
+          Регистрация 
           {entityRegister === 'org'
             ? 'организации'
             : entityRegister === 'tutor'
@@ -303,9 +318,9 @@ export const RegistrationPage: FC = () => {
               type="text"
               name="promo"
             />
-            <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
+            {/* <div className={`${DEFAULT_CLASSNAME}_form_error_filed`}>
               {registerForm.errors.promo}
-            </div>
+            </div> */}
           </>
         )}
 

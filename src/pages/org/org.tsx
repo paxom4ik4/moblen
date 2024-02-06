@@ -6,11 +6,12 @@ import {TutorOrg} from './tutorCard'
 const MainOrg = ()=> {
 
     const {data: tutorsForOrg} = useQuery(['getTutorsForOrg'], () => getTutorsForOrg());
-    // console.log(tutorsForOrg)
+
     return(
-        <div style ={{display: 'flex'}}>{tutorsForOrg?.map((el: TutorOrg) => {
+        <div style ={{display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start', overflowY: 'scroll'}}>
+            {tutorsForOrg?.length ? tutorsForOrg?.map((el: TutorOrg) => {
             return <TutorCard key={tutorsForOrg?.indexOf(el)} tutor={el} />
-        })}</div>
+        }): <div>В Вашей организации пока нет преподавателей</div>}</div>
     )
 };
 

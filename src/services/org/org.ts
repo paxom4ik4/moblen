@@ -5,6 +5,7 @@ const BALANCE_URL = '/balance';
 const ORG_REF = '/orgRef'
 const ORG_RELATE = '/relate'
 const REGISTRATION_URL = '/user';
+const MEMBER_REF = '/orgMember'
 
 const orgAPI = {
   getOrgInfo: (org_uuid: string) => {
@@ -35,7 +36,13 @@ const orgAPI = {
   getInfoUser: async () => {
     const res = await API.get(`${REGISTRATION_URL}`);
     return res.data;
+  },
+  postOrgMember: async ({ref} : {ref: string}) => {
+    const res = await API.post(`${MEMBER_REF}`, {
+      referral: ref,
+    });
+    return res.data;
   }
 };
 
-export const { getOrgInfo, getBalance, getOrgLink, refreshOrgLink, getTutorsForOrg, getInfoUser } = orgAPI;
+export const { getOrgInfo, getBalance, getOrgLink, refreshOrgLink, getTutorsForOrg, getInfoUser, postOrgMember } = orgAPI;

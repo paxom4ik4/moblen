@@ -57,9 +57,6 @@ export const StudentTestCard: FC<StudentTestCardProps> = (props) => {
     seeCriteria = true,
   } = props;
 
-  // console.log('deadline props', props);
-  
-
   const [listStatus, score, maxScore] = status;
 
   const { appMode } = useSelector((state: RootState) => state.appMode);

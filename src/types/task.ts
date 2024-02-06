@@ -58,15 +58,18 @@ export interface CompareOption {
   index: string;
   text: string;
   connected?: number[];
+  isLeft: boolean;
 }
 
 export interface CompareLeftOption {
   index: string;
   text: string;
+  isLeft: boolean;
 }
 
 export interface ConvertedCompareOption {
   text: string;
   index: string;
   connected?: string;
+  isLeft: boolean;
 }

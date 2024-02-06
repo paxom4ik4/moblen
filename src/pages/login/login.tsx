@@ -142,7 +142,7 @@ console.log(loginData)
           onChange={form.handleChange}
           onBlur={form.handleBlur}
           value={form.values.login}
-          label={'Логин'}
+          label={'Почта'}
           type="login"
           name="login"
         />

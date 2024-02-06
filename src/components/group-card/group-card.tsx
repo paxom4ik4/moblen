@@ -91,9 +91,13 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
       setIsNewGroupCreating(false);
       setIsEditMode(false);
 
+      // console.log('newGroupName', newGroupName);
+      
       createGroupMutation.mutate({ groupName: newGroupName });
     } else {
       if (id && newGroupName.length) {
+      // console.log('newGroupNamenewGroupName', newGroupName);
+
         editGroupNameMutation.mutate({ groupId: id!, groupName: newGroupName });
         setIsEditMode(false);
       }
@@ -179,7 +183,11 @@ export const GroupCard: FC<GroupCardProps> = (props) => {
           {isEditMode && (
             <input
               maxLength={24}
-              onChange={(e) => setNewGroupName(e.currentTarget.value)}
+              onChange={(e) => {
+                // console.log('e.currentTarget.value', e.currentTarget.value);
+                
+                setNewGroupName(e.currentTarget.value)}
+              }
               className={`${DEFAULT_CLASSNAME}_text-name`}
               autoFocus={true}
               value={newGroupName}

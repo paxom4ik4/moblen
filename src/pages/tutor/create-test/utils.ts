@@ -18,16 +18,24 @@ export const convertCompareOptions = (
   leftOptions: CompareOption[],
   rightOptions: CompareOption[],
 ): ConvertedCompareOption[] => {
-  const convertedLeftOption = leftOptions.map((item) => ({
-    text: item.text,
-    index: `${item.index}`,
-  }));
+ 
+  const convertedLeftOption = leftOptions.map((item: CompareOption) => {
+    return({
+      text: item.text,
+      index: `${item.index}`,
+      isLeft: true
+    })
+  });
 
-  const convertedRightOptions = rightOptions.map((item) => ({
-    text: item.text,
-    index: `${item.index}`,
-    connected: item?.connected?.map((item) => `${item}`).join(' ') ?? '',
-  }));
+  const convertedRightOptions = rightOptions.map((item) => {
+    
+    return({
+      text: item.text,
+      index: `${item.index}`,
+      connected: item.connected!.map((item) => `${item}`).join(' ') ?? '',
+      isLeft: false
+    })
+  });
 
   return [...convertedLeftOption, ...convertedRightOptions];
 };

@@ -30,7 +30,7 @@
     }
 
     img {
-      object-fit: contain;
+      object-fit: cover;
       width: 36px;
       height: 36px;
       border-radius: 50%;
@@ -85,7 +85,7 @@
       }
 
       img {
-        object-fit: contain;
+        object-fit: cover;
         cursor: pointer;
         width: 64px;
         height: 64px;

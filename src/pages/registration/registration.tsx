@@ -279,8 +279,8 @@ export const RegistrationPage: FC = () => {
           onBlur={registerForm.handleBlur}
           onChange={registerForm.handleChange}
           value={registerForm.values.login}
-          placeholder={'Email или телефон'}
-          label={'Логин'}
+          placeholder={'Email'}
+          label={'Почта'}
           type="login"
           name="login"
         />
@@ -333,7 +333,7 @@ export const RegistrationPage: FC = () => {
               className={`${DEFAULT_CLASSNAME}_footer_mode`}>
               <Typography color={'default'}>Есть аккаунт?</Typography> Войти
             </Typography>
-            {!location.pathname.includes('ref') && (
+            {!location.pathname.includes('registerGroup') && (
               <>
                 <Typography
                   onClick={() => {

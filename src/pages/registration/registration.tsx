@@ -46,7 +46,7 @@ export const RegistrationPage: FC = () => {
 
   const [entityRegister, setEntityRegister] = useState<TypeEntityRegister>('org');
 
-  const [isTutorRegister] = useState<boolean>(true);
+  // const [isOrgRegister] = useState<boolean>(entityRegister === 'org' ? true : false);
 
   const changeModeHandler = (value: TypeEntityRegister) => {
     setEntityRegister(value);
@@ -78,6 +78,7 @@ export const RegistrationPage: FC = () => {
   }, [params.groupId]);
 
   const handleStudentRegister = async (values: RegistrationValues) => {
+
     if (location.pathname.includes('registerGroup')) {
       const { groupId } = params;
 
@@ -112,7 +113,7 @@ export const RegistrationPage: FC = () => {
         : entityRegister === 'tutor'
           ? handleTutorRegister(values)
           : handleStudentRegister(values),
-    validate: (values) => validateFn(values, isTutorRegister),
+    validate: (values) => validateFn(values),
   });
 
   const createNewTutorMutation = useMutation(

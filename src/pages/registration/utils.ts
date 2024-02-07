@@ -14,7 +14,7 @@ const WRONG_MAIL_FORMAT = 'Неверный формат Email';
 // const WRONG_PHONE_FORMAT = 'Неверный формат телефона';
 const PASSWORD_CHECK_ERROR = 'Минимум 8 символов, содержащий цифру, без кириллицы';
 
-export const validateFn = (values: RegistrationValues, isTutorRegister: boolean) => {
+export const validateFn = (values: RegistrationValues) => {
   const errors: Partial<RegistrationValues> = {};
   // eslint-disable-next-line no-useless-escape
   const regMail = /^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$/;
@@ -34,12 +34,12 @@ export const validateFn = (values: RegistrationValues, isTutorRegister: boolean)
     errors.surname = REQUIRED;
   }
 
-  if (isTutorRegister && !values.promo) {
-    errors.promo = REQUIRED;
-  }
+  // if (isOrgRegister && !values.promo) {
+  //   errors.promo = REQUIRED;
+  // }
 
   // eslint-disable-next-line no-useless-escape
-  const regPassword = /^(?=.*\d)(?=.*[\W_])(?!.*[А-Яа-я]).{8,}$/g
+  const regPassword = /^(?=.*\d).{8,}$/g
 
   if (!values.password) {
     errors.password = REQUIRED;

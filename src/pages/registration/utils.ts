@@ -39,7 +39,7 @@ export const validateFn = (values: RegistrationValues, isTutorRegister: boolean)
   }
 
   // eslint-disable-next-line no-useless-escape
-  const regPassword = /(?=.*[0-9])[0-9a-zA-Z\\!\.\/\[\]\-\=@#$%^>\,\.<&{?}~*]{8,}/g
+  const regPassword = /^(?=.*\d)(?=.*[\W_])(?!.*[А-Яа-я]).{8,}$/g
 
   if (!values.password) {
     errors.password = REQUIRED;

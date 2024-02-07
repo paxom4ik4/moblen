@@ -327,11 +327,21 @@ export const RegistrationPage: FC = () => {
         <div className={`${DEFAULT_CLASSNAME}_footer`}>
           <div className={`${DEFAULT_CLASSNAME}_footer_buttons`}>
             <Typography
-              onClick={handleLoginStudentWithRef}
               color={'purple'}
               weight={'bold'}
               className={`${DEFAULT_CLASSNAME}_footer_mode`}>
-              <Typography color={'default'}>Есть аккаунт?</Typography> Войти
+              <Typography onClick={handleLoginStudentWithRef} color={'default'}>Есть аккаунт?</Typography>
+              <span
+                onClick={() =>
+                  navigate(
+                    params?.groupId
+                      ? `/joinGroup/${params?.groupId}`
+                      : LoginRoutes.LOGIN,
+                  )
+                }
+                color={'purple'}>
+                Войти
+              </span>
             </Typography>
             {!location.pathname.includes('registerGroup') && (
               <>

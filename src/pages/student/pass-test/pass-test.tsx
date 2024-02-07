@@ -1,4 +1,4 @@
-import { FC, memo, useState } from 'react';
+import { FC, memo, useEffect, useMemo, useState } from 'react';
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { Typography } from 'common/typography/typography.tsx';
@@ -27,6 +27,48 @@ export interface Answers {
   [key: string]: string;
 }
 
+const SECOND = 1000;
+const MINUTE = SECOND * 60;
+const HOUR = MINUTE * 60;
+const DAY = HOUR * 24;
+
+const Timer = (props : { deadline: string } ) => {
+
+  const {
+    deadline
+  } = props;
+
+  const parsedDeadline = useMemo(() => Date.parse(deadline), [deadline]);
+  const [time, setTime] = useState(parsedDeadline - Date.now());
+
+  useEffect(() => {
+      const interval = setInterval(
+          () => setTime(parsedDeadline - Date.now()),
+          1000,
+      );
+
+      return () => clearInterval(interval);
+  }, [parsedDeadline]);
+
+  return (
+      <div style={{display: 'flex', gap: 10, justifyContent: 'flex-end'}}>
+          {Object.entries({
+              Дней: time / DAY,
+              Часов: (time / HOUR) % 24,
+              Минут: (time / MINUTE) % 60,
+              Секунд: (time / SECOND) % 60,
+          }).map(([label, value]) => (
+              <div key={label}>
+                  <div style={{display: 'flex', gap: 5}}>
+                      <p style={{color: 'red'}}>{`${Math.floor(value)}`.padStart(2, "0")}</p>
+                      <span style={{color: 'red'}}>{label}</span>
+                  </div>
+              </div>
+          ))}
+      </div>
+  );
+};
+
 const PassTest: FC = memo(() => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -35,7 +77,31 @@ const PassTest: FC = memo(() => {
 
   const { data: tasksData, isLoading: isTasksLoading } = useQuery('tasks', () => getTasks(id!));
 
-  console.log(tasksData);
+  const timer = tasksData ? new Date(tasksData?.deadline).getTime() - new Date(Date.now()).getTime() : -1;
+  
+  const [isNotLate, setIsNotLate] = useState<boolean>(true);
+  
+  useEffect(() => {
+    if (tasksData) {
+      tasksData.deadline !== null ? setIsNotLate(tasksData && tasksData.deadline !== null && (new Date(tasksData.deadline) > new Date(Date.now()))) : setIsNotLate(true)
+    }
+  }, [tasksData])
+  
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [sendTimer, _] = useState(new Date(tasksData?.deadline).getTime() - new Date(Date.now()).getTime());
+
+  if (isNotLate && tasksData && tasksData.deadline !== null && timer !== -1 && timer > 0) {
+    setTimeout(() => {
+      setIsNotLate(false);
+    }, timer);
+  }
+
+  useEffect(() => {
+    if (!isNotLate && sendTimer > 0) {
+      submitTestHandler();
+    }
+  }, [isNotLate])
   
 
   const maxScore = tasksData?.tasks?.reduce(
@@ -108,10 +174,21 @@ const PassTest: FC = memo(() => {
               orderedTestOptions={task.variants as TestIndexOption[]}
             />
           ))}
-
-          <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>
-            <CheckIcon />
-          </button>
+          {isNotLate && (
+            <>
+              <button className={`${DEFAULT_CLASSNAME}_submit-test`} onClick={submitTestHandler}>
+                <CheckIcon />
+              </button>
+              {tasksData.deadline !== null && (
+                <>
+                  <p style={{textAlign: 'right', color: 'red'}}>
+                    До дедлайна
+                  </p>
+                  <Timer deadline={tasksData.deadline}/>
+                </>
+              )}
+            </>
+          )}
         </div>
       )}
     </div>

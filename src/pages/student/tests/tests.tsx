@@ -171,9 +171,6 @@ const Tests: FC<TestsProps> = memo((props) => {
 
   const showTasks = activeCourse && activeTopic && !!taskLists?.length;
 
-  console.log('taskLists', taskLists);
-  
-
   return (
     <>
       <Notification
